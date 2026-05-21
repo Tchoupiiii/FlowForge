@@ -91,18 +91,22 @@ export function getModule(type) {
 
 export function getModuleExecutor(type) {
   const mod = modules[type]
-  if (mod && typeof mod.execute === 'function') {
-    return mod.execute
+  if (mod) {
+    if (typeof mod.execute === 'function') return mod.execute
+    if (mod.default && typeof mod.default.execute === 'function') return mod.default.execute
   }
   return null
 }
 
 export function listModules() {
-  return Object.entries(modules).map(([type, mod]) => ({
-    type,
-    label: mod.meta?.label || type,
-    category: mod.meta?.category || 'core'
-  }))
+  return Object.entries(modules).map(([type, mod]) => {
+    const meta = mod.meta || (mod.default && mod.default.meta) || {}
+    return {
+      type,
+      label: meta.label || type,
+      category: meta.category || 'core'
+    }
+  })
 }
 
 export default modules
