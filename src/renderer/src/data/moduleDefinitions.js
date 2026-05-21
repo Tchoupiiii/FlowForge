@@ -3,7 +3,9 @@ import {
   FolderOpen, Save, Code, Hourglass, Bell, Bot, Brain,
   Image, Tags, MapPin, MessageCircle, Send,
   MessageSquare, Hash, Rss, Filter, Bitcoin,
-  Github, Languages, Heart, LineChart, Calendar, Database
+  Github, Languages, Heart, LineChart, Calendar, Database,
+  Terminal, FileText, Search, Table, Binary, FileDigit,
+  Calculator, Scissors, Layout, MessageCircleQuestion
 } from 'lucide-react'
 
 export const MODULE_DEFINITIONS = [
@@ -163,6 +165,108 @@ export const MODULE_DEFINITIONS = [
       tip: 'Les notifications apparaissent dans le centre de notifications Windows.'
     }
   },
+  {
+    type: 'executeCommand', label: 'Commande Shell', icon: 'Terminal', color: '#64748b', category: 'systeme',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'command', label: 'Commande', type: 'text', default: 'echo "Hello"' }
+    ],
+    help: {
+      description: 'Exécute une commande dans le terminal du système.',
+      example: 'Commande: dir C:\\',
+      tip: 'Utile pour lancer des scripts ou interagir avec l\'OS.'
+    }
+  },
+  {
+    type: 'uuidGenerator', label: 'Générer UUID', icon: 'FileDigit', color: '#94a3b8', category: 'systeme',
+    inputs: 1, outputs: 1,
+    configFields: [],
+    help: {
+      description: 'Génère un identifiant unique universel (UUID v4).',
+      example: '→ { uuid: "123e4567-e89b-12d3-a456-426614174000" }',
+      tip: 'Indispensable pour créer des clés primaires ou des tokens.'
+    }
+  },
+  {
+    type: 'base64', label: 'Base64 Encode/Decode', icon: 'Binary', color: '#cbd5e1', category: 'donnees',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['encode', 'decode'], default: 'encode' },
+      { key: 'inputField', label: 'Champ de données (laisser vide pour config.text)', type: 'text', default: '' },
+      { key: 'text', label: 'Texte par défaut', type: 'textarea', default: '' }
+    ],
+    help: {
+      description: 'Convertit du texte en Base64 et inversement.',
+      example: 'Action: encode, Texte: Hello → SGVsbG8=',
+      tip: 'Pratique pour les requêtes HTTP nécessitant une auth Basic.'
+    }
+  },
+  {
+    type: 'regexMatch', label: 'Expression Régulière', icon: 'Search', color: '#14b8a6', category: 'donnees',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'pattern', label: 'Pattern Regex', type: 'text', default: '.*' },
+      { key: 'inputField', label: 'Champ à analyser', type: 'text', default: 'text' }
+    ],
+    help: {
+      description: 'Extrait des données à partir d\'un texte selon un pattern.',
+      example: 'Pattern: \\d+ → Extrait tous les nombres',
+      tip: 'La sortie contiendra un tableau des correspondances (matches).'
+    }
+  },
+  {
+    type: 'jsonToCsv', label: 'JSON vers CSV', icon: 'Table', color: '#0ea5e9', category: 'donnees',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'inputField', label: 'Champ JSON (vide = tout)', type: 'text', default: '' }
+    ],
+    help: {
+      description: 'Convertit un tableau d\'objets JSON en texte CSV.',
+      example: '[{a: 1}] → "a\\n1"',
+      tip: 'Associez-le au nœud Écriture Fichier pour générer un fichier .csv.'
+    }
+  },
+  {
+    type: 'csvToJson', label: 'CSV vers JSON', icon: 'FileText', color: '#0284c7', category: 'donnees',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'csv', label: 'Contenu CSV (vide = prendre de l\'input)', type: 'textarea', default: '' },
+      { key: 'inputField', label: 'Champ contenant le CSV', type: 'text', default: 'content' }
+    ],
+    help: {
+      description: 'Convertit un texte CSV en tableau d\'objets JSON.',
+      example: '"a,b\\n1,2" → [{a:"1", b:"2"}]',
+      tip: 'Peut traiter la sortie d\'un fichier texte lu avec Lecture Fichier.'
+    }
+  },
+  {
+    type: 'mathOperation', label: 'Calcul Mathématique', icon: 'Calculator', color: '#ef4444', category: 'donnees',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'operation', label: 'Opération', type: 'select', options: ['add', 'subtract', 'multiply', 'divide'], default: 'add' },
+      { key: 'a', label: 'Valeur A (nombre ou champ)', type: 'text', default: '0' },
+      { key: 'b', label: 'Valeur B (nombre ou champ)', type: 'text', default: '0' }
+    ],
+    help: {
+      description: 'Effectue une opération mathématique de base.',
+      example: 'Opération: add, A: 5, B: 10 → 15',
+      tip: 'Vous pouvez référencer des champs d\'input ex: {{input.price}}.'
+    }
+  },
+  {
+    type: 'stringManipulation', label: 'Manipulation Texte', icon: 'Scissors', color: '#f59e0b', category: 'donnees',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['uppercase', 'lowercase', 'trim', 'split'], default: 'uppercase' },
+      { key: 'text', label: 'Texte à modifier', type: 'text', default: '' },
+      { key: 'separator', label: 'Séparateur (pour split)', type: 'text', default: ',', showIf: (c) => c.action === 'split' }
+    ],
+    help: {
+      description: 'Modifie une chaîne de caractères.',
+      example: 'Action: uppercase, Texte: hello → HELLO',
+      tip: 'L\'action split retournera un tableau (array) de sous-chaînes.'
+    }
+  },
   // ──── Data & APIs ────
   {
     type: 'rssParser', label: 'Lecture RSS', icon: 'Rss', color: '#f97316', category: 'core',
@@ -241,6 +345,36 @@ export const MODULE_DEFINITIONS = [
       tip: 'La sortie contient le prix exact de l\'action demandée.'
     }
   },
+  {
+    type: 'trelloCard', label: 'Créer Carte Trello', icon: 'Layout', color: '#0079bf', category: 'productivite',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'password', default: '' },
+      { key: 'token', label: 'Token', type: 'password', default: '' },
+      { key: 'idList', label: 'ID de la Liste', type: 'text', default: '' },
+      { key: 'name', label: 'Nom de la carte', type: 'text', default: 'Nouvelle tâche' }
+    ],
+    help: {
+      description: 'Crée une carte dans une liste Trello via l\'API officielle.',
+      example: 'Nom de la carte: Bugfix 1.0.2',
+      tip: 'Vous trouverez la clé et le token dans la section Power-Ups de Trello.'
+    }
+  },
+  {
+    type: 'githubCreateIssue', label: 'Créer Issue GitHub', icon: 'Github', color: '#18181b', category: 'api',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'token', label: 'Token GitHub', type: 'password', default: '' },
+      { key: 'repo', label: 'Dépôt (owner/repo)', type: 'text', default: 'Tchoupiiii/FlowForge' },
+      { key: 'title', label: 'Titre de l\'issue', type: 'text', default: 'Bug report' },
+      { key: 'body', label: 'Description', type: 'textarea', default: '' }
+    ],
+    help: {
+      description: 'Crée une issue sur un dépôt GitHub.',
+      example: 'Titre: Erreur sur le panneau\nDescription: ...',
+      tip: 'Nécessite un Personal Access Token avec la permission "repo".'
+    }
+  },
   // ──── Integrations ────
   {
     type: 'discordWebhook', label: 'Envoi Discord', icon: 'MessageSquare', color: '#5865F2', category: 'core',
@@ -311,6 +445,34 @@ export const MODULE_DEFINITIONS = [
       description: "Envoie un prompt à un modèle d'IA (OpenAI ou Ollama local).",
       example: 'Provider: openai\nModèle: gpt-4\nPrompt: Résume ce texte...',
       tip: 'Pour Ollama (gratuit, local), installez Ollama et utilisez le modèle llama3.'
+    }
+  },
+  {
+    type: 'openAiChat', label: 'ChatGPT', icon: 'MessageCircleQuestion', color: '#10a37f', category: 'ai',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'apiKey', label: 'Clé API', type: 'password', default: '' },
+      { key: 'model', label: 'Modèle', type: 'text', default: 'gpt-4o' },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', default: 'Bonjour' }
+    ],
+    help: {
+      description: 'Envoie une requête directement à l\'API cloud OpenAI.',
+      example: 'Prompt: Donne-moi une blague.',
+      tip: 'Si vous avez configuré Ollama, préférez le module Agent IA.'
+    }
+  },
+  {
+    type: 'anthropicClaude', label: 'Claude (Anthropic)', icon: 'Bot', color: '#d97757', category: 'ai',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'apiKey', label: 'Clé API', type: 'password', default: '' },
+      { key: 'model', label: 'Modèle', type: 'text', default: 'claude-3-opus-20240229' },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', default: 'Bonjour' }
+    ],
+    help: {
+      description: 'Envoie une requête à l\'API Anthropic Claude.',
+      example: 'Prompt: Explique la physique quantique.',
+      tip: 'Claude est excellent pour l\'analyse de très grands textes.'
     }
   },
   {
@@ -415,18 +577,21 @@ export const MODULE_DEFINITIONS = [
   }
 ]
 
-/** Icon component map — maps icon string names to lucide-react components */
 export const ICON_MAP = {
   Play, Clock, Globe, Anchor, GitBranch, RefreshCw, Mail,
   FolderOpen, Save, Code, Hourglass, Bell, Bot, Brain,
   Image, Tags, MapPin, MessageCircle, Send,
   MessageSquare, Hash, Rss, Filter, Bitcoin,
-  Github, Languages, Heart, LineChart, Calendar, Database
+  Github, Languages, Heart, LineChart, Calendar, Database,
+  Terminal, FileText, Search, Table, Binary, FileDigit,
+  Calculator, Scissors, Layout, MessageCircleQuestion
 }
 
 /** Category labels for sidebar display */
 const CATEGORY_LABELS = {
   core: 'Core',
+  systeme: 'Système & Fichiers',
+  donnees: 'Traitement Données',
   api: 'Données & APIs',
   ai: 'Intelligence Artificielle',
   map: 'Carte',

@@ -1,7 +1,7 @@
 {
   "name": "flowforge",
-  "version": "1.0.1",
-  "description": "FlowForge — Automatisation de workflows no-code",
+  "version": "1.0.2",
+  "description": "FlowForge - Automatisation No-Code",
   "main": "./out/main/index.js",
   "author": "FlowForge",
   "license": "MIT",

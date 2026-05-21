@@ -28,7 +28,18 @@ import * as openFda from './openFda.js'
 import * as stockPrice from './stockPrice.js'
 import * as googleCalendar from './googleCalendar.js'
 import * as notionDatabase from './notionDatabase.js'
-
+import * as executeCommand from './executeCommand.js'
+import * as regexMatch from './regexMatch.js'
+import * as jsonToCsv from './jsonToCsv.js'
+import * as csvToJson from './csvToJson.js'
+import * as base64 from './base64.js'
+import * as uuidGenerator from './uuidGenerator.js'
+import * as mathOperation from './mathOperation.js'
+import * as stringManipulation from './stringManipulation.js'
+import * as trelloCard from './trelloCard.js'
+import * as githubCreateIssue from './githubCreateIssue.js'
+import * as openAiChat from './openAiChat.js'
+import * as anthropicClaude from './anthropicClaude.js'
 const modules = {
   triggerManual,
   timerCron,
@@ -59,7 +70,19 @@ const modules = {
   openFda,
   stockPrice,
   googleCalendar,
-  notionDatabase
+  notionDatabase,
+  executeCommand,
+  regexMatch,
+  jsonToCsv,
+  csvToJson,
+  base64,
+  uuidGenerator,
+  mathOperation,
+  stringManipulation,
+  trelloCard,
+  githubCreateIssue,
+  openAiChat,
+  anthropicClaude
 }
 
 export function getModule(type) {

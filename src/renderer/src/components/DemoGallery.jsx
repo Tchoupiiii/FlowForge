@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar } from 'lucide-react'
+import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 
 // Import demos
@@ -15,7 +15,8 @@ import githubTranslateDemo from '../demos/githubTranslateDemo'
 import healthDemo from '../demos/healthDemo'
 import financeDemo from '../demos/financeDemo'
 import planningDemo from '../demos/planningDemo'
-
+import systemMonitorDemo from '../demos/systemMonitorDemo'
+import trelloCardDemo from '../demos/trelloCardDemo'
 const DEMOS = [
   { ...weatherDemo(), icon: Cloud, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
   { ...csvDemo(), icon: FileJson, gradient: 'linear-gradient(135deg, #2dd4bf 0%, #3b82f6 100%)' },
@@ -28,7 +29,9 @@ const DEMOS = [
   { ...githubTranslateDemo(), icon: Github, gradient: 'linear-gradient(135deg, #18181b 0%, #3f3f46 100%)' },
   { ...healthDemo(), icon: Heart, gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)' },
   { ...financeDemo(), icon: LineChart, gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)' },
-  { ...planningDemo(), icon: Calendar, gradient: 'linear-gradient(135deg, #4285F4 0%, #1e40af 100%)' }
+  { ...planningDemo(), icon: Calendar, gradient: 'linear-gradient(135deg, #4285F4 0%, #1e40af 100%)' },
+  { ...systemMonitorDemo(), icon: Terminal, gradient: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' },
+  { ...trelloCardDemo(), icon: Layout, gradient: 'linear-gradient(135deg, #0079bf 0%, #0284c7 100%)' }
 ]
 
 export default function DemoGallery({ onClose }) {
