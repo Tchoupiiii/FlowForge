@@ -1,0 +1,28 @@
+appId: com.flowforge.app
+productName: FlowForge
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.*'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,CHANGELOG.md,README.md}'
+asarUnpack:
+  - resources/**
+win:
+  executableName: FlowForge
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  artifactName: FlowForge-${version}-setup.${ext}
+  shortcutName: FlowForge
+  uninstallDisplayName: FlowForge
+  createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+publish:
+  provider: github
+  owner: Tchoupiiii
+  repo: FlowForge
