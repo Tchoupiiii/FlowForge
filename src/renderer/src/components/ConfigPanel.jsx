@@ -12,7 +12,10 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
   React.useEffect(() => {
     // If the node has a provider field set to ollama, try to fetch models
     const checkOllama = async () => {
-      if (node?.data?.config?.provider === 'ollama') {
+      const providerField = node?.data?.type ? getModuleByType(node.data.type)?.configFields?.find(f => f.key === 'provider') : null;
+      const providerValue = node?.data?.config?.provider !== undefined ? node.data.config.provider : (providerField?.default);
+      
+      if (providerValue === 'ollama') {
         try {
           let data;
           if (window.electronAPI && window.electronAPI.getOllamaModels) {
@@ -73,7 +76,10 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
       case 'text':
       case 'password':
         // Special logic for dynamic ollama model field
-        if (field.key === 'model' && config.provider === 'ollama') {
+        const providerField = moduleDef.configFields?.find(f => f.key === 'provider');
+        const providerValue = config.provider !== undefined ? config.provider : (providerField?.default);
+        
+        if (field.key === 'model' && providerValue === 'ollama') {
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <select

@@ -1,6 +1,6 @@
 {
   "name": "flowforge",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "FlowForge - Automatisation No-Code",
   "main": "./out/main/index.js",
   "author": "FlowForge",

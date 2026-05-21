@@ -15,6 +15,7 @@ import ContextMenu from './components/ContextMenu'
 import GuideModal from './components/GuideModal'
 import CopilotPanel from './components/CopilotPanel'
 import SettingsModal from './components/SettingsModal'
+import WorkflowsModal from './components/WorkflowsModal'
 
 function AppContent() {
   const [selectedNodeId, setSelectedNodeId] = useState(null)
@@ -23,6 +24,7 @@ function AppContent() {
   const [showGuide, setShowGuide] = useState(false)
   const [showCopilot, setShowCopilot] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showWorkflows, setShowWorkflows] = useState(false)
   const [showExecutionLog, setShowExecutionLog] = useState(false)
   const [contextMenu, setContextMenu] = useState(null)
   const [updateReady, setUpdateReady] = useState(false)
@@ -116,14 +118,15 @@ function AppContent() {
       <div className="app-body">
         <Sidebar />
         <div className="main-area">
-          <Toolbar
-            onShowDemos={handleShowDemos}
-            onShowGuide={handleShowGuide}
-            onShowCopilot={handleShowCopilot}
-            onShowSettings={() => setShowSettings(true)}
-            onToggleLog={handleToggleLog}
-            showLog={showExecutionLog}
-          />
+            <Toolbar
+              onShowDemos={handleShowDemos}
+              onShowGuide={handleShowGuide}
+              onShowCopilot={handleShowCopilot}
+              onShowSettings={() => setShowSettings(true)}
+              onShowWorkflows={() => setShowWorkflows(true)}
+              onToggleLog={handleToggleLog}
+              showLog={showExecutionLog}
+            />
           <div className="content-area">
             {showDemoGallery ? (
               <DemoGallery onClose={handleCloseDemos} />
@@ -168,6 +171,9 @@ function AppContent() {
       )}
       {showSettings && (
         <SettingsModal onClose={() => setShowSettings(false)} />
+      )}
+      {showWorkflows && (
+        <WorkflowsModal onClose={() => setShowWorkflows(false)} />
       )}
       
       {updateReady && (

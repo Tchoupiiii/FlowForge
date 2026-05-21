@@ -91,16 +91,44 @@ export function getModule(type) {
 
 export function getModuleExecutor(type) {
   const mod = modules[type]
-  if (mod) {
-    if (typeof mod.execute === 'function') return mod.execute
-    if (mod.default && typeof mod.default.execute === 'function') return mod.default.execute
+  if (!mod) return null
+
+  // deep search for execute
+  const findExecute = (obj, depth = 0) => {
+    if (!obj || depth > 3) return null
+    if (typeof obj.execute === 'function') return obj.execute
+    if (typeof obj === 'object') {
+      for (const key of Object.keys(obj)) {
+        if (typeof obj[key] === 'object' || typeof obj[key] === 'function') {
+          const found = findExecute(obj[key], depth + 1)
+          if (found) return found
+        }
+      }
+    }
+    return null
   }
-  return null
+  
+  return findExecute(mod) || null
 }
 
 export function listModules() {
   return Object.entries(modules).map(([type, mod]) => {
-    const meta = mod.meta || (mod.default && mod.default.meta) || {}
+    // deep search for meta
+    const findMeta = (obj, depth = 0) => {
+      if (!obj || depth > 3) return null
+      if (obj.meta) return obj.meta
+      if (typeof obj === 'object') {
+        for (const key of Object.keys(obj)) {
+          if (typeof obj[key] === 'object' || typeof obj[key] === 'function') {
+            const found = findMeta(obj[key], depth + 1)
+            if (found) return found
+          }
+        }
+      }
+      return null
+    }
+
+    const meta = findMeta(mod) || {}
     return {
       type,
       label: meta.label || type,

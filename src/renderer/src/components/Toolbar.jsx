@@ -4,7 +4,7 @@ import { useWorkflow } from '../context/WorkflowContext'
 import { useExecution } from '../context/ExecutionContext'
 import ThemeToggle from './ThemeToggle'
 
-export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot, onShowSettings }) {
+export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot, onShowSettings, onShowWorkflows }) {
   const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas } = useWorkflow()
   const { isRunning, execute, stop } = useExecution()
 
@@ -44,6 +44,11 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
 
         <div className="toolbar-divider" />
 
+        <button className="toolbar-btn" onClick={onShowWorkflows} title="Ouvrir">
+          <FolderOpen size={16} />
+          <span>Ouvrir</span>
+        </button>
+
         <button className="toolbar-btn" onClick={handleSave} title="Sauvegarder">
           <Save size={16} />
           <span>Sauver</span>
@@ -70,7 +75,7 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
         </button>
 
         <button className="toolbar-btn" onClick={() => onToggleLog && onToggleLog()} title="Logs">
-          <FolderOpen size={16} />
+          <Layout size={16} />
           <span>{showLog ? 'Masquer Logs' : 'Logs'}</span>
         </button>
 
