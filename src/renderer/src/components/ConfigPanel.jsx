@@ -69,6 +69,26 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
     updateNodeConfig(node.id, updates)
   }
 
+  // Render text with {{variables}} highlighted
+  const renderHighlightedPreview = (text) => {
+    if (!text || typeof text !== 'string' || !text.includes('{{')) return null
+    const parts = text.split(/(\{\{.+?\}\})/g)
+    return (
+      <div className="var-preview" style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        padding: '12px 16px', pointerEvents: 'none', whiteSpace: 'pre-wrap',
+        wordBreak: 'break-word', fontSize: '13px', lineHeight: '1.6',
+        fontFamily: 'inherit', color: 'transparent', overflow: 'hidden'
+      }}>
+        {parts.map((part, i) =>
+          /^\{\{.+?\}\}$/.test(part)
+            ? <span key={i} className="var-highlight">{part}</span>
+            : <span key={i}>{part}</span>
+        )}
+      </div>
+    )
+  }
+
   const renderField = (field) => {
     const value = config[field.key] !== undefined ? config[field.key] : field.default
 
@@ -127,14 +147,18 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
       case 'textarea':
       case 'code':
         return (
-          <textarea
-            className={`config-textarea ${field.type === 'code' ? 'config-code' : ''}`}
-            value={value || ''}
-            onChange={(e) => handleChange(field.key, e.target.value)}
-            rows={field.type === 'code' ? 6 : 3}
-            placeholder={field.default || ''}
-            spellCheck={false}
-          />
+          <div style={{ position: 'relative' }}>
+            {renderHighlightedPreview(value || '')}
+            <textarea
+              className={`config-textarea ${field.type === 'code' ? 'config-code' : ''}`}
+              value={value || ''}
+              onChange={(e) => handleChange(field.key, e.target.value)}
+              rows={field.type === 'code' ? 6 : 3}
+              placeholder={field.default || ''}
+              spellCheck={false}
+              style={{ background: value?.includes('{{') ? 'transparent' : undefined, position: 'relative', zIndex: 1 }}
+            />
+          </div>
         )
       default:
         return (

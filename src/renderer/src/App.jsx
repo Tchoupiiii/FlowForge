@@ -16,6 +16,7 @@ import GuideModal from './components/GuideModal'
 import CopilotPanel from './components/CopilotPanel'
 import SettingsModal from './components/SettingsModal'
 import WorkflowsModal from './components/WorkflowsModal'
+import { ToastProvider, useToast } from './components/ToastProvider'
 
 function AppContent() {
   const [selectedNodeId, setSelectedNodeId] = useState(null)
@@ -29,12 +30,19 @@ function AppContent() {
   const [contextMenu, setContextMenu] = useState(null)
   const [updateReady, setUpdateReady] = useState(false)
   const [appVersion, setAppVersion] = useState('v1.0.0')
+  const toast = useToast()
 
   useEffect(() => {
     if (window.electronAPI) {
       if (window.electronAPI.onUpdateDownloaded) {
         window.electronAPI.onUpdateDownloaded(() => {
           setUpdateReady(true)
+          toast.success('Mise à jour prête', 'FlowForge sera mis à jour au prochain démarrage.')
+        })
+      }
+      if (window.electronAPI.onUpdateAvailable) {
+        window.electronAPI.onUpdateAvailable(() => {
+          toast.info('Mise à jour disponible', 'Téléchargement en cours...')
         })
       }
       if (window.electronAPI.getVersion) {
@@ -200,7 +208,9 @@ export default function App() {
       <WorkflowProvider>
         <ExecutionProvider>
           <ReactFlowProvider>
-            <AppContent />
+            <ToastProvider>
+              <AppContent />
+            </ToastProvider>
           </ReactFlowProvider>
         </ExecutionProvider>
       </WorkflowProvider>

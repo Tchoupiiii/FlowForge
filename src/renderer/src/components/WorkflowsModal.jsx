@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react'
-import { X, FolderOpen, Trash2 } from 'lucide-react'
+import { X, FolderOpen, Trash2, Download, Upload } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
+import { useToast } from './ToastProvider'
 
 export default function WorkflowsModal({ onClose }) {
-  const { listWorkflows, savedWorkflows, loadWorkflow, deleteWorkflow } = useWorkflow()
+  const { listWorkflows, savedWorkflows, loadWorkflow, deleteWorkflow, nodes, edges, workflowName, loadDemoWorkflow } = useWorkflow()
+  const toast = useToast()
 
   useEffect(() => {
     listWorkflows()
@@ -11,6 +13,7 @@ export default function WorkflowsModal({ onClose }) {
 
   const handleLoad = async (id) => {
     await loadWorkflow(id)
+    toast.success('Workflow chargé', 'Le workflow a été chargé avec succès.')
     onClose()
   }
 
@@ -18,14 +21,49 @@ export default function WorkflowsModal({ onClose }) {
     e.stopPropagation()
     if (confirm('Voulez-vous vraiment supprimer ce workflow ?')) {
       await deleteWorkflow(id)
+      toast.info('Workflow supprimé', 'Le workflow a été supprimé.')
+    }
+  }
+
+  const handleExport = async () => {
+    if (window.electronAPI && window.electronAPI.exportWorkflow) {
+      const workflow = {
+        name: workflowName,
+        nodes: nodes.map(n => ({ ...n })),
+        edges: edges.map(e => ({ ...e })),
+        exportedAt: new Date().toISOString()
+      }
+      const result = await window.electronAPI.exportWorkflow(workflow)
+      if (result?.success) {
+        toast.success('Workflow exporté', `Sauvegardé dans ${result.path}`)
+      } else if (!result?.canceled) {
+        toast.error('Erreur', result?.error || 'Impossible d\'exporter.')
+      }
+    }
+  }
+
+  const handleImport = async () => {
+    if (window.electronAPI && window.electronAPI.importWorkflow) {
+      const result = await window.electronAPI.importWorkflow()
+      if (result?.success && result.workflow) {
+        loadDemoWorkflow({
+          name: result.workflow.name || 'Workflow importé',
+          nodes: result.workflow.nodes || [],
+          edges: result.workflow.edges || []
+        })
+        toast.success('Workflow importé', `"${result.workflow.name || 'Workflow'}" chargé avec succès.`)
+        onClose()
+      } else if (!result?.canceled) {
+        toast.error('Erreur', result?.error || 'Fichier invalide.')
+      }
     }
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '500px' }}>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" style={{ maxWidth: '560px' }} onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2><FolderOpen size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} /> Ouvrir un Workflow</h2>
+          <h2><FolderOpen size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />Mes Workflows</h2>
           <button className="icon-btn" onClick={onClose}><X size={20} /></button>
         </div>
         
@@ -39,30 +77,30 @@ export default function WorkflowsModal({ onClose }) {
               {savedWorkflows.map(wf => (
                 <div 
                   key={wf.id}
+                  className="workflow-item"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '12px 16px',
-                    background: 'var(--bg-surface)',
-                    borderRadius: 'var(--radius-sm)',
+                    padding: '14px 16px',
+                    background: 'var(--bg-surface-2)',
+                    borderRadius: 'var(--radius-md)',
                     border: '1px solid var(--glass-border)',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
-                  className="workflow-item"
                   onClick={() => handleLoad(wf.id)}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span style={{ fontWeight: '500', color: 'var(--text)' }}>{wf.name || 'Sans nom'}</span>
+                    <span style={{ fontWeight: '600', color: 'var(--text)', fontSize: '14px' }}>{wf.name || 'Sans nom'}</span>
                     <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                      Dernière modif: {new Date(wf.updatedAt).toLocaleString()}
+                      {wf.nodeCount || 0} nœuds · Modifié le {new Date(wf.updatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   <button 
                     className="icon-btn" 
                     onClick={(e) => handleDelete(wf.id, e)}
-                    style={{ color: 'var(--danger)' }}
+                    style={{ color: 'var(--error)' }}
                     title="Supprimer"
                   >
                     <Trash2 size={16} />
@@ -73,7 +111,15 @@ export default function WorkflowsModal({ onClose }) {
           )}
         </div>
         
-        <div className="modal-footer" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="btn-secondary" onClick={handleImport}>
+              <Upload size={14} /> Importer
+            </button>
+            <button className="btn-secondary" onClick={handleExport}>
+              <Download size={14} /> Exporter actuel
+            </button>
+          </div>
           <button className="btn-secondary" onClick={onClose}>Fermer</button>
         </div>
       </div>

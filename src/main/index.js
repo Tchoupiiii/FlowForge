@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { autoUpdater } from 'electron-updater'
 import { ExecutionEngine } from './executionEngine.js'
@@ -53,29 +53,24 @@ app.whenReady().then(() => {
   autoUpdater.allowPrerelease = false
   autoUpdater.allowDowngrade = false
 
-  // Chercher des mises à jour
-  autoUpdater.checkForUpdatesAndNotify().catch(err => {
-    console.log('Update check failed:', err)
-  })
+  // Chercher des mises à jour (silently, no crash if fails)
+  if (!isDev) {
+    autoUpdater.checkForUpdates().catch(err => {
+      console.log('Update check failed (normal in dev):', err?.message)
+    })
+  }
 
-  // Events d'auto-update
+  // Events d'auto-update — send to renderer for in-app toasts
   autoUpdater.on('error', (err) => {
-    if (Notification.isSupported()) {
-      new Notification({ title: 'Erreur de mise à jour', body: err.message }).show()
-    }
+    console.log('Auto-update error:', err?.message)
+    mainWindow?.webContents.send('update-error', err?.message || 'Unknown error')
   })
 
   autoUpdater.on('update-available', () => {
-    if (Notification.isSupported()) {
-      new Notification({ title: 'Mise à jour disponible', body: 'Une nouvelle version de FlowForge est en cours de téléchargement...' }).show()
-    }
+    mainWindow?.webContents.send('update-available')
   })
 
   autoUpdater.on('update-downloaded', () => {
-    if (Notification.isSupported()) {
-      new Notification({ title: 'Mise à jour prête', body: 'FlowForge sera mis à jour au prochain démarrage.' }).show()
-    }
-    // Also notify renderer if needed
     mainWindow?.webContents.send('update-downloaded')
   })
 
@@ -211,6 +206,42 @@ ipcMain.handle('ollama:get-tags', async () => {
     if (!res.ok) return { success: false, error: 'Ollama API error' }
     const data = await res.json()
     return { success: true, models: data.models }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+})
+
+// Workflow export/import (file dialog)
+ipcMain.handle('workflow:export', async (_event, workflow) => {
+  const { dialog } = require('electron')
+  const { writeFileSync } = require('fs')
+  try {
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Exporter le workflow',
+      defaultPath: `${(workflow.name || 'workflow').replace(/[^a-zA-Z0-9]/g, '_')}.flowforge.json`,
+      filters: [{ name: 'FlowForge Workflow', extensions: ['flowforge.json', 'json'] }]
+    })
+    if (result.canceled || !result.filePath) return { success: false, canceled: true }
+    writeFileSync(result.filePath, JSON.stringify(workflow, null, 2), 'utf-8')
+    return { success: true, path: result.filePath }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('workflow:import', async () => {
+  const { dialog } = require('electron')
+  const { readFileSync } = require('fs')
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Importer un workflow',
+      filters: [{ name: 'FlowForge Workflow', extensions: ['flowforge.json', 'json'] }],
+      properties: ['openFile']
+    })
+    if (result.canceled || !result.filePaths.length) return { success: false, canceled: true }
+    const data = readFileSync(result.filePaths[0], 'utf-8')
+    const workflow = JSON.parse(data)
+    return { success: true, workflow }
   } catch (error) {
     return { success: false, error: error.message }
   }

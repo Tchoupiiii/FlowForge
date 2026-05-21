@@ -46,7 +46,7 @@ export default function cryptoDiscordDemo() {
           color: '#2dd4bf',
           category: 'core',
           config: {
-            expression: 'return {\n  message: `🚀 Le prix actuel du ${input.coin.toUpperCase()} est de $${input.price} !`\n};'
+            expression: 'return {\n  message: `🚀 Le prix actuel du ${input.coin?.toUpperCase() || "BTC"} est de $${input.price || input.bitcoin?.usd || "N/A"} !`\n};'
           },
           status: 'idle'
         }

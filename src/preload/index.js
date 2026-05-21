@@ -29,6 +29,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Updates
   onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', callback),
+  onUpdateAvailable: (callback) => ipcRenderer.on('update-available', callback),
+  onUpdateError: (callback) => ipcRenderer.on('update-error', (_event, msg) => callback(msg)),
   installUpdate: () => ipcRenderer.invoke('app:install-update'),
 
   // Theme
@@ -36,5 +38,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setTheme: (theme) => ipcRenderer.invoke('app:set-theme', theme),
 
   // AI APIs
-  getOllamaModels: () => ipcRenderer.invoke('ollama:get-tags')
+  getOllamaModels: () => ipcRenderer.invoke('ollama:get-tags'),
+
+  // Workflow file export/import
+  exportWorkflow: (workflow) => ipcRenderer.invoke('workflow:export', workflow),
+  importWorkflow: () => ipcRenderer.invoke('workflow:import')
 })

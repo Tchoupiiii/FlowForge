@@ -95,28 +95,12 @@ export function WorkflowProvider({ children }) {
     try {
       if (window.electronAPI) {
         await window.electronAPI.saveWorkflow(workflow)
-        
-        // Show HTML5 Notification
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('Workflow sauvegardé !', {
-            body: `Le workflow "${workflow.name}" a bien été enregistré.`,
-            silent: true
-          })
-        } else if ('Notification' in window && Notification.permission !== 'denied') {
-          Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-              new Notification('Workflow sauvegardé !', {
-                body: `Le workflow "${workflow.name}" a bien été enregistré.`,
-                silent: true
-              })
-            }
-          })
-        }
       }
+      return { ...workflow, _saved: true }
     } catch (e) {
       console.error('Save failed:', e)
+      return { ...workflow, _saved: false, _error: e.message }
     }
-    return workflow
   }, [workflowId, workflowName, nodes, edges])
 
   const loadWorkflow = useCallback(async (id) => {

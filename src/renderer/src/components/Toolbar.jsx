@@ -2,11 +2,13 @@ import React from 'react'
 import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { useExecution } from '../context/ExecutionContext'
+import { useToast } from './ToastProvider'
 import ThemeToggle from './ThemeToggle'
 
 export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot, onShowSettings, onShowWorkflows }) {
   const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas } = useWorkflow()
   const { isRunning, execute, stop } = useExecution()
+  const toast = useToast()
 
   const handleRun = async () => {
     if (isRunning) {
@@ -17,7 +19,12 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
   }
 
   const handleSave = async () => {
-    await saveWorkflow()
+    const result = await saveWorkflow()
+    if (result?._saved) {
+      toast.success('Workflow sauvegardé', `"${result.name}" a été enregistré.`)
+    } else {
+      toast.error('Erreur de sauvegarde', result?._error || 'Une erreur est survenue.')
+    }
   }
 
   return (

@@ -52,7 +52,7 @@ export default function trelloCardDemo() {
           inputs: 1,
           outputs: 1,
           config: {
-            name: 'Ticket issu du Workflow',
+            name: '{{input.matches[0]}}',
             idList: 'TRELLO_LIST_ID',
             apiKey: '',
             token: ''
