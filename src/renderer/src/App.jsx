@@ -45,6 +45,14 @@ function AppContent() {
           toast.info('Mise à jour disponible', 'Téléchargement en cours...')
         })
       }
+      if (window.electronAPI.onAppNotification) {
+        window.electronAPI.onAppNotification((data) => {
+          const type = data.type || 'info'
+          if (toast[type]) {
+            toast[type](data.title || 'Notification', data.body || '')
+          }
+        })
+      }
       if (window.electronAPI.getVersion) {
         window.electronAPI.getVersion().then(version => {
           setAppVersion('v' + version)

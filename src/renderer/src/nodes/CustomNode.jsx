@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useState, useRef, useEffect } from 'react'
 import { Handle, Position } from 'reactflow'
 import { ICON_MAP, getModuleByType } from '../data/moduleDefinitions'
 
@@ -8,8 +8,42 @@ function CustomNode({ data, selected }) {
   const moduleDef = getModuleByType(data.type) || {}
   const inputsCount = data.inputs !== undefined ? data.inputs : (moduleDef.inputs || 0)
   const outputsCount = data.outputs !== undefined ? data.outputs : (moduleDef.outputs || 0)
+  
+  const [isEditing, setIsEditing] = useState(false)
+  const [editLabel, setEditLabel] = useState(data.label || '')
+  const inputRef = useRef(null)
 
-  // Build a config summary to show in the node body
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [isEditing])
+
+  const handleDoubleClick = (e) => {
+    e.stopPropagation()
+    setEditLabel(data.label || '')
+    setIsEditing(true)
+  }
+
+  const handleBlur = () => {
+    setIsEditing(false)
+    if (editLabel.trim() && editLabel !== data.label && data.onRename) {
+      data.onRename(editLabel.trim())
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.target.blur()
+    }
+    if (e.key === 'Escape') {
+      setEditLabel(data.label || '')
+      setIsEditing(false)
+    }
+  }
+
+  // Build a config summary with variable highlighting
   let configSummary = ''
   if (data.config) {
     if (data.type === 'httpRequest' && data.config.url) {
@@ -34,7 +68,20 @@ function CustomNode({ data, selected }) {
       configSummary = `${data.config.field} ${data.config.operator || '=='} ${data.config.value || ''}`
     } else if (data.type === 'codeJs') {
       configSummary = 'JavaScript'
+    } else if (data.type === 'loopForEach') {
+      configSummary = `${data.config.arrayField || 'items'} ${data.config.maxIterations ? '(max: ' + data.config.maxIterations + ')' : ''}`
     }
+  }
+
+  // Render summary with variable highlighting
+  const renderSummary = (text) => {
+    if (!text || !text.includes('{{')) return text
+    const parts = text.split(/(\{\{.+?\}\})/g)
+    return parts.map((part, i) =>
+      /^\{\{.+?\}\}$/.test(part)
+        ? <span key={i} className="var-highlight">{part}</span>
+        : part
+    )
   }
 
   return (
@@ -53,12 +100,36 @@ function CustomNode({ data, selected }) {
         <div className="custom-node-icon" style={{ background: `${data.color}20`, color: data.color }}>
           {IconComp && <IconComp size={18} />}
         </div>
-        <span className="custom-node-label">{data.label}</span>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            className="node-rename-input"
+            value={editLabel}
+            onChange={e => setEditLabel(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'var(--bg-surface-2)',
+              border: '1px solid var(--accent)',
+              borderRadius: '4px',
+              color: 'var(--text)',
+              fontSize: '12px',
+              fontWeight: '600',
+              padding: '2px 6px',
+              outline: 'none',
+              width: '100%',
+              minWidth: '60px'
+            }}
+          />
+        ) : (
+          <span className="custom-node-label" onDoubleClick={handleDoubleClick} title="Double-clic pour renommer">{data.label}</span>
+        )}
       </div>
 
       {configSummary && (
         <div className="custom-node-body">
-          <span className="custom-node-summary">{configSummary}</span>
+          <span className="custom-node-summary">{renderSummary(configSummary)}</span>
         </div>
       )}
 

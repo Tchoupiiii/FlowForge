@@ -153,6 +153,19 @@ export const MODULE_DEFINITIONS = [
     }
   },
   {
+    type: 'loopForEach', label: 'Boucle (Loop)', icon: 'RefreshCw', color: '#22d3ee', category: 'core',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'arrayField', label: 'Champ tableau (ex: items)', type: 'text', default: 'items' },
+      { key: 'maxIterations', label: 'Max itérations (0 = illimité)', type: 'number', default: 0 }
+    ],
+    help: {
+      description: 'Itère sur chaque élément d\'un tableau. Passe les éléments un par un au nœud suivant.',
+      example: 'Champ: items → traite chaque élément du tableau',
+      tip: 'Connectez la sortie à un nœud de traitement pour appliquer une action à chaque élément.'
+    }
+  },
+  {
     type: 'notification', label: 'Notification', icon: 'Bell', color: '#f87171', category: 'core',
     inputs: 1, outputs: 1,
     configFields: [
@@ -160,9 +173,9 @@ export const MODULE_DEFINITIONS = [
       { key: 'body', label: 'Message', type: 'text', default: '' }
     ],
     help: {
-      description: 'Affiche une notification système Windows.',
+      description: 'Affiche une notification dans l\'application.',
       example: 'Titre: Alerte\nMessage: Le workflow est terminé !',
-      tip: 'Les notifications apparaissent dans le centre de notifications Windows.'
+      tip: 'Utilisez {{input.xxx}} pour injecter des données dynamiques.'
     }
   },
   {

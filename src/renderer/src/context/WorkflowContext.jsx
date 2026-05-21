@@ -65,6 +65,15 @@ export function WorkflowProvider({ children }) {
     }))
   }, [setNodes])
 
+  const renameNode = useCallback((nodeId, newLabel) => {
+    setNodes((nds) => nds.map(n => {
+      if (n.id === nodeId) {
+        return { ...n, data: { ...n.data, label: newLabel } }
+      }
+      return n
+    }))
+  }, [setNodes])
+
   const updateNodeStatus = useCallback((nodeId, status) => {
     setNodes((nds) => nds.map(n => {
       if (n.id === nodeId) {
@@ -163,7 +172,7 @@ export function WorkflowProvider({ children }) {
       onNodesChange, onEdgesChange, onConnect,
       workflowName, setWorkflowName,
       workflowId,
-      addNode, updateNodeConfig, updateNodeStatus, resetAllStatus,
+      addNode, updateNodeConfig, updateNodeStatus, resetAllStatus, renameNode,
       saveWorkflow, loadWorkflow, loadDemoWorkflow,
       listWorkflows, deleteWorkflow, savedWorkflows,
       clearCanvas, reactFlowWrapper

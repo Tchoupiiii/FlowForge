@@ -42,5 +42,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Workflow file export/import
   exportWorkflow: (workflow) => ipcRenderer.invoke('workflow:export', workflow),
-  importWorkflow: () => ipcRenderer.invoke('workflow:import')
+  importWorkflow: () => ipcRenderer.invoke('workflow:import'),
+
+  // In-app notifications from workflow modules
+  onAppNotification: (callback) => ipcRenderer.on('app-notification', (_event, data) => callback(data))
 })

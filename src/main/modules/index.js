@@ -40,6 +40,7 @@ import * as trelloCard from './trelloCard.js'
 import * as githubCreateIssue from './githubCreateIssue.js'
 import * as openAiChat from './openAiChat.js'
 import * as anthropicClaude from './anthropicClaude.js'
+import * as loopForEach from './loopForEach.js'
 const modules = {
   triggerManual,
   timerCron,
@@ -82,7 +83,8 @@ const modules = {
   trelloCard,
   githubCreateIssue,
   openAiChat,
-  anthropicClaude
+  anthropicClaude,
+  loopForEach
 }
 
 export function getModule(type) {

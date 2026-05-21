@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useMemo } from 'react'
 import ReactFlow, { Background, Controls, MiniMap } from 'reactflow'
 import { useWorkflow } from '../context/WorkflowContext'
 import CustomNode from '../nodes/CustomNode'
@@ -14,9 +14,20 @@ const defaultEdgeOptions = {
 export default function Canvas({ onNodeSelect, onContextMenu }) {
   const {
     nodes, edges, onNodesChange, onEdgesChange, onConnect,
-    addNode, reactFlowWrapper
+    addNode, reactFlowWrapper, renameNode
   } = useWorkflow()
   const reactFlowInstance = useRef(null)
+
+  // Inject onRename callback into each node's data
+  const augmentedNodes = useMemo(() => {
+    return nodes.map(n => ({
+      ...n,
+      data: {
+        ...n.data,
+        onRename: (newLabel) => renameNode(n.id, newLabel)
+      }
+    }))
+  }, [nodes, renameNode])
 
   const onDrop = useCallback((e) => {
     e.preventDefault()
@@ -62,7 +73,7 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
   return (
     <div className="canvas-wrapper" ref={reactFlowWrapper}>
       <ReactFlow
-        nodes={nodes}
+        nodes={augmentedNodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

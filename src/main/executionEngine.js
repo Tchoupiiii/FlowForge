@@ -1,5 +1,49 @@
-import { Notification } from 'electron'
 import { getModuleExecutor } from './modules/index.js'
+
+/**
+ * Interpolate {{input.xxx}} variables in a string
+ * Supports nested paths like {{input.data.name}} and array access like {{input.items[0]}}
+ */
+function interpolate(template, data) {
+  if (!data || typeof template !== 'string') return template
+  return template.replace(/\{\{(.+?)\}\}/g, (_match, key) => {
+    const trimmedKey = key.trim()
+    // Support "input.xxx" or just "xxx"
+    const cleanKey = trimmedKey.startsWith('input.') ? trimmedKey.slice(6) : trimmedKey
+    
+    if (cleanKey === 'input' || trimmedKey === 'input') {
+      // {{input}} = the whole input object
+      return typeof data === 'object' ? JSON.stringify(data) : String(data)
+    }
+    
+    // Navigate nested paths (supports dots and brackets)
+    const parts = cleanKey.replace(/\[(\d+)\]/g, '.$1').split('.')
+    let value = data
+    for (const part of parts) {
+      if (value === null || value === undefined) return ''
+      value = value[part]
+    }
+    if (value === null || value === undefined) return ''
+    if (typeof value === 'object') return JSON.stringify(value)
+    return String(value)
+  })
+}
+
+/**
+ * Deep-interpolate all string values in a config object
+ */
+function interpolateConfig(config, inputData) {
+  if (!inputData || !config) return config
+  const result = {}
+  for (const [key, value] of Object.entries(config)) {
+    if (typeof value === 'string') {
+      result[key] = interpolate(value, inputData)
+    } else {
+      result[key] = value
+    }
+  }
+  return result
+}
 
 export class ExecutionEngine {
   constructor() {
@@ -73,12 +117,14 @@ export class ExecutionEngine {
         if (!node) continue
         const moduleType = node.data?.type || node.type
         const executor = getModuleExecutor(moduleType)
-        const config = node.data?.config || {}
+        const rawConfig = node.data?.config || {}
         const label = node.data?.label || moduleType
 
         // Gather input data from parent nodes
         let inputData = {}
         const parentEdges = edges.filter(e => e.target === nodeId)
+        let wasSkipped = false
+
         for (const pe of parentEdges) {
           if (results[pe.source]) {
             // If condition node, check which branch
@@ -89,26 +135,32 @@ export class ExecutionEngine {
               if (branch === 'false' && condResult.result === true) {
                 onProgress(nodeId, 'skipped', { message: 'Branche non prise (condition vraie)' })
                 results[nodeId] = { _skipped: true }
-                continue
+                wasSkipped = true
+                break
               }
               if (branch === 'true' && condResult.result === false) {
                 onProgress(nodeId, 'skipped', { message: 'Branche non prise (condition fausse)' })
                 results[nodeId] = { _skipped: true }
-                continue
+                wasSkipped = true
+                break
               }
             }
             if (results[pe.source]._skipped) {
               results[nodeId] = { _skipped: true }
               onProgress(nodeId, 'skipped', { message: 'Parent ignoré' })
+              wasSkipped = true
               break
             }
             inputData = { ...inputData, ...results[pe.source] }
           }
         }
 
-        if (results[nodeId]?._skipped) continue
+        if (wasSkipped || results[nodeId]?._skipped) continue
 
         onProgress(nodeId, 'running', { message: `Exécution de ${label}...` })
+
+        // ★ INTERPOLATE all {{input.xxx}} variables in config before executing
+        const config = interpolateConfig(rawConfig, inputData)
 
         if (!executor) {
           // Trigger nodes just pass through
@@ -136,15 +188,6 @@ export class ExecutionEngine {
             data: result,
             duration
           })
-
-          if (['writeFile', 'discordWebhook', 'slackWebhook', 'telegramSend', 'email'].includes(moduleType)) {
-            if (Notification.isSupported()) {
-              new Notification({
-                title: 'Action FlowForge réussie',
-                body: `Le module "${label}" s'est exécuté avec succès.`
-              }).show()
-            }
-          }
         } catch (error) {
           results[nodeId] = { error: error.message }
           onProgress(nodeId, 'error', {

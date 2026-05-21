@@ -870,13 +870,15 @@ body {
 }
 
 .config-field-label {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 7px;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
 }
 
 .config-input,
@@ -884,22 +886,24 @@ body {
 .config-textarea {
   width: 100%;
   background: var(--bg-surface-2);
-  border: 1px solid var(--glass-border);
+  border: 1.5px solid var(--glass-border);
   color: var(--text);
   outline: none;
-  transition: all var(--transition);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', -apple-system, sans-serif;
+  box-sizing: border-box;
 }
 
 .config-input,
 .config-select {
-  height: 40px;
-  padding: 0 14px;
-  border-radius: var(--radius-pill);
+  height: 42px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
   font-size: 13px;
 }
 
 .config-textarea {
-  min-height: 80px;
+  min-height: 90px;
   padding: 12px 16px;
   border-radius: var(--radius-md);
   font-size: 13px;
@@ -907,16 +911,31 @@ body {
   line-height: 1.6;
 }
 
+.config-input:hover,
+.config-select:hover,
+.config-textarea:hover {
+  border-color: rgba(124, 107, 240, 0.4);
+  background: var(--bg-hover);
+}
+
 .config-input:focus,
 .config-select:focus,
 .config-textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-  background: var(--bg-hover);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 2px 8px rgba(124, 107, 240, 0.15);
+  background: var(--bg-surface);
+}
+
+.config-input::placeholder,
+.config-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.4;
+  font-style: italic;
 }
 
 .config-select {
   appearance: none;
+  cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238888a4' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
@@ -927,12 +946,15 @@ body {
   letter-spacing: 2px;
 }
 
-.config-code-textarea {
-  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+.config-code-textarea,
+.config-textarea.config-code {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
   font-size: 12px;
   min-height: 120px;
   line-height: 1.7;
   tab-size: 2;
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(124, 107, 240, 0.2);
 }
 
 /* ============================================================
@@ -2634,11 +2656,14 @@ body {
 
 /* ==================== VARIABLE HIGHLIGHT ==================== */
 .var-highlight {
-  color: #c084fc;
-  font-weight: 600;
-  background: rgba(192, 132, 252, 0.1);
-  border-radius: 3px;
-  padding: 0 2px;
+  color: #e879f9;
+  font-weight: 700;
+  background: rgba(232, 121, 249, 0.15);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.92em;
+  border: 1px solid rgba(232, 121, 249, 0.25);
 }
 
 /* ==================== WORKFLOW ITEM HOVER ==================== */
