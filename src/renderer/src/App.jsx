@@ -14,6 +14,7 @@ import DemoGallery from './components/DemoGallery'
 import ContextMenu from './components/ContextMenu'
 import GuideModal from './components/GuideModal'
 import CopilotPanel from './components/CopilotPanel'
+import SettingsModal from './components/SettingsModal'
 
 function AppContent() {
   const [selectedNodeId, setSelectedNodeId] = useState(null)
@@ -21,15 +22,24 @@ function AppContent() {
   const [showDemoGallery, setShowDemoGallery] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
   const [showCopilot, setShowCopilot] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [showExecutionLog, setShowExecutionLog] = useState(false)
   const [contextMenu, setContextMenu] = useState(null)
   const [updateReady, setUpdateReady] = useState(false)
+  const [appVersion, setAppVersion] = useState('v1.0.0')
 
   useEffect(() => {
-    if (window.electronAPI && window.electronAPI.onUpdateDownloaded) {
-      window.electronAPI.onUpdateDownloaded(() => {
-        setUpdateReady(true)
-      })
+    if (window.electronAPI) {
+      if (window.electronAPI.onUpdateDownloaded) {
+        window.electronAPI.onUpdateDownloaded(() => {
+          setUpdateReady(true)
+        })
+      }
+      if (window.electronAPI.getVersion) {
+        window.electronAPI.getVersion().then(version => {
+          setAppVersion('v' + version)
+        })
+      }
     }
   }, [])
 
@@ -110,6 +120,7 @@ function AppContent() {
             onShowDemos={handleShowDemos}
             onShowGuide={handleShowGuide}
             onShowCopilot={handleShowCopilot}
+            onShowSettings={() => setShowSettings(true)}
             onToggleLog={handleToggleLog}
             showLog={showExecutionLog}
           />
@@ -155,6 +166,9 @@ function AppContent() {
       {showCopilot && (
         <CopilotPanel onClose={() => setShowCopilot(false)} />
       )}
+      {showSettings && (
+        <SettingsModal onClose={() => setShowSettings(false)} />
+      )}
       
       {updateReady && (
         <div className="update-banner">
@@ -169,7 +183,7 @@ function AppContent() {
         </div>
       )}
 
-      <div className="app-version">v1.0.1</div>
+      <div className="app-version">{appVersion}</div>
     </div>
   )
 }

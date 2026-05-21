@@ -47,12 +47,24 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow()
 
+  // Auto Updater config
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.allowPrerelease = false
+  autoUpdater.allowDowngrade = false
+
   // Chercher des mises à jour
   autoUpdater.checkForUpdatesAndNotify().catch(err => {
     console.log('Update check failed:', err)
   })
 
   // Events d'auto-update
+  autoUpdater.on('error', (err) => {
+    if (Notification.isSupported()) {
+      new Notification({ title: 'Erreur de mise à jour', body: err.message }).show()
+    }
+  })
+
   autoUpdater.on('update-available', () => {
     if (Notification.isSupported()) {
       new Notification({ title: 'Mise à jour disponible', body: 'Une nouvelle version de FlowForge est en cours de téléchargement...' }).show()
@@ -99,8 +111,21 @@ ipcMain.on('app:close', () => {
   mainWindow?.close()
 })
 
+ipcMain.handle('app:get-version', () => {
+  return app.getVersion()
+})
+
 ipcMain.handle('app:install-update', () => {
   autoUpdater.quitAndInstall(false, true)
+})
+
+// Settings
+ipcMain.handle('app:get-settings', async () => {
+  return storage.loadSettings()
+})
+
+ipcMain.handle('app:set-settings', async (_event, settings) => {
+  return storage.saveSettings(settings)
 })
 
 // Theme

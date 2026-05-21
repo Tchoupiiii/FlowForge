@@ -1,6 +1,11 @@
+import { loadSettings } from '../storage.js'
+
 export const execute = async (config, inputData) => {
   try {
-    const { apiKey, token, idList, name, desc } = config;
+    const settings = loadSettings();
+    const apiKey = config.apiKey || settings.trelloApiKey;
+    const token = config.token || settings.trelloToken;
+    const { idList, name, desc } = config;
     if (!apiKey || !token || !idList || !name) {
       throw new Error('Missing required Trello configuration (apiKey, token, idList, name).');
     }

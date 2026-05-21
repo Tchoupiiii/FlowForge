@@ -1,7 +1,5 @@
-/**
- * AI Agent Module
- * Makes API calls to OpenAI or Ollama for chat completions / text generation.
- */
+import { loadSettings } from '../storage.js'
+
 export default {
   meta: {
     type: 'aiAgent',
@@ -35,9 +33,11 @@ export default {
 }
 
 async function callOpenAI(config, params) {
-  const apiKey = config.apiKey
+  const settings = loadSettings();
+  const apiKey = config.apiKey || settings.openaiApiKey;
+  
   if (!apiKey) {
-    throw new Error('AI Agent (OpenAI): apiKey is required')
+    throw new Error('AI Agent (OpenAI): apiKey is required (configure it in Settings or the Node)')
   }
 
   const baseUrl = config.baseUrl || 'https://api.openai.com/v1'

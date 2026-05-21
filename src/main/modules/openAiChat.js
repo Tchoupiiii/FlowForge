@@ -1,6 +1,12 @@
+import { loadSettings } from '../storage.js'
+
 export const execute = async (config, inputData) => {
   try {
-    const { apiKey, model = 'gpt-3.5-turbo', prompt, systemPrompt } = config;
+    const settings = loadSettings();
+    const apiKey = config.apiKey || settings.openaiApiKey;
+    const model = config.model || 'gpt-3.5-turbo';
+    const { prompt, systemPrompt } = config;
+    
     if (!apiKey || !prompt) {
       throw new Error('Missing required OpenAI configuration (apiKey, prompt).');
     }

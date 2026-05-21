@@ -1,6 +1,12 @@
+import { loadSettings } from '../storage.js'
+
 export const execute = async (config, inputData) => {
   try {
-    const { apiKey, model = 'claude-3-haiku-20240307', prompt, systemPrompt } = config;
+    const settings = loadSettings();
+    const apiKey = config.apiKey || settings.anthropicApiKey;
+    const model = config.model || 'claude-3-haiku-20240307';
+    const { prompt, systemPrompt } = config;
+    
     if (!apiKey || !prompt) {
       throw new Error('Missing required Anthropic configuration (apiKey, prompt).');
     }

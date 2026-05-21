@@ -1,10 +1,10 @@
 import React from 'react'
-import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles } from 'lucide-react'
+import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { useExecution } from '../context/ExecutionContext'
 import ThemeToggle from './ThemeToggle'
 
-export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot }) {
+export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot, onShowSettings }) {
   const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas } = useWorkflow()
   const { isRunning, execute, stop } = useExecution()
 
@@ -62,6 +62,11 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
         <button className="toolbar-btn" style={{ color: '#818cf8' }} onClick={onShowCopilot} title="Copilot">
           <Sparkles size={16} />
           <span>Copilot</span>
+        </button>
+
+        <button className="toolbar-btn" onClick={onShowSettings} title="Paramètres">
+          <Settings size={16} />
+          <span>Paramètres</span>
         </button>
 
         <button className="toolbar-btn" onClick={() => onToggleLog && onToggleLog()} title="Logs">

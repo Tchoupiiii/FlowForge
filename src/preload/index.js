@@ -17,10 +17,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners('execution:progress')
   },
 
-  // Window controls
+  // Window Controls
   minimize: () => ipcRenderer.send('app:minimize'),
   maximize: () => ipcRenderer.send('app:maximize'),
   close: () => ipcRenderer.send('app:close'),
+  
+  // App info & Settings
+  getVersion: () => ipcRenderer.invoke('app:get-version'),
+  getSettings: () => ipcRenderer.invoke('app:get-settings'),
+  setSettings: (settings) => ipcRenderer.invoke('app:set-settings', settings),
 
   // Updates
   onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', callback),

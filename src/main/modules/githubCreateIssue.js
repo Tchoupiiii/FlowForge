@@ -1,6 +1,10 @@
+import { loadSettings } from '../storage.js'
+
 export const execute = async (config, inputData) => {
   try {
-    const { token, repo, title, body } = config;
+    const settings = loadSettings();
+    const token = config.token || settings.githubToken;
+    const { repo, title, body } = config;
     if (!token || !repo || !title) {
       throw new Error('Missing required GitHub configuration (token, repo, title).');
     }
