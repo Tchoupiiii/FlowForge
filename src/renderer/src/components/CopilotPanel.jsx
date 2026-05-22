@@ -5,15 +5,30 @@ import { useWorkflow } from '../context/WorkflowContext'
 
 export default function CopilotPanel({ onClose }) {
   const { loadDemoWorkflow, nodes, edges } = useWorkflow()
-  const [mode, setMode] = useState('create')
-  const [provider, setProvider] = useState('ollama')
-  const [apiKey, setApiKey] = useState('')
-  const [model, setModel] = useState('')
+  const [mode, setMode] = useState(() => localStorage.getItem('copilot_mode') || 'create')
+  const [provider, setProvider] = useState(() => localStorage.getItem('copilot_provider') || 'ollama')
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('copilot_apiKey') || '')
+  const [model, setModel] = useState(() => localStorage.getItem('copilot_model') || '')
   const [ollamaModels, setOllamaModels] = useState([])
   const [prompt, setPrompt] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+  const [chatHistory, setChatHistory] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('copilot_chat')) || []
+    } catch {
+      return []
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('copilot_mode', mode)
+    localStorage.setItem('copilot_provider', provider)
+    localStorage.setItem('copilot_apiKey', apiKey)
+    localStorage.setItem('copilot_model', model)
+    localStorage.setItem('copilot_chat', JSON.stringify(chatHistory))
+  }, [mode, provider, apiKey, model, chatHistory])
 
   useEffect(() => {
     if (provider === 'ollama') {
@@ -38,12 +53,16 @@ export default function CopilotPanel({ onClose }) {
 
   const handleGenerate = async () => {
     if (!prompt) return
+    
+    const userMessage = { role: 'user', content: prompt }
+    setChatHistory(prev => [...prev, userMessage])
+    setPrompt('')
     setLoading(true)
     setError('')
     setMessage('')
 
     const currentWorkflowJson = JSON.stringify({ nodes, edges })
-    const basePrompt = `Tu es FlowForge Copilot. Ton rôle est de générer ou modifier des workflows automatisés (no-code).
+    const basePrompt = `Tu es FlowForge Copilot. Ton rôle est d'aider l'utilisateur avec son workflow.
 Un workflow est un objet JSON de cette forme :
 {
   "name": "Nom du workflow",
@@ -65,22 +84,32 @@ Voici la liste des modules disponibles (TYPE_DU_MODULE) :
 ${MODULE_DEFINITIONS.map(m => `- ${m.type} : ${m.label} (${m.help.description})`).join('\n')}
 
 INSTRUCTIONS :
-1. Analyse la demande de l'utilisateur.
-2. Si un module essentiel manque pour réaliser ce qu'il demande, retourne STRICTEMENT le JSON : { "impossible": true }
-3. Sinon, retourne STRICTEMENT et UNIQUEMENT le JSON du workflow (pas de texte, pas de balises).
+1. Si l'utilisateur te pose une question générale, réponds lui en texte clair et naturel (sans JSON).
+2. Si l'utilisateur te demande explicitement de générer, ajouter ou modifier le workflow, retourne STRICTEMENT un objet JSON représentant le workflow (SANS texte autour).
+3. Si un module essentiel manque pour réaliser ce qu'il demande, retourne STRICTEMENT le JSON : { "impossible": true }
 `
 
     const systemPrompt = mode === 'modify' 
-      ? `${basePrompt}\nWORKFLOW ACTUEL :\n${currentWorkflowJson}\n\nApplique les modifications demandées sur le workflow actuel et renvoie le JSON complet modifié.`
-      : `${basePrompt}\nCrée un nouveau workflow de zéro en positionnant les nœuds avec un x croissant.`
+      ? `${basePrompt}\nWORKFLOW ACTUEL :\n${currentWorkflowJson}\n\nApplique les modifications demandées sur le workflow actuel ou réponds à la question.`
+      : `${basePrompt}\nCrée un nouveau workflow de zéro ou réponds à la question de l'utilisateur.`
+
+    // Prepare messages array for API
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...chatHistory.slice(-5), // keep last 5 messages for context
+      userMessage
+    ]
 
     try {
       let responseText = ''
 
       if (provider === 'ollama') {
         if (window.electronAPI && window.electronAPI.generateOllama) {
-          const options = { system: systemPrompt, format: 'json', num_predict: 2048 }
-          const res = await window.electronAPI.generateOllama(prompt, model, options)
+          // Send messages array as prompt by joining them for Ollama, or use Ollama chat endpoint if supported. 
+          // For simplicity, we just pass the system prompt and the user's latest prompt.
+          const ollamaPrompt = `Historique: ${chatHistory.slice(-3).map(m => m.role + ': ' + m.content).join('\n')}\n\nUtilisateur: ${userMessage.content}`
+          const options = { system: systemPrompt, num_predict: 2048 }
+          const res = await window.electronAPI.generateOllama(ollamaPrompt, model, options)
           if (!res.success) throw new Error(res.error)
           responseText = res.response
         } else {
@@ -95,11 +124,7 @@ INSTRUCTIONS :
           },
           body: JSON.stringify({
             model: model,
-            response_format: { type: "json_object" },
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: prompt }
-            ]
+            messages: messages
           })
         })
         if (!res.ok) throw new Error('Erreur API OpenAI (Vérifiez la clé API)')
@@ -107,22 +132,24 @@ INSTRUCTIONS :
         responseText = data.choices[0].message.content
       }
 
+      setChatHistory(prev => [...prev, { role: 'assistant', content: responseText }])
+
       let workflow
       try {
         workflow = JSON.parse(responseText)
       } catch (err) {
         // Fallback for partial/markdown JSON from local models
-        const match = responseText.match(/\{[\s\S]*\}/)
+        const match = responseText.match(/\{[\s\S]*"nodes"[\s\S]*\}/)
         if (match) {
-          workflow = JSON.parse(match[0])
-        } else {
-          throw err
+          try { workflow = JSON.parse(match[0]) } catch(e) {}
+        } else if (responseText.includes('"impossible": true')) {
+          workflow = { impossible: true }
         }
       }
 
-      if (workflow.impossible) {
-        setMessage("C'est impossible pour l'instant, aucun module ne permet de faire ça. Veuillez me contacter !")
-      } else {
+      if (workflow && workflow.impossible) {
+        setMessage("C'est impossible pour l'instant, aucun module ne permet de faire ça.")
+      } else if (workflow && workflow.nodes) {
         // Hydrate node data with required defaults
         workflow.nodes = workflow.nodes.map(n => {
           const modDef = MODULE_DEFINITIONS.find(m => m.type === n.data.type)
@@ -142,11 +169,11 @@ INSTRUCTIONS :
         })
 
         loadDemoWorkflow(workflow)
-        setMessage("Workflow généré avec succès !")
+        setMessage("Workflow appliqué avec succès !")
       }
 
     } catch (e) {
-      setError(`Erreur lors de la génération: ${e.message}`)
+      setError(`Erreur: ${e.message}`)
     }
     
     setLoading(false)
@@ -198,13 +225,43 @@ INSTRUCTIONS :
         </div>
 
         <div className="copilot-chat">
-          <label className="config-field-label">Que souhaitez-vous automatiser ?</label>
+          {chatHistory.length > 0 && (
+            <div className="chat-history" style={{ 
+              maxHeight: '250px', 
+              overflowY: 'auto', 
+              marginBottom: '15px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              {chatHistory.map((msg, i) => (
+                <div key={i} style={{
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12.5px',
+                  lineHeight: '1.4',
+                  background: msg.role === 'user' ? 'rgba(255,255,255,0.05)' : 'rgba(124, 107, 240, 0.1)',
+                  border: `1px solid ${msg.role === 'user' ? 'var(--glass-border)' : 'var(--accent)'}`,
+                  color: msg.role === 'user' ? 'var(--text)' : 'var(--text)',
+                  alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                  maxWidth: '90%'
+                }}>
+                  <strong style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>
+                    {msg.role === 'user' ? 'Vous' : 'Copilot'}
+                  </strong>
+                  <span style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <label className="config-field-label">Discutez avec l'IA ou demandez un workflow</label>
           <textarea 
             className="config-textarea" 
-            rows={4} 
+            rows={3} 
             value={prompt} 
             onChange={e => setPrompt(e.target.value)}
-            placeholder="Ex: Un workflow qui télécharge un flux RSS, filtre les articles sur l'IA, et m'envoie un résumé sur Slack..."
+            placeholder="Ex: A quoi sert ce workflow ? ou Crée un workflow qui télécharge un flux RSS..."
           />
           
           <button 
