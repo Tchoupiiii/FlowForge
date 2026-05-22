@@ -26,6 +26,8 @@ function createWindow() {
     }
   })
 
+  mainWindow.maximize() // Démarrer en plein écran par défaut
+
   // Load renderer
   if (isDev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])

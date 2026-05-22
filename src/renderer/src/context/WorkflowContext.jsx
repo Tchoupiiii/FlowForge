@@ -342,18 +342,94 @@ export function WorkflowProvider({ children }) {
     createNewTab()
   }, [createNewTab])
 
+  const [history, setHistory] = useState([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
+  const [clipboard, setClipboard] = useState({ nodes: [], edges: [] })
+
+  const takeSnapshot = useCallback(() => {
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1)
+      newHistory.push({ 
+        nodes: JSON.parse(JSON.stringify(nodes)), 
+        edges: JSON.parse(JSON.stringify(edges)) 
+      })
+      if (newHistory.length > 50) newHistory.shift()
+      return newHistory
+    })
+    setHistoryIndex(prev => Math.min(prev + 1, 49))
+  }, [nodes, edges, historyIndex])
+
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const prev = history[historyIndex - 1]
+      setNodes(prev.nodes)
+      setEdges(prev.edges)
+      setHistoryIndex(historyIndex - 1)
+    }
+  }, [history, historyIndex, setNodes, setEdges])
+
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const next = history[historyIndex + 1]
+      setNodes(next.nodes)
+      setEdges(next.edges)
+      setHistoryIndex(historyIndex + 1)
+    }
+  }, [history, historyIndex, setNodes, setEdges])
+
+  const copySelection = useCallback((selectedNodes, selectedEdges) => {
+    setClipboard({ 
+      nodes: JSON.parse(JSON.stringify(selectedNodes)), 
+      edges: JSON.parse(JSON.stringify(selectedEdges)) 
+    })
+  }, [])
+
+  const pasteSelection = useCallback(() => {
+    if (clipboard.nodes.length === 0) return
+    takeSnapshot()
+    
+    // Create mapping of old ID to new ID
+    const idMap = {}
+    const newNodes = clipboard.nodes.map(n => {
+      const newId = `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      idMap[n.id] = newId
+      return {
+        ...n,
+        id: newId,
+        position: { x: n.position.x + 50, y: n.position.y + 50 },
+        selected: true
+      }
+    })
+
+    const newEdges = clipboard.edges.map(e => ({
+      ...e,
+      id: `edge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      source: idMap[e.source] || e.source,
+      target: idMap[e.target] || e.target,
+      selected: true
+    }))
+
+    // Deselect current
+    setNodes(nds => nds.map(n => ({ ...n, selected: false })).concat(newNodes))
+    setEdges(eds => eds.map(e => ({ ...e, selected: false })).concat(newEdges))
+  }, [clipboard, takeSnapshot, setNodes, setEdges])
+
+  const value = {
+    nodes, setNodes, onNodesChange,
+    edges, setEdges, onEdgesChange,
+    tabs, activeTabId,
+    workflowName, workflowId,
+    setWorkflowName, setWorkflowId,
+    createNewTab, closeTab, switchTab,
+    savedWorkflows, saveWorkflow, loadWorkflow, deleteWorkflow, listWorkflows,
+    loadDemoWorkflow, clearCanvas,
+    onConnect, addNode, duplicateNode, renameNode,
+    updateNodeConfig, updateNodeStatus, resetAllStatus, modulePreferences, reactFlowWrapper,
+    undo, redo, takeSnapshot, copySelection, pasteSelection
+  }
+
   return (
-    <WorkflowContext.Provider value={{
-      tabs, activeTabId, createNewTab, closeTab, switchTab,
-      nodes, edges, setNodes, setEdges,
-      onNodesChange, onEdgesChange, onConnect,
-      workflowName, setWorkflowName,
-      workflowId,
-      addNode, duplicateNode, updateNodeConfig, updateNodeStatus, resetAllStatus, renameNode,
-      saveWorkflow, loadWorkflow, loadDemoWorkflow,
-      listWorkflows, deleteWorkflow, savedWorkflows,
-      clearCanvas, reactFlowWrapper
-    }}>
+    <WorkflowContext.Provider value={value}>
       {children}
     </WorkflowContext.Provider>
   )

@@ -14,7 +14,8 @@ const defaultEdgeOptions = {
 export default function Canvas({ onNodeSelect, onContextMenu }) {
   const {
     nodes, edges, onNodesChange, onEdgesChange, onConnect,
-    addNode, duplicateNode, reactFlowWrapper, renameNode
+    addNode, duplicateNode, reactFlowWrapper, renameNode,
+    undo, redo, copySelection, pasteSelection, takeSnapshot
   } = useWorkflow()
   const reactFlowInstance = useRef(null)
 
@@ -92,20 +93,54 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
           duplicateNode(clipboard)
         }
       }
+      // Don't trigger shortcuts if user is typing in an input/textarea
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case 'z':
+            e.preventDefault()
+            undo()
+            break
+          case 'y':
+            e.preventDefault()
+            redo()
+            break
+          case 'c':
+            e.preventDefault()
+            const selectedNodes = nodes.filter(n => n.selected)
+            const selectedEdges = edges.filter(e => e.selected)
+            if (selectedNodes.length > 0) copySelection(selectedNodes, selectedEdges)
+            break
+          case 'v':
+            e.preventDefault()
+            pasteSelection()
+            break
+          default:
+            break
+        }
+      }
     }
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [augmentedNodes, clipboard, duplicateNode])
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [undo, redo, copySelection, pasteSelection, nodes, edges])
 
   return (
     <div className="canvas-wrapper" ref={reactFlowWrapper}>
       <ReactFlow
         nodes={augmentedNodes}
         edges={edges}
-        onNodesChange={onNodesChange}
+        onNodesChange={(changes) => {
+          onNodesChange(changes)
+        }}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
+        onConnect={(params) => {
+          takeSnapshot()
+          onConnect(params)
+        }}
+        onNodeDragStop={() => takeSnapshot()}
+        nodeTypes={nodeTypes}
         onInit={(instance) => { reactFlowInstance.current = instance }}
         onDrop={onDrop}
         onDragOver={onDragOver}
@@ -113,12 +148,13 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
         onPaneClick={onPaneClick}
         onNodeContextMenu={handleNodeContextMenu}
         onPaneContextMenu={handlePaneContextMenu}
-        nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
+        deleteKeyCode={['Backspace', 'Delete']}
+        onNodesDelete={() => takeSnapshot()}
+        onEdgesDelete={() => takeSnapshot()}
         fitView
         snapToGrid
         snapGrid={[16, 16]}
-        deleteKeyCode={['Delete', 'Backspace']}
         className="flow-canvas"
       >
         <Background

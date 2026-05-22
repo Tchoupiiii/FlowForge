@@ -107,6 +107,17 @@ export default function GuideModal({ onClose }) {
                 </ul>
                 <p>Connectez simplement la sortie du nœud Boucle au nœud suivant. Ce dernier sera exécuté <em>pour chaque élément</em> du tableau !</p>
               </div>
+              <div className="guide-section">
+                <h3>Raccourcis Clavier</h3>
+                <p>Pour aller plus vite dans votre création :</p>
+                <ul>
+                  <li><strong>Ctrl + C / Cmd + C</strong> : Copier les nœuds sélectionnés</li>
+                  <li><strong>Ctrl + V / Cmd + V</strong> : Coller les nœuds copiés</li>
+                  <li><strong>Ctrl + Z / Cmd + Z</strong> : Annuler la dernière action (Undo)</li>
+                  <li><strong>Ctrl + Y / Cmd + Y</strong> : Refaire l'action annulée (Redo)</li>
+                  <li><strong>Suppr / Backspace</strong> : Supprimer l'élément sélectionné</li>
+                </ul>
+              </div>
               </>
             )}
 
