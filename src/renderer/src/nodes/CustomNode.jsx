@@ -9,7 +9,8 @@ function CustomNode({ data, selected }) {
   const inputsCount = data.inputs !== undefined ? data.inputs : (moduleDef.inputs || 0)
   const outputsCount = data.outputs !== undefined ? data.outputs : (moduleDef.outputs || 0)
   
-  const configFields = moduleDef.configFields || []
+  const excludedKeys = ['token', 'apikey', 'bottoken', 'chatid', 'password', 'webhookurl']
+  const configFields = (moduleDef.configFields || []).filter(f => !excludedKeys.some(k => f.key.toLowerCase().includes(k)))
   const outputFields = moduleDef.outputFields || []
   
   const [isEditing, setIsEditing] = useState(false)

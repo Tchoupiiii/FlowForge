@@ -152,58 +152,44 @@ function AppContent() {
             <Toolbar
               onShowDemos={handleShowDemos}
               onShowGuide={handleShowGuide}
-              onShowCopilot={handleToggleCopilot}
               onShowSettings={() => setShowSettings(true)}
               onShowWorkflows={() => setShowWorkflows(true)}
               onShowNotifications={() => setShowNotifications(true)}
               onToggleLog={handleToggleLog}
               showLog={showExecutionLog}
             />
-          <div className="content-area">
-            {showDemoGallery ? (
-              <DemoGallery onClose={handleCloseDemos} />
-            ) : (
-              <>
-                <Canvas onNodeSelect={handleNodeSelect} onContextMenu={handleContextMenu} />
-                {selectedNodeId && nodes.find(n => n.id === selectedNodeId) && (
-                  <ConfigPanel
-                    node={nodes.find(n => n.id === selectedNodeId)}
-                    onShowHelp={handleShowHelp}
-                    onClose={handleCloseConfig}
-                  />
-                )}
-              </>
-            )}
-          </div>
-          {showExecutionLog && (
-            <ExecutionLog onClose={() => setShowExecutionLog(false)} />
-          )}
+            <div className="workspace-area">
+              <Canvas onNodeSelect={handleNodeSelect} onContextMenu={handleContextMenu} />
+              {showDemoGallery && <DemoGallery onClose={handleCloseDemos} />}
+              {showExecutionLog && <ExecutionLog onClose={handleToggleLog} />}
+              {helpModule && <HelpPanel module={helpModule} onClose={handleCloseHelp} />}
+              {selectedNodeId && nodes.find(n => n.id === selectedNodeId) && (
+                <ConfigPanel
+                  node={nodes.find(n => n.id === selectedNodeId)}
+                  onShowHelp={handleShowHelp}
+                  onClose={handleCloseConfig}
+                />
+              )}
+              {showGuide && <GuideModal onClose={() => setShowGuide(false)} />}
+              {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+              {showWorkflows && <WorkflowsModal onClose={() => setShowWorkflows(false)} />}
+              {showNotifications && <NotificationsModal notifications={notificationsHistory} onClose={() => setShowNotifications(false)} />}
+              {contextMenu && (
+                <ContextMenu
+                  x={contextMenu.x}
+                  y={contextMenu.y}
+                  type={contextMenu.type}
+                  nodeId={contextMenu.nodeId}
+                  onClose={handleCloseContextMenu}
+                  onAddNode={handleAddNodeFromMenu}
+                  onDeleteNode={handleDeleteNode}
+                  onDuplicateNode={handleDuplicateNode}
+                />
+              )}
+            </div>
         </div>
-        {showCopilot && (
-          <CopilotPanel onClose={() => setShowCopilot(false)} />
-        )}
+        <CopilotPanel />
       </div>
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          type={contextMenu.type}
-          nodeId={contextMenu.nodeId}
-          onClose={handleCloseContextMenu}
-          onAddNode={handleAddNodeFromMenu}
-          onDeleteNode={handleDeleteNode}
-          onDuplicateNode={handleDuplicateNode}
-        />
-      )}
-      {helpModule && (
-        <HelpPanel module={helpModule} onClose={handleCloseHelp} />
-      )}
-      {showGuide && (
-        <GuideModal onClose={() => setShowGuide(false)} />
-      )}
-      {showSettings && (
-        <SettingsModal onClose={() => setShowSettings(false)} />
-      )}
       {showWorkflows && (
         <WorkflowsModal onClose={() => setShowWorkflows(false)} />
       )}

@@ -225,6 +225,7 @@ export class ExecutionEngine {
             message: `Erreur: ${error.message}`,
             error: error.message
           })
+          break // STOP execution on error
         }
       }
 

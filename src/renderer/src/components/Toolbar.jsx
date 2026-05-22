@@ -5,7 +5,7 @@ import { useExecution } from '../context/ExecutionContext'
 import { useToast } from './ToastProvider'
 import ThemeToggle from './ThemeToggle'
 
-export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot, onShowSettings, onShowWorkflows, onShowNotifications }) {
+export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowSettings, onShowWorkflows, onShowNotifications, hasUnreadNotifications }) {
   const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas } = useWorkflow()
   const { isRunning, execute, stop } = useExecution()
   const toast = useToast()
@@ -71,19 +71,9 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
           <span>Guide</span>
         </button>
 
-        <button className="toolbar-btn" style={{ color: '#818cf8' }} onClick={onShowCopilot} title="Copilot">
-          <Sparkles size={16} />
-          <span>Copilot</span>
-        </button>
-
         <button className="toolbar-btn" onClick={onShowSettings} title="Paramètres">
           <Settings size={16} />
           <span>Paramètres</span>
-        </button>
-
-        <button className="toolbar-btn" onClick={onShowNotifications} title="Notifications">
-          <Bell size={16} />
-          <span>Notifications</span>
         </button>
 
         <button className="toolbar-btn" onClick={() => onToggleLog && onToggleLog()} title="Logs">
@@ -100,6 +90,28 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
 
       <div className="toolbar-right">
         {isRunning && <div className="toolbar-status"><span className="toolbar-status-dot running" />En cours...</div>}
+        
+        <button 
+          className="toolbar-btn toolbar-btn-ghost" 
+          onClick={onShowNotifications} 
+          title="Notifications"
+          style={{ position: 'relative' }}
+        >
+          <Bell size={16} />
+          {hasUnreadNotifications && (
+            <span style={{
+              position: 'absolute',
+              top: '4px',
+              right: '4px',
+              width: '8px',
+              height: '8px',
+              background: '#ef4444',
+              borderRadius: '50%',
+              border: '2px solid var(--bg-surface)'
+            }} />
+          )}
+        </button>
+        
         <ThemeToggle />
       </div>
     </div>

@@ -187,6 +187,13 @@ ipcMain.handle('workflow:execute', async (_event, workflow) => {
         data,
         timestamp: Date.now()
       })
+      if (status === 'error') {
+        mainWindow?.webContents.send('app-notification', {
+          type: 'error',
+          title: 'Erreur d\'exécution',
+          body: data?.message || 'Une erreur est survenue lors de l\'exécution du nœud.'
+        })
+      }
     })
     return result
   } catch (error) {

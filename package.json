@@ -1,7 +1,7 @@
 {
   "name": "flowforge",
-  "version": "1.4.0",
-  "description": "Automatisez vos tâches avec des modules IA",
+  "version": "1.4.1",
+  "description": "Un constructeur visuel de workflows",
   "main": "./out/main/index.js",
   "author": "FlowForge",
   "license": "MIT",

@@ -61,7 +61,16 @@ export default function CopilotPanel({ onClose }) {
     if (!prompt) return
     
     const userMessage = { role: 'user', content: prompt }
-    setDiscussions(prev => prev.map(d => d.id === activeId ? { ...d, history: [...d.history, userMessage] } : d))
+    setDiscussions(prev => prev.map(d => {
+      if (d.id === activeId) {
+        let newTitle = d.title;
+        if (newTitle === 'Nouvelle discussion' && prompt.length > 0) {
+          newTitle = prompt.substring(0, 20) + (prompt.length > 20 ? '...' : '');
+        }
+        return { ...d, title: newTitle, history: [...d.history, userMessage] }
+      }
+      return d
+    }))
     setPrompt('')
     setLoading(true)
     setError('')
@@ -210,16 +219,35 @@ INSTRUCTIONS :
         </div>
         
         <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-          <select 
-            className="config-select" 
-            style={{ flex: 1, padding: '4px 8px', fontSize: '12px' }}
-            value={activeId} 
-            onChange={(e) => setActiveId(e.target.value)}
-          >
+          
+          <div style={{ display: 'flex', overflowX: 'auto', gap: '4px', flex: 1, paddingBottom: '4px', scrollbarWidth: 'none' }}>
             {discussions.map(d => (
-              <option key={d.id} value={d.id}>Discussion {new Date(parseInt(d.id)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</option>
+              <div 
+                key={d.id} 
+                onClick={() => setActiveId(d.id)}
+                style={{ 
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                  padding: '4px 8px', borderRadius: '4px', 
+                  background: activeId === d.id ? 'var(--bg-surface-2)' : 'transparent',
+                  cursor: 'pointer', border: activeId === d.id ? '1px solid var(--border)' : '1px solid transparent',
+                  fontSize: '11px', whiteSpace: 'nowrap'
+                }}>
+                <span title={d.title} style={{ maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.title}</span>
+                {discussions.length > 1 && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const newDiscussions = discussions.filter(x => x.id !== d.id);
+                      setDiscussions(newDiscussions);
+                      if (activeId === d.id) setActiveId(newDiscussions[0].id);
+                    }}
+                    style={{ padding: '2px', opacity: 0.6 }}
+                  ><X size={12} /></button>
+                )}
+              </div>
             ))}
-          </select>
+          </div>
+
           <button 
             className="toolbar-btn" 
             style={{ padding: '4px', background: 'var(--bg-surface-2)' }}

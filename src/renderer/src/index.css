@@ -1736,6 +1736,40 @@ body {
   border-radius: 50% !important;
   border: 2px solid var(--bg-surface) !important;
   transition: all var(--transition-fast) !important;
+  pointer-events: auto;
+}
+
+.handle-wrapper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.handle-label {
+  position: absolute;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-muted);
+  pointer-events: none;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--bg-surface);
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+}
+
+.target-label {
+  left: -8px;
+  transform: translateX(-100%);
+  text-align: right;
+}
+
+.source-label {
+  right: -8px;
+  transform: translateX(100%);
+  text-align: left;
 }
 
 .theme-toggle-track {
@@ -1967,15 +2001,14 @@ body {
 
 .copilot-panel {
   width: 380px;
+  min-width: 380px;
   height: 100%;
-  position: relative;
   background: var(--bg-surface);
-  border-left: 1px solid var(--glass-border);
+  border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-lg);
-  animation: slideInRight 0.2s ease;
+  z-index: 50;
+  transition: all var(--transition);
 }
 
 @keyframes slideInRight {
