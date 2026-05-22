@@ -1,5 +1,5 @@
 import React from 'react'
-import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings, Bell, Download, Upload } from 'lucide-react'
+import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings, Bell, Download, Upload, Terminal } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { useExecution } from '../context/ExecutionContext'
 import { useToast } from './ToastProvider'
@@ -52,8 +52,7 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
         <div className="toolbar-divider" />
 
         <button className="toolbar-btn" onClick={handleSave} title="Sauvegarder">
-          <Save size={16} />
-          <span>Sauvegarder</span>
+          <Save size={18} />
         </button>
 
         <button className="toolbar-btn" onClick={async () => {
@@ -65,8 +64,7 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
             }
           }
         }} title="Importer">
-          <Download size={16} />
-          <span>Importer</span>
+          <Download size={18} />
         </button>
 
         <button className="toolbar-btn" onClick={async () => {
@@ -74,29 +72,35 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
             await window.electronAPI.exportWorkflow({ name: workflowName, nodes, edges });
             toast.success('Export réussi', 'Le workflow a été exporté.');
           }
-        }} title="Exporter">
-          <Upload size={16} />
-          <span>Exporter</span>
+        }} title="Exporter (JSON)">
+          <Upload size={18} />
+        </button>
+        
+        <button className="toolbar-btn" onClick={async () => {
+          if (window.electronAPI?.exportScript) {
+            await window.electronAPI.exportScript({ name: workflowName, nodes, edges });
+            toast.success('Export Console réussi', 'Le script autonome a été généré avec succès !');
+          }
+        }} title="Exporter en Console (Script)">
+          <Terminal size={18} />
         </button>
 
+        <div className="toolbar-divider" />
+
         <button className="toolbar-btn" onClick={onShowDemos} title="Démos">
-          <Layout size={16} />
-          <span>Démos</span>
+          <Layout size={18} />
         </button>
 
         <button className="toolbar-btn" onClick={onShowGuide} title="Guide">
-          <BookOpen size={16} />
-          <span>Guide</span>
+          <BookOpen size={18} />
         </button>
 
         <button className="toolbar-btn" onClick={onShowSettings} title="Paramètres">
-          <Settings size={16} />
-          <span>Paramètres</span>
+          <Settings size={18} />
         </button>
 
-        <button className="toolbar-btn" onClick={() => onToggleLog && onToggleLog()} title="Logs">
-          <Layout size={16} />
-          <span>{showLog ? 'Masquer Logs' : 'Logs'}</span>
+        <button className="toolbar-btn" onClick={() => onToggleLog && onToggleLog()} title={showLog ? 'Masquer Logs' : 'Afficher Logs'}>
+          <Terminal size={18} />
         </button>
 
         <div className="toolbar-divider" />

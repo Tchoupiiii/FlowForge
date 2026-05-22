@@ -247,7 +247,7 @@ ipcMain.handle('workflow:export', async (_event, workflow) => {
   const { writeFileSync } = require('fs')
   try {
     const result = await dialog.showSaveDialog(mainWindow, {
-      title: 'Exporter le workflow',
+      title: 'Exporter le workflow (JSON)',
       defaultPath: `${(workflow.name || 'workflow').replace(/[^a-zA-Z0-9]/g, '_')}.flowforge.json`,
       filters: [{ name: 'FlowForge Workflow', extensions: ['flowforge.json', 'json'] }]
     })
@@ -255,6 +255,100 @@ ipcMain.handle('workflow:export', async (_event, workflow) => {
     writeFileSync(result.filePath, JSON.stringify(workflow, null, 2), 'utf-8')
     return { success: true, path: result.filePath }
   } catch (error) {
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('workflow:export-script', async (_event, workflow) => {
+  const { dialog } = require('electron')
+  const { writeFileSync, mkdirSync, copyFileSync, readdirSync, statSync } = require('fs')
+  const { join, dirname } = require('path')
+
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Choisir un dossier pour exporter le script autonome',
+      properties: ['openDirectory', 'createDirectory']
+    })
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false, canceled: true }
+    }
+
+    const targetDir = result.filePaths[0]
+    
+    // Copy execution engine and modules
+    const engineSrcDir = isDev 
+      ? join(__dirname, '../../src/main') 
+      : join(process.resourcesPath, 'engine-src')
+
+    // Copy executionEngine.js
+    copyFileSync(join(engineSrcDir, 'executionEngine.js'), join(targetDir, 'executionEngine.js'))
+    
+    // Copy modules folder recursively
+    const modulesSrc = join(engineSrcDir, 'modules')
+    const modulesTarget = join(targetDir, 'modules')
+    if (!require('fs').existsSync(modulesTarget)) mkdirSync(modulesTarget)
+    
+    const modulesFiles = readdirSync(modulesSrc)
+    for (const file of modulesFiles) {
+      if (statSync(join(modulesSrc, file)).isFile()) {
+        copyFileSync(join(modulesSrc, file), join(modulesTarget, file))
+      }
+    }
+
+    // Generate workflow.json
+    writeFileSync(join(targetDir, 'workflow.json'), JSON.stringify(workflow, null, 2), 'utf-8')
+
+    // Generate run.js
+    const runScript = `// Généré automatiquement par FlowForge
+import { ExecutionEngine } from './executionEngine.js'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const workflowPath = path.join(__dirname, 'workflow.json')
+
+try {
+  const workflowData = JSON.parse(fs.readFileSync(workflowPath, 'utf-8'))
+  const engine = new ExecutionEngine()
+  
+  console.log('🚀 Démarrage du workflow autonome : ' + (workflowData.name || 'Sans nom'))
+  
+  engine.execute(workflowData, (nodeId, status, data) => {
+    // Affiche la progression
+    if (status === 'error') {
+      console.error(\`[ERREUR] Nœud \${nodeId} : \${data.message || ''}\`)
+    } else {
+      console.log(\`[\${status.toUpperCase()}] Nœud \${nodeId} : \${data.message || 'Terminé'}\`)
+    }
+  }).then(results => {
+    console.log('✅ Exécution terminée !')
+  }).catch(err => {
+    console.error('❌ Erreur critique :', err)
+  })
+} catch (e) {
+  console.error('Impossible de charger workflow.json', e)
+}
+`
+    writeFileSync(join(targetDir, 'run.js'), runScript, 'utf-8')
+
+    // Generate package.json
+    const packageJson = {
+      name: "flowforge-standalone-script",
+      version: "1.0.0",
+      description: "Workflow généré par FlowForge",
+      main: "run.js",
+      type: "module",
+      scripts: {
+        start: "node run.js"
+      }
+    }
+    writeFileSync(join(targetDir, 'package.json'), JSON.stringify(packageJson, null, 2), 'utf-8')
+
+    return { success: true, targetDir }
+  } catch (error) {
+    console.error('Export Script Error:', error)
     return { success: false, error: error.message }
   }
 })

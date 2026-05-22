@@ -10,9 +10,9 @@ export default function shopFinder() {
       { id: 'd5_4', type: 'customNode', position: { x: 80, y: 570 }, data: { type: 'writeFile', label: 'Écriture Fichier', icon: 'Save', color: '#34d399', category: 'core', inputs: 1, outputs: 1, config: { path: 'C:\\data\\boutiques.json', format: 'json' }, status: 'idle' } }
     ],
     edges: [
-      { id: 'd5_e1', source: 'd5_1', target: 'd5_2', type: 'smoothstep', animated: true },
-      { id: 'd5_e2', source: 'd5_2', target: 'd5_3', type: 'smoothstep', animated: true },
-      { id: 'd5_e3', source: 'd5_3', target: 'd5_4', type: 'smoothstep', animated: true }
+      { id: 'd5_e1', source: 'd5_1', sourceHandle: 'a', target: 'd5_2', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd5_e2', source: 'd5_2', sourceHandle: 'a', target: 'd5_3', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd5_e3', source: 'd5_3', sourceHandle: 'a', target: 'd5_4', targetHandle: 'a', type: 'smoothstep', animated: true }
     ]
   }
 }

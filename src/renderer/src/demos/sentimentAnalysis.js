@@ -12,11 +12,11 @@ export default function sentimentAnalysis() {
       { id: 'd6_6', type: 'customNode', position: { x: -100, y: 700 }, data: { type: 'notification', label: 'Notification', icon: 'Bell', color: '#4ade80', category: 'core', inputs: 1, outputs: 1, config: { title: '✅ Avis positif', body: 'Tous les avis sont positifs !' }, status: 'idle' } }
     ],
     edges: [
-      { id: 'd6_e1', source: 'd6_1', target: 'd6_2', type: 'smoothstep', animated: true },
-      { id: 'd6_e2', source: 'd6_2', target: 'd6_3', type: 'smoothstep', animated: true },
-      { id: 'd6_e3', source: 'd6_3', target: 'd6_4', type: 'smoothstep', animated: true },
-      { id: 'd6_e4', source: 'd6_4', sourceHandle: 'true', target: 'd6_5', type: 'smoothstep', animated: true },
-      { id: 'd6_e5', source: 'd6_4', sourceHandle: 'false', target: 'd6_6', type: 'smoothstep', animated: true }
+      { id: 'd6_e1', source: 'd6_1', sourceHandle: 'a', target: 'd6_2', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd6_e2', source: 'd6_2', sourceHandle: 'a', target: 'd6_3', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd6_e3', source: 'd6_3', sourceHandle: 'a', target: 'd6_4', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd6_e4', source: 'd6_4', sourceHandle: 'true', target: 'd6_5', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd6_e5', source: 'd6_4', sourceHandle: 'false', target: 'd6_6', targetHandle: 'a', type: 'smoothstep', animated: true }
     ]
   }
 }

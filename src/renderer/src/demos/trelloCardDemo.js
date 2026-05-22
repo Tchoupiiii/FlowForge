@@ -62,8 +62,8 @@ export default function trelloCardDemo() {
       }
     ],
     edges: [
-      { id: 'e1-2', source: 'n1', target: 'n2', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } },
-      { id: 'e2-3', source: 'n2', target: 'n3', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } }
+      { id: 'e1-2', source: 'n1', sourceHandle: 'a', target: 'n2', targetHandle: 'a', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } },
+      { id: 'e2-3', source: 'n2', sourceHandle: 'a', target: 'n3', targetHandle: 'a', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } }
     ]
   }
 }

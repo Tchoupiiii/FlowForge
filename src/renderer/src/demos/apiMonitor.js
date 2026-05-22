@@ -11,10 +11,10 @@ export default function apiMonitor() {
       { id: 'd4_5', type: 'customNode', position: { x: -100, y: 540 }, data: { type: 'notification', label: 'Notification', icon: 'Bell', color: '#f87171', category: 'core', inputs: 1, outputs: 1, config: { title: '✅ API OK', body: 'Le serveur fonctionne normalement.' }, status: 'idle' } }
     ],
     edges: [
-      { id: 'd4_e1', source: 'd4_1', target: 'd4_2', type: 'smoothstep', animated: true },
-      { id: 'd4_e2', source: 'd4_2', target: 'd4_3', type: 'smoothstep', animated: true },
-      { id: 'd4_e3', source: 'd4_3', sourceHandle: 'true', target: 'd4_4', type: 'smoothstep', animated: true },
-      { id: 'd4_e4', source: 'd4_3', sourceHandle: 'false', target: 'd4_5', type: 'smoothstep', animated: true }
+      { id: 'd4_e1', source: 'd4_1', sourceHandle: 'a', target: 'd4_2', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd4_e2', source: 'd4_2', sourceHandle: 'a', target: 'd4_3', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd4_e3', source: 'd4_3', sourceHandle: 'true', target: 'd4_4', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd4_e4', source: 'd4_3', sourceHandle: 'false', target: 'd4_5', targetHandle: 'a', type: 'smoothstep', animated: true }
     ]
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Search, Zap, Brain, MapPin, Send, Folder, Trash2 } from 'lucide-react'
+import { Search, Zap, Brain, MapPin, Send, Folder, Trash2, Plus } from 'lucide-react'
 import { MODULE_DEFINITIONS, ICON_MAP, getCategories, getCategoryLabel } from '../data/moduleDefinitions'
 import { useWorkflow } from '../context/WorkflowContext'
 
@@ -101,6 +101,18 @@ export default function Sidebar() {
 
       {activeTab === 'projects' && (
         <div className="sidebar-modules" style={{ padding: '10px' }}>
+          <button 
+            className="toolbar-btn toolbar-btn-primary" 
+            style={{ width: '100%', justifyContent: 'center', marginBottom: '15px' }}
+            onClick={() => {
+              clearCanvas()
+              setWorkflowName('Nouveau Projet')
+            }}
+          >
+            <Plus size={16} />
+            <span>Nouveau Projet</span>
+          </button>
+          
           <div style={{ marginBottom: '15px', color: 'var(--text-secondary)', fontSize: '12px' }}>
             Double-cliquez pour ouvrir un projet.
           </div>

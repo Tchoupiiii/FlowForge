@@ -48,9 +48,9 @@ export default function loopDemo() {
       }
     ],
     edges: [
-      { id: 'e1', source: 'trigger', target: 'rss' },
-      { id: 'e2', source: 'rss', target: 'loop' },
-      { id: 'e3', source: 'loop', target: 'notify' }
+      { id: 'e1', source: 'trigger', sourceHandle: 'a', target: 'rss' },
+      { id: 'e2', source: 'rss', sourceHandle: 'a', target: 'loop' },
+      { id: 'e3', source: 'loop', sourceHandle: 'a', target: 'notify' }
     ]
   }
 }

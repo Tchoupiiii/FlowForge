@@ -9,6 +9,12 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,CHANGELOG.md,README.md}'
 asarUnpack:
   - resources/**
+extraResources:
+  - from: "src/main"
+    to: "engine-src"
+    filter:
+      - "executionEngine.js"
+      - "modules/**"
 win:
   executableName: FlowForge
   target:

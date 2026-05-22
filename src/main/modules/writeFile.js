@@ -3,8 +3,8 @@
  * Writes data to a file on disk in text, JSON, or CSV format.
  */
 import { writeFileSync, mkdirSync, existsSync } from 'fs'
+import os from 'os'
 import { resolve, dirname, isAbsolute, join } from 'path'
-import { app } from 'electron'
 
 export default {
   meta: {
@@ -26,8 +26,16 @@ export default {
     if (isAbsolute(filePath)) {
       resolvedPath = resolve(filePath)
     } else {
-      const desktop = app.getPath('desktop')
-      resolvedPath = join(desktop, filePath)
+      try {
+        const electron = await import('electron').catch(() => null)
+        if (electron && electron.app) {
+          resolvedPath = join(electron.app.getPath('desktop'), filePath)
+        } else {
+          resolvedPath = join(os.tmpdir(), filePath)
+        }
+      } catch (e) {
+        resolvedPath = join(os.tmpdir(), filePath)
+      }
     }
     
     const format = (config.format || 'text').toLowerCase()

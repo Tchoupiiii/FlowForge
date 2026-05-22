@@ -10,9 +10,9 @@ export default function csvToJson() {
       { id: 'd2_4', type: 'customNode', position: { x: 80, y: 540 }, data: { type: 'writeFile', label: 'Écriture Fichier', icon: 'Save', color: '#34d399', category: 'core', inputs: 1, outputs: 1, config: { path: 'C:\\data\\output.json', format: 'json' }, status: 'idle' } }
     ],
     edges: [
-      { id: 'd2_e1', source: 'd2_1', target: 'd2_2', type: 'smoothstep', animated: true },
-      { id: 'd2_e2', source: 'd2_2', target: 'd2_3', type: 'smoothstep', animated: true },
-      { id: 'd2_e3', source: 'd2_3', target: 'd2_4', type: 'smoothstep', animated: true }
+      { id: 'd2_e1', source: 'd2_1', sourceHandle: 'a', target: 'd2_2', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd2_e2', source: 'd2_2', sourceHandle: 'a', target: 'd2_3', targetHandle: 'a', type: 'smoothstep', animated: true },
+      { id: 'd2_e3', source: 'd2_3', sourceHandle: 'a', target: 'd2_4', targetHandle: 'a', type: 'smoothstep', animated: true }
     ]
   }
 }

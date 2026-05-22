@@ -10,9 +10,9 @@ export default function weatherNotification() {
       { id: 'd1_4', type: 'customNode', position: { x: 80, y: 540 }, data: { type: 'notification', label: 'Notification', icon: 'Bell', color: '#f87171', category: 'core', inputs: 1, outputs: 1, config: { title: '🌤 Météo Paris', body: '{{input.response}}' }, status: 'idle' } }
     ],
     edges: [
-      { id: 'd1_e1', source: 'd1_1', target: 'd1_2', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } },
-      { id: 'd1_e2', source: 'd1_2', target: 'd1_3', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } },
-      { id: 'd1_e3', source: 'd1_3', target: 'd1_4', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } }
+      { id: 'd1_e1', source: 'd1_1', sourceHandle: 'a', target: 'd1_2', targetHandle: 'a', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } },
+      { id: 'd1_e2', source: 'd1_2', sourceHandle: 'a', target: 'd1_3', targetHandle: 'a', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } },
+      { id: 'd1_e3', source: 'd1_3', sourceHandle: 'a', target: 'd1_4', targetHandle: 'a', type: 'smoothstep', animated: true, style: { stroke: 'var(--accent)', strokeWidth: 2 } }
     ]
   }
 }
