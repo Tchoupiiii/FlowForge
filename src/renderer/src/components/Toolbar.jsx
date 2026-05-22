@@ -51,6 +51,30 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
 
         <div className="toolbar-divider" />
 
+        <label className="toolbar-btn toolbar-btn-secondary" title="Importer un workflow depuis un fichier JSON" style={{ cursor: 'pointer' }}>
+          <Upload size={16} />
+          <span>Ouvrir</span>
+          <input 
+            type="file" 
+            accept=".json" 
+            style={{ display: 'none' }} 
+            onChange={(e) => {
+              const file = e.target.files[0]
+              if (!file) return
+              const reader = new FileReader()
+              reader.onload = (event) => {
+                try {
+                  const data = JSON.parse(event.target.result)
+                  loadDemoWorkflow(data)
+                } catch (err) {
+                  toast.error("Erreur", "Fichier invalide")
+                }
+              }
+              reader.readAsText(file)
+            }}
+          />
+        </label>
+
         <button className="toolbar-btn" onClick={handleSave} title="Sauvegarder">
           <Save size={18} />
         </button>

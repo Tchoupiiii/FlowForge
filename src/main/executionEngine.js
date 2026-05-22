@@ -4,40 +4,37 @@ import { getModuleExecutor } from './modules/index.js'
  * Interpolate {{input.xxx}} variables in a string
  * Supports nested paths like {{input.data.name}} and array access like {{input.items[0]}}
  */
-function interpolate(template, data) {
-  if (!data || typeof template !== 'string') return template
-  return template.replace(/\{\{(.+?)\}\}/g, (_match, key) => {
-    const trimmedKey = key.trim()
-    const cleanKey = trimmedKey.startsWith('input.') ? trimmedKey.slice(6) : trimmedKey
-    
-    if (cleanKey === 'input' || trimmedKey === 'input') {
-      return typeof data === 'object' ? JSON.stringify(data) : String(data)
-    }
-    
-    const parts = cleanKey.replace(/\[(\d+)\]/g, '.$1').split('.')
-    let value = data
-    for (const part of parts) {
-      if (value === null || value === undefined) return ''
-      value = value[part]
-    }
-    if (value === null || value === undefined) return ''
-    if (typeof value === 'object') return JSON.stringify(value)
-    return String(value)
-  })
+function getCaseInsensitive(obj, key) {
+  if (!obj || typeof obj !== 'object') return undefined;
+  const lowerKey = key.toLowerCase();
+  for (const k of Object.keys(obj)) {
+    if (k.toLowerCase() === lowerKey) return obj[k];
+  }
+  return undefined;
 }
 
 function getNestedValue(data, key) {
   const trimmedKey = key.trim()
   const cleanKey = trimmedKey.startsWith('input.') ? trimmedKey.slice(6) : trimmedKey
-  if (cleanKey === 'input' || trimmedKey === 'input') return data
+  if (cleanKey.toLowerCase() === 'input') return data
   
   const parts = cleanKey.replace(/\[(\d+)\]/g, '.$1').split('.')
   let value = data
   for (const part of parts) {
     if (value === null || value === undefined) return undefined
-    value = value[part]
+    value = getCaseInsensitive(value, part)
   }
   return value
+}
+
+function interpolate(template, data) {
+  if (!data || typeof template !== 'string') return template
+  return template.replace(/\{\{(.+?)\}\}/g, (match, key) => {
+    const value = getNestedValue(data, key)
+    if (value === null || value === undefined) return match // Return original tag if not found
+    if (typeof value === 'object') return JSON.stringify(value)
+    return String(value)
+  })
 }
 
 function interpolateConfig(config, inputData) {

@@ -66,25 +66,8 @@ export default function Sidebar() {
         onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
       />
 
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)' }}>
-        <div 
-          onClick={() => setActiveTab('modules')}
-          style={{ flex: 1, padding: '12px 0', textAlign: 'center', cursor: 'pointer', borderBottom: activeTab === 'modules' ? '2px solid var(--accent)' : '2px solid transparent', color: activeTab === 'modules' ? 'white' : 'var(--text-secondary)' }}
-        >
-          Modules
-        </div>
-        <div 
-          onClick={() => setActiveTab('projects')}
-          style={{ flex: 1, padding: '12px 0', textAlign: 'center', cursor: 'pointer', borderBottom: activeTab === 'projects' ? '2px solid var(--accent)' : '2px solid transparent', color: activeTab === 'projects' ? 'white' : 'var(--text-secondary)' }}
-        >
-          Projets
-        </div>
-      </div>
-
-      {activeTab === 'modules' && (
-        <>
-          <div className="sidebar-header">
-            <div className="sidebar-search">
+      <div className="sidebar-header">
+        <div className="sidebar-search">
               <div className="sidebar-search-wrapper">
                 <Search size={16} className="sidebar-search-icon" />
                 <input
@@ -133,60 +116,7 @@ export default function Sidebar() {
               )
             })}
           </div>
-        </>
-      )}
 
-      {activeTab === 'projects' && (
-        <div className="sidebar-modules" style={{ padding: '10px' }}>
-          <button 
-            className="toolbar-btn toolbar-btn-primary" 
-            style={{ width: '100%', justifyContent: 'center', marginBottom: '15px' }}
-            onClick={() => {
-              clearCanvas()
-              setWorkflowName('Nouveau Projet')
-            }}
-          >
-            <Plus size={16} />
-            <span>Nouveau Projet</span>
-          </button>
-          
-          <div style={{ marginBottom: '15px', color: 'var(--text-secondary)', fontSize: '12px' }}>
-            Double-cliquez pour ouvrir un projet.
-          </div>
-          {savedWorkflows.length === 0 ? (
-            <div style={{ color: 'var(--text-secondary)', textAlign: 'center', marginTop: '20px' }}>
-              Aucun projet sauvegardé.
-            </div>
-          ) : (
-            savedWorkflows.map(wf => (
-              <div 
-                key={wf.id} 
-                onDoubleClick={() => loadWorkflow(wf.id)}
-                style={{ 
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '10px', backgroundColor: 'var(--bg-dark)', 
-                  borderRadius: '6px', marginBottom: '8px', cursor: 'pointer',
-                  border: '1px solid var(--border-color)'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                  <Folder size={16} color="var(--accent)" />
-                  <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', fontSize: '13px' }}>
-                    {wf.name || 'Projet sans nom'}
-                  </span>
-                </div>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); deleteWorkflow(wf.id) }}
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--error)' }}
-                  title="Supprimer"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      )}
     </div>
   )
 }
