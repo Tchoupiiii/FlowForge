@@ -4,6 +4,8 @@ export const meta = {
   category: 'telegram'
 }
 
+const sessionOffsets = new Map()
+
 export async function execute(config, inputData) {
   try {
     const botToken = config.botToken || ''
@@ -18,7 +20,7 @@ export async function execute(config, inputData) {
     }
 
     // Get updates via long polling
-    const offset = config._lastOffset || 0
+    const offset = sessionOffsets.get(botToken) || 0
     const url = `https://api.telegram.org/bot${botToken}/getUpdates?offset=${offset}&timeout=${timeout}&limit=10`
 
     const response = await fetch(url)
@@ -58,11 +60,10 @@ export async function execute(config, inputData) {
     }))
 
     // Track the last offset for next poll
-    const newOffset = results.length > 0
-      ? Math.max(...results.map(r => r.updateId)) + 1
-      : offset
-
-    config._lastOffset = newOffset
+    if (results.length > 0) {
+      const maxId = Math.max(...results.map(r => r.updateId))
+      sessionOffsets.set(botToken, maxId + 1)
+    }
 
     if (results.length === 0) {
       return { _skipped: true, message: 'Aucun nouveau message' }

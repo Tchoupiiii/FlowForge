@@ -8,15 +8,12 @@ function interpolate(template, data) {
   if (!data || typeof template !== 'string') return template
   return template.replace(/\{\{(.+?)\}\}/g, (_match, key) => {
     const trimmedKey = key.trim()
-    // Support "input.xxx" or just "xxx"
     const cleanKey = trimmedKey.startsWith('input.') ? trimmedKey.slice(6) : trimmedKey
     
     if (cleanKey === 'input' || trimmedKey === 'input') {
-      // {{input}} = the whole input object
       return typeof data === 'object' ? JSON.stringify(data) : String(data)
     }
     
-    // Navigate nested paths (supports dots and brackets)
     const parts = cleanKey.replace(/\[(\d+)\]/g, '.$1').split('.')
     let value = data
     for (const part of parts) {
@@ -29,15 +26,33 @@ function interpolate(template, data) {
   })
 }
 
-/**
- * Deep-interpolate all string values in a config object
- */
+function getNestedValue(data, key) {
+  const trimmedKey = key.trim()
+  const cleanKey = trimmedKey.startsWith('input.') ? trimmedKey.slice(6) : trimmedKey
+  if (cleanKey === 'input' || trimmedKey === 'input') return data
+  
+  const parts = cleanKey.replace(/\[(\d+)\]/g, '.$1').split('.')
+  let value = data
+  for (const part of parts) {
+    if (value === null || value === undefined) return undefined
+    value = value[part]
+  }
+  return value
+}
+
 function interpolateConfig(config, inputData) {
   if (!inputData || !config) return config
   const result = {}
   for (const [key, value] of Object.entries(config)) {
     if (typeof value === 'string') {
-      result[key] = interpolate(value, inputData)
+      // Check for EXACT match to preserve types (e.g. array/object injection)
+      const exactMatch = value.match(/^\{\{(.+?)\}\}$/)
+      if (exactMatch) {
+        const rawVal = getNestedValue(inputData, exactMatch[1])
+        result[key] = rawVal !== undefined ? rawVal : value
+      } else {
+        result[key] = interpolate(value, inputData)
+      }
     } else {
       result[key] = value
     }
@@ -139,7 +154,6 @@ export class ExecutionEngine {
 
         // Gather input data from parent nodes
         let inputData = {}
-        let explicitConfigOverrides = {}
         const parentEdges = edges.filter(e => e.target === nodeId)
         let wasSkipped = false
 
@@ -172,14 +186,6 @@ export class ExecutionEngine {
             
             // Standard data merging for {{input.xxx}} usage
             inputData = { ...inputData, ...results[pe.source] }
-            
-            // Blueprint routing (Explicit Handle to Handle)
-            if (pe.sourceHandle && pe.targetHandle && pe.sourceHandle !== 'true' && pe.sourceHandle !== 'false' && pe.sourceHandle !== 'a' && pe.targetHandle !== 'a') {
-              const sourceValue = results[pe.source][pe.sourceHandle]
-              if (sourceValue !== undefined) {
-                explicitConfigOverrides[pe.targetHandle] = sourceValue
-              }
-            }
           }
         }
 
@@ -189,9 +195,6 @@ export class ExecutionEngine {
 
         // ★ INTERPOLATE all {{input.xxx}} variables in config before executing
         let config = interpolateConfig(rawConfig, inputData)
-        
-        // ★ APPLY explicit blueprint routing overrides (allows raw object/array passing!)
-        config = { ...config, ...explicitConfigOverrides }
 
         if (!executor) {
           // Trigger nodes just pass through

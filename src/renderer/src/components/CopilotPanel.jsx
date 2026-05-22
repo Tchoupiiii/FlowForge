@@ -91,7 +91,7 @@ Un workflow est un objet JSON de cette forme :
     }
   ],
   "edges": [
-    { "id": "e1-2", "source": "n1", "target": "n2", "type": "smoothstep", "animated": true }
+    { "id": "e1-2", "source": "n1", "target": "n2", "sourceHandle": "a", "targetHandle": "a", "type": "smoothstep", "animated": true }
   ]
 }
 
@@ -188,6 +188,15 @@ INSTRUCTIONS :
           }
           return n
         })
+
+        // Ensure edges have handles
+        if (workflow.edges) {
+          workflow.edges = workflow.edges.map(e => ({
+            sourceHandle: 'a',
+            targetHandle: 'a',
+            ...e
+          }))
+        }
 
         loadDemoWorkflow(workflow)
         setMessage("Workflow appliqué avec succès !")

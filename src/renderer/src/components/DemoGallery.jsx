@@ -41,7 +41,16 @@ export default function DemoGallery({ onClose }) {
   const { loadDemoWorkflow } = useWorkflow()
 
   const handleLoad = (demo) => {
-    loadDemoWorkflow(demo)
+    // Add default handles if not present
+    const processedDemo = {
+      ...demo,
+      edges: (demo.edges || []).map(e => ({
+        sourceHandle: 'a', 
+        targetHandle: 'a', 
+        ...e 
+      }))
+    }
+    loadDemoWorkflow(processedDemo)
     onClose()
   }
 

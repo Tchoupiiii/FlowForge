@@ -188,7 +188,7 @@ function AppContent() {
               )}
             </div>
         </div>
-        <CopilotPanel />
+        {!showDemoGallery && <CopilotPanel />}
       </div>
       {showWorkflows && (
         <WorkflowsModal onClose={() => setShowWorkflows(false)} />

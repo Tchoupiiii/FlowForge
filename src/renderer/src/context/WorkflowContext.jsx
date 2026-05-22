@@ -113,13 +113,36 @@ export function WorkflowProvider({ children }) {
 
   // --- REACT FLOW HELPERS ---
   const onConnect = useCallback((params) => {
+    // Si c'est une connexion de type variable explicite (pas les points centraux "a")
+    if (params.targetHandle && params.sourceHandle && params.targetHandle !== 'a' && params.sourceHandle !== 'a') {
+      setNodes(nds => nds.map(n => {
+        if (n.id === params.target) {
+          const currentVal = n.data.config?.[params.targetHandle] || ''
+          const injection = `{{${params.sourceHandle}}}`
+          // Eviter de l'ajouter si déjà présent
+          const newVal = String(currentVal).includes(injection) 
+            ? currentVal 
+            : `${currentVal} ${injection}`.trim()
+            
+          return {
+            ...n,
+            data: {
+              ...n.data,
+              config: { ...n.data.config, [params.targetHandle]: newVal }
+            }
+          }
+        }
+        return n
+      }))
+    }
+
     setEdges((eds) => addEdge({
       ...params,
       type: 'smoothstep',
       animated: true,
       style: { stroke: 'var(--accent)', strokeWidth: 2 }
     }, eds))
-  }, [setEdges])
+  }, [setEdges, setNodes])
 
   const addNode = useCallback((type, position) => {
     const moduleDef = getModuleByType(type)

@@ -1,12 +1,12 @@
 import React from 'react'
-import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings, Bell } from 'lucide-react'
+import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings, Bell, Download, Upload } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { useExecution } from '../context/ExecutionContext'
 import { useToast } from './ToastProvider'
 import ThemeToggle from './ThemeToggle'
 
 export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowSettings, onShowWorkflows, onShowNotifications, hasUnreadNotifications }) {
-  const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas } = useWorkflow()
+  const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas, loadDemoWorkflow } = useWorkflow()
   const { isRunning, execute, stop } = useExecution()
   const toast = useToast()
 
@@ -51,14 +51,32 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
 
         <div className="toolbar-divider" />
 
-        <button className="toolbar-btn" onClick={onShowWorkflows} title="Ouvrir">
-          <FolderOpen size={16} />
-          <span>Ouvrir</span>
-        </button>
-
         <button className="toolbar-btn" onClick={handleSave} title="Sauvegarder">
           <Save size={16} />
-          <span>Sauver</span>
+          <span>Sauvegarder</span>
+        </button>
+
+        <button className="toolbar-btn" onClick={async () => {
+          if (window.electronAPI?.importWorkflow) {
+            const wf = await window.electronAPI.importWorkflow();
+            if (wf && wf.nodes && wf.edges) {
+              loadDemoWorkflow(wf);
+              toast.success('Import réussi', 'Le workflow a été chargé.');
+            }
+          }
+        }} title="Importer">
+          <Download size={16} />
+          <span>Importer</span>
+        </button>
+
+        <button className="toolbar-btn" onClick={async () => {
+          if (window.electronAPI?.exportWorkflow) {
+            await window.electronAPI.exportWorkflow({ name: workflowName, nodes, edges });
+            toast.success('Export réussi', 'Le workflow a été exporté.');
+          }
+        }} title="Exporter">
+          <Upload size={16} />
+          <span>Exporter</span>
         </button>
 
         <button className="toolbar-btn" onClick={onShowDemos} title="Démos">
