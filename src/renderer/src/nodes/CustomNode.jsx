@@ -1,5 +1,6 @@
 import React, { memo, useState, useRef, useEffect } from 'react'
 import { Handle, Position } from 'reactflow'
+import { Loader2 } from 'lucide-react'
 import { ICON_MAP, getModuleByType } from '../data/moduleDefinitions'
 
 function CustomNode({ data, selected }) {
@@ -93,46 +94,19 @@ function CustomNode({ data, selected }) {
       {/* Target (Input) Handles */}
       {inputsCount > 0 && (
         <div className="custom-handles-target">
-          {configFields.length > 0 ? (
-            <>
-              {/* Generic Input Handle */}
-              <Handle
-                type="target"
-                position={Position.Left}
-                id="a"
-                className="custom-handle generic-handle"
-                style={{ top: '10%', background: '#64748b', width: '12px', height: '12px', borderRadius: '2px' }}
-              />
-              {configFields.map((field, i) => (
-                <div key={field.key} className="handle-wrapper target">
-                  <Handle
-                    type="target"
-                    position={Position.Left}
-                    id={field.key}
-                    className="custom-handle"
-                    style={{ top: `${((i + 1) / (configFields.length + 1)) * 80 + 20}%`, background: data.color }}
-                  />
-                  <span className="handle-label target-label" style={{ top: `calc(${((i + 1) / (configFields.length + 1)) * 80 + 20}% - 6px)` }}>
-                    {field.label}
-                  </span>
-                </div>
-              ))}
-            </>
-          ) : (
-            <Handle
-              type="target"
-              position={Position.Left}
-              id="a"
-              className="custom-handle"
-              style={{ background: data.color }}
-            />
-          )}
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="a"
+            className="custom-handle generic-handle"
+            style={{ background: data.color }}
+          />
         </div>
       )}
 
       <div className="custom-node-header">
         <div className="custom-node-icon" style={{ background: `${data.color}20`, color: data.color }}>
-          {IconComp && <IconComp size={18} />}
+          {statusClass === 'running' ? <Loader2 size={18} className="spin" /> : (IconComp && <IconComp size={18} />)}
         </div>
         {isEditing ? (
           <input
@@ -177,40 +151,13 @@ function CustomNode({ data, selected }) {
         </div>
       ) : outputsCount > 0 ? (
         <div className="custom-handles-source">
-          {outputFields.length > 0 ? (
-            <>
-              {/* Generic Output Handle */}
-              <Handle
-                type="source"
-                position={Position.Right}
-                id="a"
-                className="custom-handle generic-handle"
-                style={{ top: '10%', background: '#64748b', width: '12px', height: '12px', borderRadius: '2px' }}
-              />
-              {outputFields.map((field, i) => (
-                <div key={field.key} className="handle-wrapper source">
-                  <span className="handle-label source-label" style={{ top: `calc(${((i + 1) / (outputFields.length + 1)) * 80 + 20}% - 6px)` }}>
-                    {field.label}
-                  </span>
-                  <Handle
-                    type="source"
-                    position={Position.Right}
-                    id={field.key}
-                    className="custom-handle"
-                    style={{ top: `${((i + 1) / (outputFields.length + 1)) * 80 + 20}%`, background: data.color }}
-                  />
-                </div>
-              ))}
-            </>
-          ) : (
-            <Handle
-              type="source"
-              position={Position.Right}
-              id="a"
-              className="custom-handle"
-              style={{ background: data.color }}
-            />
-          )}
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="a"
+            className="custom-handle generic-handle"
+            style={{ background: data.color }}
+          />
         </div>
       ) : null}
     </div>

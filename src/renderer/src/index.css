@@ -728,6 +728,15 @@ body {
   color: #fff;
 }
 
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .custom-node-label {
   font-size: 13px;
   font-weight: 600;
@@ -2003,19 +2012,6 @@ body {
 /* ============================================================
    COPILOT PANEL
    ============================================================ */
-
-.demo-gallery {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15, 15, 20, 0.95);
-  backdrop-filter: blur(8px);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
 
 .copilot-panel {
   width: 380px;
