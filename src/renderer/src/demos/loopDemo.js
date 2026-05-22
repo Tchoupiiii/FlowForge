@@ -48,8 +48,8 @@ export const demoLoop = {
     }
   ],
   edges: [
-    { id: 'e1-2', source: 'n1', target: 'n2', sourceHandle: 'trigger', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
-    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'result', targetHandle: 'arrayField', animated: true, style: { stroke: '#fcd34d', strokeWidth: 2 } },
-    { id: 'e3-4', source: 'n3', target: 'n4', sourceHandle: 'item', animated: true, style: { stroke: '#22d3ee', strokeWidth: 2 } }
+    { id: 'e1-2', source: 'n1', target: 'n2', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
+    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#fcd34d', strokeWidth: 2 } },
+    { id: 'e3-4', source: 'n3', target: 'n4', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#22d3ee', strokeWidth: 2 } }
   ]
 }

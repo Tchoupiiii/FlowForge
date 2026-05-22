@@ -21,7 +21,7 @@ export async function execute(config, inputData) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        content,
+        content: typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content),
         username
       })
     })

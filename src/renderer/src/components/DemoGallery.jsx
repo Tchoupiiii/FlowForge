@@ -4,19 +4,24 @@ import { useWorkflow } from '../context/WorkflowContext'
 
 import { DEMOS as RAW_DEMOS } from '../demos'
 
-const DEMOS = RAW_DEMOS.map((demo, i) => ({
+const getIconAndGradient = (demo) => {
+  if (demo.id === 'demo-crypto-bot') return { icon: Bitcoin, gradient: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' }
+  if (demo.id === 'demo-api-monitor') return { icon: Activity, gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)' }
+  if (demo.id === 'demo-macro-economy') return { icon: BarChart, gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' }
+  if (demo.id === 'demo-weather') return { icon: Cloud, gradient: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)' }
+  if (demo.id === 'demo-loop') return { icon: Repeat, gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)' }
+  return { icon: Layout, gradient: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' }
+}
+
+const DEMOS = RAW_DEMOS.map((demo) => ({
   ...demo,
-  icon: i % 2 === 0 ? Bitcoin : Activity,
-  gradient: i % 2 === 0 
-    ? 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' 
-    : 'linear-gradient(135deg, #10b981 0%, #047857 100%)'
+  ...getIconAndGradient(demo)
 }))
 
 export default function DemoGallery({ onClose }) {
   const { loadDemoWorkflow } = useWorkflow()
 
   const handleLoad = (demo) => {
-    // Add default handles if not present
     const processedDemo = {
       ...demo,
       edges: (demo.edges || []).map(e => ({

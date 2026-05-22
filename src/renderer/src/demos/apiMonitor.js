@@ -59,9 +59,9 @@ export const demoApiMonitor = {
     }
   ],
   edges: [
-    { id: 'e1-2', source: 'n1', target: 'n2', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
-    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'status', targetHandle: 'field', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } },
-    { id: 'e3-4', source: 'n3', target: 'n4', sourceHandle: 'true', targetHandle: 'title', animated: true, style: { stroke: '#4ade80', strokeWidth: 2 } },
-    { id: 'e3-5', source: 'n3', target: 'n5', sourceHandle: 'false', targetHandle: 'title', animated: true, style: { stroke: '#f87171', strokeWidth: 2 } }
+    { id: 'e1-2', source: 'n1', target: 'n2', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
+    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } },
+    { id: 'e3-4', source: 'n3', target: 'n4', sourceHandle: 'true', targetHandle: 'a', animated: true, style: { stroke: '#4ade80', strokeWidth: 2 } },
+    { id: 'e3-5', source: 'n3', target: 'n5', sourceHandle: 'false', targetHandle: 'a', animated: true, style: { stroke: '#f87171', strokeWidth: 2 } }
   ]
 }

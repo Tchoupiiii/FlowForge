@@ -15,9 +15,18 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
   const {
     nodes, edges, onNodesChange, onEdgesChange, onConnect,
     addNode, duplicateNode, reactFlowWrapper, renameNode,
-    undo, redo, copySelection, pasteSelection, takeSnapshot
+    undo, redo, copySelection, pasteSelection, takeSnapshot,
+    activeTabId
   } = useWorkflow()
   const reactFlowInstance = useRef(null)
+
+  useEffect(() => {
+    if (reactFlowInstance.current && nodes.length > 0) {
+      setTimeout(() => {
+        reactFlowInstance.current.fitView({ padding: 0.2, duration: 800 })
+      }, 50)
+    }
+  }, [activeTabId])
 
   // Inject onRename callback into each node's data
   const augmentedNodes = useMemo(() => {

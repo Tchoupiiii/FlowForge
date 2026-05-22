@@ -39,7 +39,7 @@ export async function execute(config, inputData) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: text,
+        text: typeof text === 'object' ? JSON.stringify(text, null, 2) : String(text),
         parse_mode: parseMode,
         disable_web_page_preview: config.disablePreview || false
       })

@@ -181,6 +181,14 @@ export class ExecutionEngine {
               break
             }
             
+            if (pe.sourceHandle && pe.targetHandle && pe.targetHandle !== 'trigger' && pe.targetHandle !== 'a') {
+              const srcValue = results[pe.source][pe.sourceHandle]
+              if (srcValue !== undefined) {
+                // Determine if we should override. If it's an array/object, we overwrite directly
+                rawConfig = { ...rawConfig, [pe.targetHandle]: srcValue }
+              }
+            }
+            
             // Standard data merging for {{input.xxx}} usage
             inputData = { ...inputData, ...results[pe.source] }
           }

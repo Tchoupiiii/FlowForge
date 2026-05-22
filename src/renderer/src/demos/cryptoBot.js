@@ -37,7 +37,7 @@ export const demoCryptoBot = {
     }
   ],
   edges: [
-    { id: 'e1-2', source: 'n1', target: 'n2', sourceHandle: 'messages', targetHandle: 'coin', animated: true, style: { stroke: '#0088cc', strokeWidth: 2 } },
-    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'price', targetHandle: 'message', animated: true, style: { stroke: '#f59e0b', strokeWidth: 2 } }
+    { id: 'e1-2', source: 'n1', target: 'n2', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#0088cc', strokeWidth: 2 } },
+    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f59e0b', strokeWidth: 2 } }
   ]
 }

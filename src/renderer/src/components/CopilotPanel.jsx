@@ -123,6 +123,7 @@ INSTRUCTIONS :
 1. Si l'utilisateur te pose une question générale, réponds lui en texte clair et naturel (sans JSON).
 2. Si l'utilisateur te demande explicitement de générer, ajouter ou modifier le workflow, retourne STRICTEMENT un objet JSON représentant le workflow (SANS texte autour).
 3. Si un module essentiel manque pour réaliser ce qu'il demande, retourne STRICTEMENT le JSON : { "impossible": true }
+4. Si l'utilisateur demande de récupérer des informations, des actualités ou des infos macro-économiques, UTILISE LE MODULE "rssParser" avec une URL pertinente (ex: https://news.google.com/rss/search?q=macro+economy+usd) ou "httpRequest" au lieu de dire que c'est impossible.
 `
 
     const systemPrompt = `${basePrompt}\n\n[CONTEXTE] Voici le workflow actuellement sur le Canvas (s'il est vide, tu peux l'ignorer) :\n${currentWorkflowJson}\n\nSi l'utilisateur demande une modification, applique-la sur ce workflow. S'il demande une création, crée un nouveau workflow de zéro.`
@@ -149,6 +150,25 @@ INSTRUCTIONS :
         } else {
           throw new Error('API locale non disponible')
         }
+      } else if (provider === 'anthropic') {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({
+            model: model,
+            max_tokens: 4096,
+            system: systemPrompt,
+            messages: [{ role: 'user', content: userMessage.content }]
+          })
+        })
+        if (!res.ok) throw new Error('Erreur API Anthropic (Vérifiez la clé API)')
+        const data = await res.json()
+        responseText = data.content[0].text
       } else {
         const res = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -318,15 +338,36 @@ INSTRUCTIONS :
           </select>
 
           <label className="config-field-label">Fournisseur d'IA</label>
-          <select className="config-select" value={provider} onChange={(e) => setProvider(e.target.value)}>
+          <select className="config-select" value={provider} onChange={(e) => { setProvider(e.target.value); if(e.target.value==='openai') setModel('gpt-4o'); else if(e.target.value==='anthropic') setModel('claude-3-5-sonnet-20241022') }}>
             <option value="ollama">Local (Ollama)</option>
             <option value="openai">OpenAI (Cloud)</option>
+            <option value="anthropic">Anthropic (Cloud)</option>
           </select>
 
           {provider === 'openai' && (
             <>
               <label className="config-field-label">Clé API OpenAI</label>
               <input type="password" className="config-input" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="sk-..." />
+              <label className="config-field-label">Modèle OpenAI</label>
+              <select className="config-select" value={model} onChange={e => setModel(e.target.value)}>
+                <option value="gpt-4o">GPT-4o</option>
+                <option value="gpt-4o-mini">GPT-4o Mini</option>
+                <option value="o1-mini">o1 Mini</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+              </select>
+            </>
+          )}
+
+          {provider === 'anthropic' && (
+            <>
+              <label className="config-field-label">Clé API Anthropic</label>
+              <input type="password" className="config-input" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="sk-ant-..." />
+              <label className="config-field-label">Modèle Anthropic</label>
+              <select className="config-select" value={model} onChange={e => setModel(e.target.value)}>
+                <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
+                <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+              </select>
             </>
           )}
 
