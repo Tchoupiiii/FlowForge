@@ -19,6 +19,7 @@ export default {
 
     return {
       triggered: true,
+      trigger: true,
       timestamp: Date.now(),
       interval,
       timezone,

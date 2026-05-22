@@ -137,12 +137,6 @@ export default function WorkflowsModal({ onClose }) {
         
         <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button className="btn-secondary" onClick={handleImport}>
-              <Upload size={14} /> Importer
-            </button>
-            <button className="btn-secondary" onClick={handleExport}>
-              <Download size={14} /> Exporter actuel
-            </button>
           </div>
           <button className="btn-secondary" onClick={onClose}>Fermer</button>
         </div>

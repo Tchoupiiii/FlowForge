@@ -4,7 +4,7 @@ export const demoApiMonitor = {
   nodes: [
     {
       id: 'n1',
-      type: 'triggerManual',
+      type: 'customNode',
       position: { x: 100, y: 200 },
       data: {
         type: 'triggerManual',
@@ -15,7 +15,7 @@ export const demoApiMonitor = {
     },
     {
       id: 'n2',
-      type: 'httpRequest',
+      type: 'customNode',
       position: { x: 400, y: 200 },
       data: {
         type: 'httpRequest',
@@ -26,7 +26,7 @@ export const demoApiMonitor = {
     },
     {
       id: 'n3',
-      type: 'condition',
+      type: 'customNode',
       position: { x: 700, y: 200 },
       data: {
         type: 'condition',
@@ -37,7 +37,7 @@ export const demoApiMonitor = {
     },
     {
       id: 'n4',
-      type: 'notification',
+      type: 'customNode',
       position: { x: 1000, y: 100 },
       data: {
         type: 'notification',
@@ -48,7 +48,7 @@ export const demoApiMonitor = {
     },
     {
       id: 'n5',
-      type: 'notification',
+      type: 'customNode',
       position: { x: 1000, y: 300 },
       data: {
         type: 'notification',

@@ -150,6 +150,9 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
         onPaneContextMenu={handlePaneContextMenu}
         defaultEdgeOptions={defaultEdgeOptions}
         deleteKeyCode={['Backspace', 'Delete']}
+        selectionKeyCode="Shift"
+        selectionMode="partial"
+        selectionOnDrag={true}
         onNodesDelete={() => takeSnapshot()}
         onEdgesDelete={() => takeSnapshot()}
         fitView

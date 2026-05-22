@@ -9,28 +9,34 @@ import {
 } from 'lucide-react'
 
 export const MODULE_DEFINITIONS = [
-  // ──── Core ────
+  // ──── Triggers ────
   {
-    type: 'triggerManual', label: 'Trigger Manuel', icon: 'Play', color: '#4ade80', category: 'core',
-    inputs: 0, outputs: 1, configFields: [],
-    outputFields: [{ key: 'timestamp', label: 'Timestamp' }],
+    type: 'triggerManual', label: 'Déclencheur Manuel', icon: 'Play', color: '#f43f5e', category: 'trigger',
+    inputs: 0, outputs: 1,
+    configFields: [],
+    outputFields: [
+      { key: 'timestamp', label: 'Timestamp' },
+      { key: 'trigger', label: 'Lancer la suite (Action)' }
+    ],
     help: {
-      description: 'Démarre un workflow manuellement en cliquant sur le bouton Run.',
+      description: 'Déclenche le workflow manuellement quand vous cliquez sur Play.',
       example: 'Cliquez sur ▶️ pour lancer le workflow.',
       tip: 'Utilisez ce nœud comme point de départ de tous vos workflows.'
     }
   },
   {
-    type: 'timerCron', label: 'Timer / Cron', icon: 'Clock', color: '#fbbf24', category: 'core',
+    type: 'timerCron', label: 'Timer / Cron', icon: 'Clock', color: '#f59e0b', category: 'trigger',
     inputs: 0, outputs: 1,
     configFields: [
-      { key: 'interval', label: 'Intervalle (secondes)', type: 'number', default: 60 },
-      { key: 'cron', label: 'Expression Cron', type: 'text', default: '' }
+      { key: 'interval', label: 'Intervalle (ex: 5s, 10m, 1h)', type: 'text', default: '5m' }
     ],
-    outputFields: [{ key: 'timestamp', label: 'Timestamp' }],
+    outputFields: [
+      { key: 'timestamp', label: 'Timestamp' },
+      { key: 'trigger', label: 'Lancer la suite (Action)' }
+    ],
     help: {
-      description: 'Déclenche le workflow à intervalles réguliers ou selon une expression cron.',
-      example: 'Intervalle: 3600 = toutes les heures. Cron: */5 * * * * = toutes les 5 min.',
+      description: 'Déclenche le workflow à un intervalle régulier.',
+      example: 'Intervalle: 10s (toutes les 10 secondes), 5m (5 minutes)',
       tip: "Laissez le champ cron vide pour utiliser l'intervalle simple."
     }
   },

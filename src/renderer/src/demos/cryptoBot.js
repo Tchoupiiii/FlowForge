@@ -4,7 +4,7 @@ export const demoCryptoBot = {
   nodes: [
     {
       id: 'n1',
-      type: 'telegramTrigger',
+      type: 'customNode',
       position: { x: 100, y: 200 },
       data: {
         type: 'telegramTrigger',
@@ -15,7 +15,7 @@ export const demoCryptoBot = {
     },
     {
       id: 'n2',
-      type: 'cryptoPrice',
+      type: 'customNode',
       position: { x: 500, y: 200 },
       data: {
         type: 'cryptoPrice',
@@ -26,7 +26,7 @@ export const demoCryptoBot = {
     },
     {
       id: 'n3',
-      type: 'telegramSend',
+      type: 'customNode',
       position: { x: 900, y: 200 },
       data: {
         type: 'telegramSend',

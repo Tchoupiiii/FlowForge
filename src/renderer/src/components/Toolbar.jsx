@@ -55,36 +55,6 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
           <Save size={18} />
         </button>
 
-        <button className="toolbar-btn" onClick={async () => {
-          if (window.electronAPI?.importWorkflow) {
-            const res = await window.electronAPI.importWorkflow();
-            if (res && res.success && res.workflow) {
-              loadDemoWorkflow(res.workflow);
-              toast.success('Import réussi', 'Le workflow a été chargé.');
-            }
-          }
-        }} title="Importer">
-          <Download size={18} />
-        </button>
-
-        <button className="toolbar-btn" onClick={async () => {
-          if (window.electronAPI?.exportWorkflow) {
-            await window.electronAPI.exportWorkflow({ name: workflowName, nodes, edges });
-            toast.success('Export réussi', 'Le workflow a été exporté.');
-          }
-        }} title="Exporter (JSON)">
-          <Upload size={18} />
-        </button>
-        
-        <button className="toolbar-btn" onClick={async () => {
-          if (window.electronAPI?.exportScript) {
-            await window.electronAPI.exportScript({ name: workflowName, nodes, edges });
-            toast.success('Export Console réussi', 'Le script autonome a été généré avec succès !');
-          }
-        }} title="Exporter en Console (Script)">
-          <Terminal size={18} />
-        </button>
-
         <div className="toolbar-divider" />
 
         <button className="toolbar-btn" onClick={onShowDemos} title="Démos">

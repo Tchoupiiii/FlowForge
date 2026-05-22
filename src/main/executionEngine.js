@@ -199,7 +199,7 @@ export class ExecutionEngine {
         if (!executor) {
           // Trigger nodes just pass through
           if (moduleType === 'triggerManual') {
-            results[nodeId] = { triggered: true, timestamp: Date.now() }
+            results[nodeId] = { triggered: true, trigger: true, timestamp: Date.now() }
             onProgress(nodeId, 'success', {
               message: 'Workflow déclenché',
               data: results[nodeId]
@@ -216,7 +216,8 @@ export class ExecutionEngine {
           const result = await executor(config, inputData)
           const duration = Date.now() - startTime
 
-          results[nodeId] = result
+          // Pass all upstream data downstream to allow global interpolation
+          results[nodeId] = { ...inputData, ...result }
           onProgress(nodeId, 'success', {
             message: `Terminé en ${duration}ms`,
             data: result,
