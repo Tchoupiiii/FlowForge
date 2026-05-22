@@ -7,7 +7,7 @@ export const meta = {
 export async function execute(config, inputData) {
   try {
     const botToken = config.botToken || ''
-    const chatId = config.chatId || inputData?.chatId || ''
+    const chatId = config.chatId || inputData?.chatId || inputData?.chatid || ''
     const text = config.message || inputData?.text || inputData?.response || ''
     const parseMode = config.parseMode || 'HTML'
 

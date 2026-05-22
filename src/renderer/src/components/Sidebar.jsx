@@ -8,9 +8,29 @@ const CATEGORY_ICONS = { core: Zap, ai: Brain, map: MapPin, telegram: Send }
 export default function Sidebar() {
   const [activeTab, setActiveTab] = useState('modules')
   const [search, setSearch] = useState('')
+  const [width, setWidth] = useState(260)
   const categories = getCategories()
   
-  const { savedWorkflows, loadWorkflow, deleteWorkflow } = useWorkflow()
+  const { savedWorkflows, loadWorkflow, deleteWorkflow, clearCanvas, setWorkflowName } = useWorkflow()
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = width;
+    
+    const handleMouseMove = (moveEvent) => {
+      const newWidth = startWidth + (moveEvent.clientX - startX);
+      setWidth(Math.max(150, Math.min(newWidth, window.innerWidth / 2)));
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
 
   const filtered = useMemo(() => {
     if (!search.trim()) return MODULE_DEFINITIONS
@@ -28,7 +48,24 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="sidebar" style={{ display: 'flex', flexDirection: 'column', width: `${width}px`, position: 'relative' }}>
+      {/* Resize Handle */}
+      <div
+        onMouseDown={handleMouseDown}
+        style={{
+          position: 'absolute',
+          right: -2,
+          top: 0,
+          bottom: 0,
+          width: '5px',
+          cursor: 'col-resize',
+          zIndex: 100,
+          backgroundColor: 'transparent'
+        }}
+        onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--accent)'}
+        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+      />
+
       <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)' }}>
         <div 
           onClick={() => setActiveTab('modules')}

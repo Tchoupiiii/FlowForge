@@ -5,6 +5,7 @@ import { useWorkflow } from '../context/WorkflowContext'
 
 export default function CopilotPanel({ onClose }) {
   const { loadDemoWorkflow, nodes, edges } = useWorkflow()
+  const [width, setWidth] = useState(380)
   const [mode, setMode] = useState(() => localStorage.getItem('copilot_mode') || 'create')
   const [provider, setProvider] = useState(() => localStorage.getItem('copilot_provider') || 'ollama')
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('copilot_apiKey') || '')
@@ -13,6 +14,26 @@ export default function CopilotPanel({ onClose }) {
   const [prompt, setPrompt] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = width;
+    
+    const handleMouseMove = (moveEvent) => {
+      // For right panel, moving mouse left increases width
+      const newWidth = startWidth - (moveEvent.clientX - startX);
+      setWidth(Math.max(300, Math.min(newWidth, window.innerWidth / 2)));
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
   const [message, setMessage] = useState('')
   const [showSettings, setShowSettings] = useState(false)
   const [discussions, setDiscussions] = useState(() => {
@@ -210,7 +231,24 @@ INSTRUCTIONS :
   }
 
   return (
-    <div className="copilot-panel slide-in-right">
+    <div className="copilot-panel slide-in-right" style={{ width: `${width}px`, position: 'relative' }}>
+      {/* Resize Handle (Left side) */}
+      <div
+        onMouseDown={handleMouseDown}
+        style={{
+          position: 'absolute',
+          left: -2,
+          top: 0,
+          bottom: 0,
+          width: '5px',
+          cursor: 'col-resize',
+          zIndex: 100,
+          backgroundColor: 'transparent'
+        }}
+        onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--accent)'}
+        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+      />
+      
       <div className="copilot-header" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="copilot-title">

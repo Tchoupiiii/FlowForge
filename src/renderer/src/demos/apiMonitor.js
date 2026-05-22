@@ -1,20 +1,67 @@
-export default function apiMonitor() {
-  return {
-    name: 'Surveillance API',
-    description: 'Surveille un endpoint API à intervalles réguliers. Envoie un email d\'alerte si le serveur ne répond plus.',
-    tags: ['Timer', 'HTTP', 'Condition', 'Email'],
-    nodes: [
-      { id: 'd4_1', type: 'customNode', position: { x: 100, y: 60 }, data: { type: 'timerCron', label: 'Timer / Cron', icon: 'Clock', color: '#fbbf24', category: 'core', inputs: 0, outputs: 1, config: { interval: 300, cron: '' }, status: 'idle' } },
-      { id: 'd4_2', type: 'customNode', position: { x: 100, y: 220 }, data: { type: 'httpRequest', label: 'HTTP Request', icon: 'Globe', color: '#60a5fa', category: 'core', inputs: 1, outputs: 1, config: { url: 'https://api.example.com/health', method: 'GET', headers: '{}', body: '' }, status: 'idle' } },
-      { id: 'd4_3', type: 'customNode', position: { x: 100, y: 380 }, data: { type: 'condition', label: 'Condition', icon: 'GitBranch', color: '#fb923c', category: 'core', inputs: 1, outputs: 2, config: { field: 'status', operator: '!=', value: '200' }, status: 'idle' } },
-      { id: 'd4_4', type: 'customNode', position: { x: 300, y: 540 }, data: { type: 'email', label: 'Email SMTP', icon: 'Mail', color: '#f472b6', category: 'core', inputs: 1, outputs: 1, config: { to: 'admin@example.com', subject: '⚠️ API Down!', body: 'L\'API ne répond plus. Vérifiez le serveur immédiatement.' }, status: 'idle' } },
-      { id: 'd4_5', type: 'customNode', position: { x: -100, y: 540 }, data: { type: 'notification', label: 'Notification', icon: 'Bell', color: '#f87171', category: 'core', inputs: 1, outputs: 1, config: { title: '✅ API OK', body: 'Le serveur fonctionne normalement.' }, status: 'idle' } }
-    ],
-    edges: [
-      { id: 'd4_e1', source: 'd4_1', sourceHandle: 'a', target: 'd4_2', targetHandle: 'a', type: 'smoothstep', animated: true },
-      { id: 'd4_e2', source: 'd4_2', sourceHandle: 'a', target: 'd4_3', targetHandle: 'a', type: 'smoothstep', animated: true },
-      { id: 'd4_e3', source: 'd4_3', sourceHandle: 'true', target: 'd4_4', targetHandle: 'a', type: 'smoothstep', animated: true },
-      { id: 'd4_e4', source: 'd4_3', sourceHandle: 'false', target: 'd4_5', targetHandle: 'a', type: 'smoothstep', animated: true }
-    ]
-  }
+export const demoApiMonitor = {
+  id: 'demo-api-monitor',
+  name: 'Monitoring API (Health Check)',
+  nodes: [
+    {
+      id: 'n1',
+      type: 'triggerManual',
+      position: { x: 100, y: 200 },
+      data: {
+        type: 'triggerManual',
+        label: 'Déclencheur Manuel',
+        color: '#f43f5e',
+        config: {}
+      }
+    },
+    {
+      id: 'n2',
+      type: 'httpRequest',
+      position: { x: 400, y: 200 },
+      data: {
+        type: 'httpRequest',
+        label: 'Requête HTTP',
+        color: '#10b981',
+        config: { url: 'https://api.github.com', method: 'GET', headers: '{}', body: '' }
+      }
+    },
+    {
+      id: 'n3',
+      type: 'condition',
+      position: { x: 700, y: 200 },
+      data: {
+        type: 'condition',
+        label: 'Condition Status',
+        color: '#eab308',
+        config: { field: '{{status}}', operator: 'equals', value: '200' }
+      }
+    },
+    {
+      id: 'n4',
+      type: 'notification',
+      position: { x: 1000, y: 100 },
+      data: {
+        type: 'notification',
+        label: 'Alerte Succès',
+        color: '#f87171',
+        config: { title: 'API UP', body: 'L\\'API répond correctement ({{status}}).' }
+      }
+    },
+    {
+      id: 'n5',
+      type: 'notification',
+      position: { x: 1000, y: 300 },
+      data: {
+        type: 'notification',
+        label: 'Alerte Erreur',
+        color: '#f87171',
+        config: { title: 'API DOWN', body: 'Erreur: Le status est {{status}}' }
+      }
+    }
+  ],
+  edges: [
+    { id: 'e1-2', source: 'n1', target: 'n2', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
+    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'status', targetHandle: 'field', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } },
+    { id: 'e3-4', source: 'n3', target: 'n4', sourceHandle: 'true', targetHandle: 'title', animated: true, style: { stroke: '#4ade80', strokeWidth: 2 } },
+    { id: 'e3-5', source: 'n3', target: 'n5', sourceHandle: 'false', targetHandle: 'title', animated: true, style: { stroke: '#f87171', strokeWidth: 2 } }
+  ]
 }

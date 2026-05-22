@@ -70,13 +70,18 @@ export async function execute(config, inputData) {
     }
 
     const firstMsg = results[0] || {}
+    
+    // Expose keys in lowercase so {{text}}, {{chatid}} works easily
+    const lowerFirstMsg = {}
+    for (const [key, val] of Object.entries(firstMsg)) {
+      lowerFirstMsg[key.toLowerCase()] = val
+    }
 
     return {
       success: true,
       messages: results,
       count: results.length,
-      // Expose first message fields directly so {{text}} or {{chatId}} works out of the box
-      ...firstMsg
+      ...lowerFirstMsg
     }
   } catch (error) {
     return {
