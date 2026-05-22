@@ -1,10 +1,13 @@
 export const execute = async (config, inputData) => {
   try {
-    let text = config.text || (config.inputField ? inputData[config.inputField] : inputData);
+    let text = config.text || (config.inputField ? inputData[config.inputField] : (inputData.text || inputData));
     if (text === null || text === undefined) text = '';
     if (typeof text !== 'string') {
-      if (typeof text === 'object') text = JSON.stringify(text);
-      else text = String(text);
+      if (typeof text === 'object') {
+        text = text.result || text.message || JSON.stringify(text);
+      } else {
+        text = String(text);
+      }
     }
     
     let result = text;

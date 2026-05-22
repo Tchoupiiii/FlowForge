@@ -9,7 +9,7 @@ export default {
   },
 
   async execute(config, inputData) {
-    const symbol = config.symbol || inputData.symbol || 'AAPL'
+    const symbol = config.symbol || inputData.symbol || inputData.result || inputData.text || 'AAPL'
     
     try {
       // API Publique de Yahoo Finance (non-officielle mais fonctionnelle)

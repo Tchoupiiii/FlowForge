@@ -294,7 +294,10 @@ export const MODULE_DEFINITIONS = [
       { key: 'text', label: 'Texte à modifier', type: 'text', default: '' },
       { key: 'separator', label: 'Séparateur (pour split)', type: 'text', default: ',', showIf: (c) => c.action === 'split' }
     ],
-    outputFields: [{ key: 'result', label: 'Résultat' }],
+    outputFields: [
+      { key: 'result', label: 'Résultat' },
+      { key: 'text', label: 'Texte (Identique au résultat)' }
+    ],
     help: {
       description: 'Modifie une chaîne de caractères.',
       example: 'Action: uppercase, Texte: hello → HELLO',
@@ -608,7 +611,11 @@ export const MODULE_DEFINITIONS = [
       { key: 'botToken', label: 'Token du Bot', type: 'password', default: '' },
       { key: 'timeout', label: 'Timeout (secondes)', type: 'number', default: 30 }
     ],
-    outputFields: [{ key: 'messages', label: 'Messages (Tableau)' }],
+    outputFields: [
+      { key: 'messages', label: 'Messages (Brut)' },
+      { key: 'text', label: 'Texte' },
+      { key: 'chatid', label: 'Chat ID' }
+    ],
     help: {
       description: 'Reçoit les messages envoyés à votre bot Telegram via long polling.',
       example: 'Token: 123456:ABC-DEF (obtenu via @BotFather)',

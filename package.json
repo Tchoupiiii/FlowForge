@@ -1,6 +1,6 @@
 {
   "name": "flowforge",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Un constructeur visuel de workflows",
   "main": "./out/main/index.js",
   "author": "FlowForge",

@@ -43,7 +43,7 @@ export const demoApiMonitor = {
         type: 'notification',
         label: 'Alerte Succès',
         color: '#f87171',
-        config: { title: 'API UP', body: 'L\\'API répond correctement ({{status}}).' }
+        config: { title: 'API UP', body: "L'API répond correctement ({{status}})." }
       }
     },
     {

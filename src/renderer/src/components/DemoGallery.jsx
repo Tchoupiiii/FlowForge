@@ -2,40 +2,15 @@ import React from 'react'
 import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout, Repeat } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 
-// Import demos
-import weatherDemo from '../demos/weatherNotification'
-import csvDemo from '../demos/csvToJson'
-import webhookDemo from '../demos/webhookAi'
-import apiDemo from '../demos/apiMonitor'
-import shopDemo from '../demos/shopFinder'
-import sentimentDemo from '../demos/sentimentAnalysis'
-import cryptoDiscordDemo from '../demos/cryptoDiscord'
-import rssSlackDemo from '../demos/rssSlack'
-import githubTranslateDemo from '../demos/githubTranslateDemo'
-import healthDemo from '../demos/healthDemo'
-import financeDemo from '../demos/financeDemo'
-import planningDemo from '../demos/planningDemo'
-import systemMonitorDemo from '../demos/systemMonitorDemo'
-import trelloCardDemo from '../demos/trelloCardDemo'
-import loopDemo from '../demos/loopDemo'
+import { DEMOS as RAW_DEMOS } from '../demos'
 
-const DEMOS = [
-  { ...loopDemo(), icon: Repeat, gradient: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)' },
-  { ...weatherDemo(), icon: Cloud, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { ...csvDemo(), icon: FileJson, gradient: 'linear-gradient(135deg, #2dd4bf 0%, #3b82f6 100%)' },
-  { ...webhookDemo(), icon: MessageSquare, gradient: 'linear-gradient(135deg, #c084fc 0%, #818cf8 100%)' },
-  { ...apiDemo(), icon: Activity, gradient: 'linear-gradient(135deg, #fb923c 0%, #f87171 100%)' },
-  { ...shopDemo(), icon: MapPin, gradient: 'linear-gradient(135deg, #fb7185 0%, #e879f9 100%)' },
-  { ...sentimentDemo(), icon: BarChart, gradient: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)' },
-  { ...cryptoDiscordDemo(), icon: Bitcoin, gradient: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' },
-  { ...rssSlackDemo(), icon: Rss, gradient: 'linear-gradient(135deg, #f97316 0%, #E01E5A 100%)' },
-  { ...githubTranslateDemo(), icon: Github, gradient: 'linear-gradient(135deg, #18181b 0%, #3f3f46 100%)' },
-  { ...healthDemo(), icon: Heart, gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)' },
-  { ...financeDemo(), icon: LineChart, gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)' },
-  { ...planningDemo(), icon: Calendar, gradient: 'linear-gradient(135deg, #4285F4 0%, #1e40af 100%)' },
-  { ...systemMonitorDemo(), icon: Terminal, gradient: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' },
-  { ...trelloCardDemo(), icon: Layout, gradient: 'linear-gradient(135deg, #0079bf 0%, #0284c7 100%)' }
-]
+const DEMOS = RAW_DEMOS.map((demo, i) => ({
+  ...demo,
+  icon: i % 2 === 0 ? Bitcoin : Activity,
+  gradient: i % 2 === 0 
+    ? 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' 
+    : 'linear-gradient(135deg, #10b981 0%, #047857 100%)'
+}))
 
 export default function DemoGallery({ onClose }) {
   const { loadDemoWorkflow } = useWorkflow()
