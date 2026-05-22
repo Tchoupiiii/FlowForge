@@ -62,6 +62,7 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
     }
 
     updateNodeConfig(node.id, updates)
+  }
 
 
   const renderField = (field) => {
