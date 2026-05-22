@@ -26,7 +26,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'interval', label: 'Intervalle (secondes)', type: 'number', default: 60 },
       { key: 'cron', label: 'Expression Cron', type: 'text', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'timestamp', label: 'Timestamp' }],
     help: {
       description: 'Déclenche le workflow à intervalles réguliers ou selon une expression cron.',
@@ -42,7 +42,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'method', label: 'Méthode', type: 'select', options: ['GET', 'POST', 'PUT', 'DELETE'], default: 'GET' },
       { key: 'headers', label: 'Headers (JSON)', type: 'textarea', default: '{}' },
       { key: 'body', label: 'Body (JSON)', type: 'textarea', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'data', label: 'Data' }, { key: 'status', label: 'Status' }],
     help: {
       description: "Effectue une requête HTTP vers n'importe quelle API REST.",
@@ -56,7 +56,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'port', label: 'Port', type: 'number', default: 3000 },
       { key: 'path', label: 'Chemin', type: 'text', default: '/webhook' }
-    ],,
+    ],
     outputFields: [{ key: 'body', label: 'Body' }, { key: 'query', label: 'Query' }],
     help: {
       description: 'Crée un serveur HTTP qui écoute les requêtes entrantes.',
@@ -71,7 +71,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'field', label: 'Champ', type: 'text', default: 'data.value' },
       { key: 'operator', label: 'Opérateur', type: 'select', options: ['==', '!=', '>', '<', '>=', '<=', 'contains', 'not_contains'], default: '==' },
       { key: 'value', label: 'Valeur', type: 'text', default: '' }
-    ],,
+    ],
     outputFields: [],
     help: {
       description: 'Dirige le flux selon une condition. Sortie 1 = Vrai, Sortie 2 = Faux.',
@@ -84,7 +84,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'expression', label: 'Expression de transformation', type: 'textarea', default: '// Accédez aux données via "input"\nreturn input;' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat JSON' }],
     help: {
       description: 'Transforme les données JSON avec une expression JavaScript.',
@@ -101,7 +101,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'body', label: 'Corps du message', type: 'textarea', default: '' },
       { key: 'smtp_host', label: 'Serveur SMTP', type: 'text', default: 'smtp.gmail.com' },
       { key: 'smtp_port', label: 'Port SMTP', type: 'number', default: 587 }
-    ],,
+    ],
     outputFields: [{ key: 'success', label: 'Succès' }],
     help: {
       description: 'Envoie un email via un serveur SMTP.',
@@ -115,7 +115,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'path', label: 'Chemin du fichier', type: 'text', default: '' },
       { key: 'format', label: 'Format', type: 'select', options: ['text', 'json', 'csv'], default: 'text' }
-    ],,
+    ],
     outputFields: [{ key: 'data', label: 'Contenu (data)' }],
     help: {
       description: 'Lit un fichier depuis le disque local.',
@@ -129,7 +129,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'path', label: 'Chemin du fichier', type: 'text', default: '' },
       { key: 'format', label: 'Format', type: 'select', options: ['text', 'json', 'csv'], default: 'json' }
-    ],,
+    ],
     outputFields: [{ key: 'success', label: 'Succès' }],
     help: {
       description: 'Écrit des données dans un fichier sur le disque.',
@@ -142,7 +142,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'code', label: 'Code JavaScript', type: 'code', default: '// Les données d\'entrée sont dans la variable "input"\n// Retournez le résultat\nreturn input;' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Exécute du code JavaScript personnalisé.',
@@ -155,7 +155,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'seconds', label: 'Durée (secondes)', type: 'number', default: 5 }
-    ],,
+    ],
     outputFields: [{ key: 'success', label: 'Succès' }],
     help: {
       description: 'Met le workflow en pause pendant un temps défini.',
@@ -169,7 +169,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'arrayField', label: 'Champ tableau (ex: items)', type: 'text', default: 'items' },
       { key: 'maxIterations', label: 'Max itérations (0 = illimité)', type: 'number', default: 0 }
-    ],,
+    ],
     outputFields: [{ key: 'item', label: 'Élément (item)' }, { key: 'index', label: 'Index' }],
     help: {
       description: 'Itère sur chaque élément d\'un tableau. Passe les éléments un par un au nœud suivant.',
@@ -183,7 +183,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'title', label: 'Titre', type: 'text', default: 'FlowForge' },
       { key: 'body', label: 'Message', type: 'text', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'success', label: 'Succès' }],
     help: {
       description: 'Affiche une notification dans l\'application.',
@@ -196,7 +196,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'command', label: 'Commande', type: 'text', default: 'echo "Hello"' }
-    ],,
+    ],
     outputFields: [{ key: 'stdout', label: 'Sortie Stdout' }, { key: 'stderr', label: 'Erreur Stderr' }],
     help: {
       description: 'Exécute une commande dans le terminal du système.',
@@ -222,7 +222,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'action', label: 'Action', type: 'select', options: ['encode', 'decode'], default: 'encode' },
       { key: 'inputField', label: 'Champ de données (laisser vide pour config.text)', type: 'text', default: '' },
       { key: 'text', label: 'Texte par défaut', type: 'textarea', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Convertit du texte en Base64 et inversement.',
@@ -236,7 +236,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'pattern', label: 'Pattern Regex', type: 'text', default: '.*' },
       { key: 'inputField', label: 'Champ à analyser', type: 'text', default: 'text' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Extrait des données à partir d\'un texte selon un pattern.',
@@ -249,7 +249,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'inputField', label: 'Champ JSON (vide = tout)', type: 'text', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Convertit un tableau d\'objets JSON en texte CSV.',
@@ -263,7 +263,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'csv', label: 'Contenu CSV (vide = prendre de l\'input)', type: 'textarea', default: '' },
       { key: 'inputField', label: 'Champ contenant le CSV', type: 'text', default: 'content' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Convertit un texte CSV en tableau d\'objets JSON.',
@@ -278,7 +278,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'operation', label: 'Opération', type: 'select', options: ['add', 'subtract', 'multiply', 'divide'], default: 'add' },
       { key: 'a', label: 'Valeur A (nombre ou champ)', type: 'text', default: '0' },
       { key: 'b', label: 'Valeur B (nombre ou champ)', type: 'text', default: '0' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Effectue une opération mathématique de base.',
@@ -293,7 +293,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'action', label: 'Action', type: 'select', options: ['uppercase', 'lowercase', 'trim', 'split'], default: 'uppercase' },
       { key: 'text', label: 'Texte à modifier', type: 'text', default: '' },
       { key: 'separator', label: 'Séparateur (pour split)', type: 'text', default: ',', showIf: (c) => c.action === 'split' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Modifie une chaîne de caractères.',
@@ -307,7 +307,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'rssUrl', label: 'URL du Flux RSS', type: 'text', default: 'https://news.ycombinator.com/rss' }
-    ],,
+    ],
     outputFields: [{ key: 'items', label: 'Articles (items)' }],
     help: {
       description: 'Récupère et parse un flux RSS ou Atom en format JSON exploitable.',
@@ -322,7 +322,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'property', label: 'Propriété (ex: price, user.age)', type: 'text', default: '' },
       { key: 'operator', label: 'Opérateur', type: 'select', options: ['==', '!=', '>', '<', '>=', '<=', 'contains', 'not_contains'], default: '==' },
       { key: 'value', label: 'Valeur', type: 'text', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat filtré' }],
     help: {
       description: 'Filtre une liste d\'éléments (tableau JSON) selon une condition.',
@@ -336,7 +336,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'coin', label: 'ID Cryptomonnaie', type: 'text', default: 'bitcoin' },
       { key: 'currency', label: 'Devise', type: 'text', default: 'usd' }
-    ],,
+    ],
     outputFields: [{ key: 'price', label: 'Prix' }, { key: 'currency', label: 'Devise' }],
     help: {
       description: 'Récupère le prix en temps réel d\'une cryptomonnaie via CoinGecko.',
@@ -350,7 +350,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'owner', label: 'Propriétaire', type: 'text', default: 'electron' },
       { key: 'repo', label: 'Dépôt', type: 'text', default: 'electron' }
-    ],,
+    ],
     outputFields: [{ key: 'stars', label: 'Étoiles' }, { key: 'forks', label: 'Forks' }, { key: 'issues', label: 'Issues' }],
     help: {
       description: 'Récupère les informations d\'un dépôt GitHub (stars, forks, description).',
@@ -364,7 +364,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'query', label: 'Recherche (médicament, effet...)', type: 'text', default: 'aspirin' },
       { key: 'endpoint', label: 'Type de donnée', type: 'select', options: ['drug/event', 'drug/label', 'food/enforcement'], default: 'drug/event' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Recherche des données de santé via l\'API publique OpenFDA.',
@@ -377,7 +377,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'symbol', label: 'Symbole (ex: AAPL, MSFT)', type: 'text', default: 'AAPL' }
-    ],,
+    ],
     outputFields: [{ key: 'price', label: 'Prix' }, { key: 'symbol', label: 'Symbole' }],
     help: {
       description: 'Récupère le cours actuel d\'une action en bourse.',
@@ -393,7 +393,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'token', label: 'Token', type: 'password', default: '' },
       { key: 'idList', label: 'ID de la Liste', type: 'text', default: '' },
       { key: 'name', label: 'Nom de la carte', type: 'text', default: 'Nouvelle tâche' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Crée une carte dans une liste Trello via l\'API officielle.',
@@ -409,7 +409,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'repo', label: 'Dépôt (owner/repo)', type: 'text', default: 'Tchoupiiii/FlowForge' },
       { key: 'title', label: 'Titre de l\'issue', type: 'text', default: 'Bug report' },
       { key: 'body', label: 'Description', type: 'textarea', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'url', label: 'URL de l\'issue' }, { key: 'number', label: 'Numéro' }],
     help: {
       description: 'Crée une issue sur un dépôt GitHub.',
@@ -425,7 +425,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'webhookUrl', label: 'URL du Webhook', type: 'password', default: '' },
       { key: 'content', label: 'Message', type: 'textarea', default: 'Nouveau message de FlowForge !' },
       { key: 'username', label: 'Nom du Bot', type: 'text', default: 'FlowForge Bot' }
-    ],,
+    ],
     outputFields: [{ key: 'success', label: 'Succès' }],
     help: {
       description: 'Envoie un message sur un salon Discord via un Webhook.',
@@ -439,7 +439,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'webhookUrl', label: 'URL du Webhook', type: 'password', default: '' },
       { key: 'text', label: 'Message', type: 'textarea', default: 'Nouveau message de FlowForge !' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Envoie un message sur un canal Slack via un Webhook entrant.',
@@ -453,7 +453,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'summary', label: 'Titre de l\'événement', type: 'text', default: 'Réunion importante' },
       { key: 'date', label: 'Date et Heure (ISO)', type: 'text', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Ajoute un événement directement dans votre Google Calendar.',
@@ -467,7 +467,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'databaseId', label: 'Database ID', type: 'password', default: '' },
       { key: 'title', label: 'Titre de la page', type: 'text', default: '' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Crée une nouvelle page/tâche dans votre base de données Notion.',
@@ -486,7 +486,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'systemPrompt', label: 'System Prompt', type: 'textarea', default: 'Tu es un assistant utile.' },
       { key: 'userPrompt', label: 'User Prompt', type: 'textarea', default: '' },
       { key: 'temperature', label: 'Température', type: 'number', default: 0.7 }
-    ],,
+    ],
     outputFields: [{ key: 'response', label: 'Réponse Agent' }],
     help: {
       description: "Envoie un prompt à un modèle d'IA (OpenAI ou Ollama local).",
@@ -501,7 +501,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'apiKey', label: 'Clé API', type: 'password', default: '' },
       { key: 'model', label: 'Modèle', type: 'text', default: 'gpt-4o' },
       { key: 'prompt', label: 'Prompt', type: 'textarea', default: 'Bonjour' }
-    ],,
+    ],
     outputFields: [{ key: 'message', label: 'Message IA' }],
     help: {
       description: 'Envoie une requête directement à l\'API cloud OpenAI.',
@@ -516,7 +516,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'apiKey', label: 'Clé API', type: 'password', default: '' },
       { key: 'model', label: 'Modèle', type: 'text', default: 'claude-3-opus-20240229' },
       { key: 'prompt', label: 'Prompt', type: 'textarea', default: 'Bonjour' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Envoie une requête à l\'API Anthropic Claude.',
@@ -532,7 +532,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'apiKey', label: 'Clé API', type: 'password', default: '', showIf: (c) => c.provider === 'openai' },
       { key: 'model', label: 'Modèle', type: 'text', default: 'gpt-4' },
       { key: 'analysisType', label: "Type d'analyse", type: 'select', options: ['sentiment', 'summary', 'entities'], default: 'sentiment' }
-    ],,
+    ],
     outputFields: [{ key: 'summary', label: 'Résumé' }, { key: 'keywords', label: 'Mots-clés' }],
     help: {
       description: "Analyse du texte avec l'IA : sentiment, résumé ou extraction d'entités.",
@@ -547,7 +547,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'apiKey', label: 'Clé API OpenAI', type: 'password', default: '' },
       { key: 'prompt', label: "Description de l'image", type: 'textarea', default: '' },
       { key: 'size', label: 'Taille', type: 'select', options: ['256x256', '512x512', '1024x1024'], default: '512x512' }
-    ],,
+    ],
     outputFields: [{ key: 'url', label: 'URL Image' }],
     help: {
       description: "Génère une image à partir d'une description textuelle via DALL-E.",
@@ -563,7 +563,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'apiKey', label: 'Clé API', type: 'password', default: '', showIf: (c) => c.provider === 'openai' },
       { key: 'model', label: 'Modèle', type: 'text', default: 'gpt-4' },
       { key: 'categories', label: 'Catégories (une par ligne)', type: 'textarea', default: 'positif\nnégatif\nneutre' }
-    ],,
+    ],
     outputFields: [{ key: 'category', label: 'Catégorie' }, { key: 'confidence', label: 'Confiance' }],
     help: {
       description: 'Classe automatiquement du texte dans des catégories personnalisées.',
@@ -576,7 +576,7 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'targetLanguage', label: 'Langue cible (ex: en, es, fr)', type: 'text', default: 'en' }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Traduit automatiquement le texte reçu dans la langue de votre choix.',
@@ -592,7 +592,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'query', label: 'Recherche', type: 'text', default: 'boulangerie' },
       { key: 'location', label: 'Ville ou adresse', type: 'text', default: 'Paris' },
       { key: 'radius', label: 'Rayon (km)', type: 'number', default: 5 }
-    ],,
+    ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
       description: 'Recherche des lieux (boutiques, restaurants...) sur la carte OpenStreetMap.',
@@ -607,7 +607,7 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'botToken', label: 'Token du Bot', type: 'password', default: '' },
       { key: 'timeout', label: 'Timeout (secondes)', type: 'number', default: 30 }
-    ],,
+    ],
     outputFields: [{ key: 'messages', label: 'Messages (Tableau)' }],
     help: {
       description: 'Reçoit les messages envoyés à votre bot Telegram via long polling.',
@@ -623,7 +623,7 @@ export const MODULE_DEFINITIONS = [
       { key: 'chatId', label: 'Chat ID', type: 'text', default: '' },
       { key: 'message', label: 'Message', type: 'textarea', default: '' },
       { key: 'parseMode', label: 'Format', type: 'select', options: ['HTML', 'Markdown', 'MarkdownV2'], default: 'HTML' }
-    ],,
+    ],
     outputFields: [{ key: 'success', label: 'Succès' }],
     help: {
       description: 'Envoie un message via votre bot Telegram à un chat ou utilisateur.',
