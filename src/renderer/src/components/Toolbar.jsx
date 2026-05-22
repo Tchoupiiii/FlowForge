@@ -58,9 +58,9 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
 
         <button className="toolbar-btn" onClick={async () => {
           if (window.electronAPI?.importWorkflow) {
-            const wf = await window.electronAPI.importWorkflow();
-            if (wf && wf.nodes && wf.edges) {
-              loadDemoWorkflow(wf);
+            const res = await window.electronAPI.importWorkflow();
+            if (res && res.success && res.workflow) {
+              loadDemoWorkflow(res.workflow);
               toast.success('Import réussi', 'Le workflow a été chargé.');
             }
           }

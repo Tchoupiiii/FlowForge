@@ -145,35 +145,6 @@ ipcMain.handle('app:set-theme', async (_event, theme) => {
 })
 
 // Workflow CRUD
-ipcMain.handle('workflow:export', async (_event, workflow) => {
-  try {
-    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
-      title: 'Exporter le Workflow',
-      defaultPath: `workflow_${Date.now()}.json`,
-      filters: [{ name: 'JSON', extensions: ['json'] }]
-    })
-    if (canceled || !filePath) return false
-    require('fs').writeFileSync(filePath, JSON.stringify(workflow, null, 2), 'utf-8')
-    return true
-  } catch (err) {
-    return { success: false, error: err.message }
-  }
-})
-
-ipcMain.handle('workflow:import', async () => {
-  try {
-    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-      title: 'Importer un Workflow',
-      filters: [{ name: 'JSON', extensions: ['json'] }],
-      properties: ['openFile']
-    })
-    if (canceled || filePaths.length === 0) return null
-    const content = require('fs').readFileSync(filePaths[0], 'utf-8')
-    return JSON.parse(content)
-  } catch (err) {
-    return null
-  }
-})
 
 ipcMain.handle('workflow:save', async (_event, workflow) => {
   try {
