@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react'
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react'
 import { useNodesState, useEdgesState, addEdge } from 'reactflow'
 import { getModuleByType } from '../data/moduleDefinitions'
 
@@ -7,13 +7,86 @@ const WorkflowContext = createContext()
 let nodeIdCounter = 1
 
 export function WorkflowProvider({ children }) {
+  // Global ReactFlow state for the CURRENTLY ACTIVE tab
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
-  const [workflowName, setWorkflowName] = useState('Nouveau Workflow')
-  const [workflowId, setWorkflowId] = useState(null)
+  
+  // Tab Management State
+  // A tab has: tabId, workflowId, workflowName, nodes, edges
+  const [tabs, setTabs] = useState([
+    { tabId: 'tab_1', workflowId: null, workflowName: 'Nouveau Workflow', nodes: [], edges: [] }
+  ])
+  const [activeTabId, setActiveTabId] = useState('tab_1')
+  
   const [savedWorkflows, setSavedWorkflows] = useState([])
   const reactFlowWrapper = useRef(null)
 
+  // When activeTabId changes, load its nodes/edges into ReactFlow
+  useEffect(() => {
+    const activeTab = tabs.find(t => t.tabId === activeTabId)
+    if (activeTab) {
+      setNodes(activeTab.nodes || [])
+      setEdges(activeTab.edges || [])
+    }
+  }, [activeTabId]) // deliberately NOT depending on tabs, only run on tab switch
+
+  // When nodes/edges change in ReactFlow, we need to sync them back to the active tab
+  // We do this by updating the tabs array.
+  useEffect(() => {
+    setTabs(prevTabs => prevTabs.map(t => 
+      t.tabId === activeTabId 
+        ? { ...t, nodes, edges } 
+        : t
+    ))
+  }, [nodes, edges, activeTabId])
+
+  // Helper to get active tab metadata
+  const activeTab = tabs.find(t => t.tabId === activeTabId) || tabs[0]
+  const workflowName = activeTab.workflowName
+  const workflowId = activeTab.workflowId
+
+  const setWorkflowName = useCallback((name) => {
+    setTabs(prev => prev.map(t => t.tabId === activeTabId ? { ...t, workflowName: name } : t))
+  }, [activeTabId])
+
+  const setWorkflowId = useCallback((id) => {
+    setTabs(prev => prev.map(t => t.tabId === activeTabId ? { ...t, workflowId: id } : t))
+  }, [activeTabId])
+
+  // --- TAB MANAGEMENT ---
+  const createNewTab = useCallback(() => {
+    const newTabId = `tab_${Date.now()}`
+    setTabs(prev => [...prev, {
+      tabId: newTabId,
+      workflowId: null,
+      workflowName: 'Nouveau Workflow',
+      nodes: [],
+      edges: []
+    }])
+    setActiveTabId(newTabId)
+  }, [])
+
+  const closeTab = useCallback((tabIdToClose) => {
+    setTabs(prev => {
+      const newTabs = prev.filter(t => t.tabId !== tabIdToClose)
+      if (newTabs.length === 0) {
+        // Always keep at least one tab
+        const defaultTab = { tabId: `tab_${Date.now()}`, workflowId: null, workflowName: 'Nouveau Workflow', nodes: [], edges: [] }
+        setActiveTabId(defaultTab.tabId)
+        return [defaultTab]
+      }
+      if (activeTabId === tabIdToClose) {
+        setActiveTabId(newTabs[newTabs.length - 1].tabId)
+      }
+      return newTabs
+    })
+  }, [activeTabId])
+
+  const switchTab = useCallback((tabId) => {
+    setActiveTabId(tabId)
+  }, [])
+
+  // --- REACT FLOW HELPERS ---
   const onConnect = useCallback((params) => {
     setEdges((eds) => addEdge({
       ...params,
@@ -45,7 +118,6 @@ export function WorkflowProvider({ children }) {
       }
     }
 
-    // Set default config values
     if (moduleDef.configFields) {
       moduleDef.configFields.forEach(field => {
         newNode.data.config[field.key] = field.default
@@ -89,6 +161,7 @@ export function WorkflowProvider({ children }) {
     })))
   }, [setNodes])
 
+  // --- WORKFLOW IO ---
   const saveWorkflow = useCallback(async () => {
     const workflow = {
       id: workflowId || `wf_${Date.now()}`,
@@ -110,30 +183,57 @@ export function WorkflowProvider({ children }) {
       console.error('Save failed:', e)
       return { ...workflow, _saved: false, _error: e.message }
     }
-  }, [workflowId, workflowName, nodes, edges])
+  }, [workflowId, workflowName, nodes, edges, setWorkflowId])
 
   const loadWorkflow = useCallback(async (id) => {
     try {
       if (window.electronAPI) {
         const wf = await window.electronAPI.loadWorkflow(id)
         if (wf) {
-          setWorkflowId(wf.id)
-          setWorkflowName(wf.name || 'Sans nom')
-          setNodes(wf.nodes || [])
-          setEdges(wf.edges || [])
+          // Si l'onglet actuel est vide, on le remplace, sinon on ouvre un nouvel onglet
+          const isTabEmpty = nodes.length === 0 && !workflowId
+          if (isTabEmpty) {
+            setWorkflowId(wf.id)
+            setWorkflowName(wf.name || 'Sans nom')
+            setNodes(wf.nodes || [])
+            setEdges(wf.edges || [])
+          } else {
+            const newTabId = `tab_${Date.now()}`
+            setTabs(prev => [...prev, {
+              tabId: newTabId,
+              workflowId: wf.id,
+              workflowName: wf.name || 'Sans nom',
+              nodes: wf.nodes || [],
+              edges: wf.edges || []
+            }])
+            setActiveTabId(newTabId)
+          }
         }
       }
     } catch (e) {
       console.error('Load failed:', e)
     }
-  }, [setNodes, setEdges])
+  }, [nodes, workflowId, setWorkflowId, setWorkflowName, setNodes, setEdges])
 
   const loadDemoWorkflow = useCallback((demo) => {
-    setWorkflowId(null)
-    setWorkflowName(demo.name || 'Démo')
-    setNodes(demo.nodes || [])
-    setEdges(demo.edges || [])
-  }, [setNodes, setEdges])
+    const isTabEmpty = nodes.length === 0 && !workflowId
+    if (isTabEmpty) {
+      setWorkflowId(null)
+      setWorkflowName(demo.name || 'Démo')
+      setNodes(demo.nodes || [])
+      setEdges(demo.edges || [])
+    } else {
+      const newTabId = `tab_${Date.now()}`
+      setTabs(prev => [...prev, {
+        tabId: newTabId,
+        workflowId: null,
+        workflowName: demo.name || 'Démo',
+        nodes: demo.nodes || [],
+        edges: demo.edges || []
+      }])
+      setActiveTabId(newTabId)
+    }
+  }, [nodes, workflowId, setWorkflowId, setWorkflowName, setNodes, setEdges])
 
   const listWorkflows = useCallback(async () => {
     try {
@@ -160,14 +260,12 @@ export function WorkflowProvider({ children }) {
   }, [listWorkflows])
 
   const clearCanvas = useCallback(() => {
-    setNodes([])
-    setEdges([])
-    setWorkflowId(null)
-    setWorkflowName('Nouveau Workflow')
-  }, [setNodes, setEdges])
+    createNewTab()
+  }, [createNewTab])
 
   return (
     <WorkflowContext.Provider value={{
+      tabs, activeTabId, createNewTab, closeTab, switchTab,
       nodes, edges, setNodes, setEdges,
       onNodesChange, onEdgesChange, onConnect,
       workflowName, setWorkflowName,

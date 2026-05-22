@@ -1,5 +1,5 @@
 import React from 'react'
-import { X, HelpCircle } from 'lucide-react'
+import { X, HelpCircle, MessageCircleQuestion } from 'lucide-react'
 import { getModuleByType, ICON_MAP } from '../data/moduleDefinitions'
 import { useWorkflow } from '../context/WorkflowContext'
 import MapView from './MapView'
@@ -17,23 +17,18 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
       
       if (providerValue === 'ollama') {
         try {
-          let data;
           if (window.electronAPI && window.electronAPI.getOllamaModels) {
-            const res = await window.electronAPI.getOllamaModels()
-            if (res.success) {
-              data = res
+            const data = await window.electronAPI.getOllamaModels()
+            if (data.success) {
+              setOllamaModels(data.models?.map(m => m.name) || [])
+              setOllamaError(false)
             } else {
-              throw new Error(res.error)
+              throw new Error('API locale non disponible')
             }
           } else {
-            // Fallback for web mode
-            const res = await fetch('http://localhost:11434/api/tags')
-            if (!res.ok) throw new Error('Network error')
-            data = await res.json()
+            // Fallback
+            setOllamaModels([])
           }
-          
-          setOllamaModels(data.models?.map(m => m.name) || [])
-          setOllamaError(false)
         } catch (e) {
           setOllamaError(true)
         }
@@ -67,27 +62,7 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
     }
 
     updateNodeConfig(node.id, updates)
-  }
 
-  // Render text with {{variables}} highlighted
-  const renderHighlightedPreview = (text) => {
-    if (!text || typeof text !== 'string' || !text.includes('{{')) return null
-    const parts = text.split(/(\{\{.+?\}\})/g)
-    return (
-      <div className="var-preview" style={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        padding: '12px 16px', pointerEvents: 'none', whiteSpace: 'pre-wrap',
-        wordBreak: 'break-word', fontSize: '13px', lineHeight: '1.6',
-        fontFamily: 'inherit', color: 'transparent', overflow: 'hidden'
-      }}>
-        {parts.map((part, i) =>
-          /^\{\{.+?\}\}$/.test(part)
-            ? <span key={i} className="var-highlight">{part}</span>
-            : <span key={i}>{part}</span>
-        )}
-      </div>
-    )
-  }
 
   const renderField = (field) => {
     const value = config[field.key] !== undefined ? config[field.key] : field.default
@@ -147,18 +122,14 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
       case 'textarea':
       case 'code':
         return (
-          <div style={{ position: 'relative' }}>
-            {renderHighlightedPreview(value || '')}
-            <textarea
-              className={`config-textarea ${field.type === 'code' ? 'config-code' : ''}`}
-              value={value || ''}
-              onChange={(e) => handleChange(field.key, e.target.value)}
-              rows={field.type === 'code' ? 6 : 3}
-              placeholder={field.default || ''}
-              spellCheck={false}
-              style={{ background: value?.includes('{{') ? 'transparent' : undefined, position: 'relative', zIndex: 1 }}
-            />
-          </div>
+          <textarea
+            className={`config-textarea ${field.type === 'code' ? 'config-code' : ''}`}
+            value={value || ''}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            rows={field.type === 'code' ? 6 : 3}
+            placeholder={field.default || ''}
+            spellCheck={false}
+          />
         )
       default:
         return (
@@ -182,6 +153,9 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
           <span>{moduleDef.label}</span>
         </div>
         <div className="config-panel-actions">
+          <button className="config-panel-action-btn" onClick={() => onShowHelp(moduleDef)} title="Aide sur ce module">
+            <MessageCircleQuestion size={18} />
+          </button>
           <button className="config-panel-action-btn" onClick={onClose} title="Fermer">
             <X size={18} />
           </button>

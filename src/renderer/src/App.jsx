@@ -12,6 +12,7 @@ import Toolbar from './components/Toolbar'
 import ExecutionLog from './components/ExecutionLog'
 import DemoGallery from './components/DemoGallery'
 import ContextMenu from './components/ContextMenu'
+import TabBar from './components/TabBar'
 import GuideModal from './components/GuideModal'
 import CopilotPanel from './components/CopilotPanel'
 import SettingsModal from './components/SettingsModal'
@@ -61,7 +62,12 @@ function AppContent() {
     }
   }, [])
 
-  const { addNode, nodes, setNodes, setEdges } = useWorkflow()
+  const { addNode, nodes, setNodes, setEdges, activeTabId } = useWorkflow()
+
+  // Reset selected node when switching tabs
+  useEffect(() => {
+    setSelectedNodeId(null)
+  }, [activeTabId])
 
   const handleNodeSelect = useCallback((node) => {
     setSelectedNodeId(node ? node.id : null)
@@ -134,6 +140,7 @@ function AppContent() {
       <div className="app-body">
         <Sidebar />
         <div className="main-area">
+            <TabBar />
             <Toolbar
               onShowDemos={handleShowDemos}
               onShowGuide={handleShowGuide}

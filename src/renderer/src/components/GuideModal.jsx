@@ -73,9 +73,30 @@ export default function GuideModal({ onClose }) {
                 <ul className="guide-list">
                   <li><strong style={{color: 'var(--accent)'}}>Core :</strong> Logique de base (HTTP, JSON, Filtre, Trigger, Lecture de fichier, Discord, Slack, RSS).</li>
                   <li><strong style={{color: '#818cf8'}}>Intelligence Artificielle :</strong> Agents, Classificateurs et analyseurs avec OpenAI ou Ollama.</li>
-                  <li><strong style={{color: '#fb7185'}}>Carte :</strong> Modules pour rechercher et afficher des coordonnées géographiques (OpenStreetMap).</li>
-                  <li><strong style={{color: '#0088cc'}}>Telegram :</strong> Écouter les messages d'un bot ou en envoyer.</li>
+                  <li><strong style={{color: '#34d399'}}>Finance :</strong> Cours de bourse, crypto-monnaies.</li>
+                  <li><strong style={{color: '#f472b6'}}>Divers :</strong> APIs spécifiques (FDA, traductions, github, trello, google calendar).</li>
                 </ul>
+              </div>
+
+              <div className="guide-section">
+                <h3>Utiliser les Variables Magiques</h3>
+                <p>FlowForge vous permet d'injecter des données dynamiques d'un nœud précédent dans la configuration d'un nœud suivant grâce à la syntaxe <strong>&#123;&#123;input.nom_du_champ&#125;&#125;</strong>.</p>
+                <ul>
+                  <li><strong>&#123;&#123;input.price&#125;&#125;</strong> : Récupère la valeur du champ "price" du nœud précédent.</li>
+                  <li><strong>&#123;&#123;input.data.name&#125;&#125;</strong> : Récupère une valeur imbriquée.</li>
+                  <li><strong>&#123;&#123;input&#125;&#125;</strong> : Injecte l'objet complet au format JSON.</li>
+                </ul>
+                <p>Les variables sont surlignées en violet dans les champs de texte pour confirmer qu'elles sont reconnues.</p>
+              </div>
+
+              <div className="guide-section">
+                <h3>Utiliser les Boucles (Loops)</h3>
+                <p>Le module "Boucle (Loop)" permet de traiter un tableau d'éléments un par un.</p>
+                <ul>
+                  <li><strong>Champ tableau</strong> : Le nom de la clé contenant votre tableau (ex: "items"). Si laissé vide ou introuvable, FlowForge cherchera automatiquement le premier tableau dans les données d'entrée.</li>
+                  <li><strong>Max itérations</strong> : Pratique pour tester, cela limite le nombre d'éléments traités.</li>
+                </ul>
+                <p>Connectez simplement la sortie du nœud Boucle au nœud suivant. Ce dernier sera exécuté <em>pour chaque élément</em> du tableau !</p>
               </div>
             )}
 

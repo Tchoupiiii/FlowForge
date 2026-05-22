@@ -20,8 +20,12 @@ export default {
     const variation = (Math.random() - 0.5) * 5
     const price = +(base + variation).toFixed(2)
 
+    const baseNames = { AAPL: 'Apple Inc.', MSFT: 'Microsoft Corp.', GOOGL: 'Alphabet Inc.', TSLA: 'Tesla, Inc.' }
+    const name = baseNames[symbol.toUpperCase()] || `${symbol.toUpperCase()} Corp.`
+
     return {
       symbol: symbol.toUpperCase(),
+      name: name,
       price: price,
       currency: 'USD',
       timestamp: Date.now()

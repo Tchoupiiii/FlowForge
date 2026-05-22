@@ -16,17 +16,20 @@ export default function CopilotPanel({ onClose }) {
 
   useEffect(() => {
     if (provider === 'ollama') {
-      fetch('http://localhost:11434/api/tags')
-        .then(res => res.json())
-        .then(data => {
-          const models = data.models?.map(m => m.name) || []
-          setOllamaModels(models)
-          if (models.length > 0) setModel(models[0])
+      if (window.electronAPI && window.electronAPI.getOllamaModels) {
+        window.electronAPI.getOllamaModels().then(data => {
+          if (data.success) {
+            const models = data.models?.map(m => m.name) || []
+            setOllamaModels(models)
+            if (models.length > 0 && !model) {
+              setModel(models[0])
+            }
+          }
+        }).catch(err => {
+          console.error('Ollama list error', err)
+          setError("Impossible de contacter Ollama.")
         })
-        .catch(() => {
-          setOllamaModels([])
-          setError("Impossible de contacter Ollama sur le port 11434.")
-        })
+      }
     } else {
       setModel('gpt-4o')
     }
@@ -69,20 +72,14 @@ Positionne les noeuds avec un x croissant (ex: 100, 350, 600).`
       let responseText = ''
 
       if (provider === 'ollama') {
-        const res = await fetch('http://localhost:11434/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: model,
-            system: systemPrompt,
-            prompt: prompt,
-            stream: false,
-            format: 'json'
-          })
-        })
-        if (!res.ok) throw new Error('Erreur API Ollama')
-        const data = await res.json()
-        responseText = data.response
+        if (window.electronAPI && window.electronAPI.generateOllama) {
+          const options = { system: systemPrompt, format: 'json' }
+          const res = await window.electronAPI.generateOllama(prompt, model, options)
+          if (!res.success) throw new Error(res.error)
+          responseText = res.response
+        } else {
+          throw new Error('API locale non disponible')
+        }
       } else {
         const res = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',

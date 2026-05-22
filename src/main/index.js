@@ -202,10 +202,30 @@ ipcMain.handle('workflow:stop', async () => {
 // Ollama API
 ipcMain.handle('ollama:get-tags', async () => {
   try {
-    const res = await (typeof fetch !== 'undefined' ? fetch('http://localhost:11434/api/tags') : global.fetch('http://localhost:11434/api/tags'))
+    const res = await (typeof fetch !== 'undefined' ? fetch('http://127.0.0.1:11434/api/tags') : global.fetch('http://127.0.0.1:11434/api/tags'))
     if (!res.ok) return { success: false, error: 'Ollama API error' }
     const data = await res.json()
     return { success: true, models: data.models }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('ollama:generate', async (_event, prompt, model, options = {}) => {
+  try {
+    const body = { model: model || 'llama3', prompt, stream: false, ...options }
+    const res = await (typeof fetch !== 'undefined' ? fetch('http://127.0.0.1:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }) : global.fetch('http://127.0.0.1:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }))
+    if (!res.ok) return { success: false, error: 'Ollama API error' }
+    const data = await res.json()
+    return { success: true, response: data.response }
   } catch (error) {
     return { success: false, error: error.message }
   }

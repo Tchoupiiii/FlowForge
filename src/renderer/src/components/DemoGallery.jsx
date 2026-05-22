@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout } from 'lucide-react'
+import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout, Repeat } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 
 // Import demos
@@ -17,7 +17,10 @@ import financeDemo from '../demos/financeDemo'
 import planningDemo from '../demos/planningDemo'
 import systemMonitorDemo from '../demos/systemMonitorDemo'
 import trelloCardDemo from '../demos/trelloCardDemo'
+import loopDemo from '../demos/loopDemo'
+
 const DEMOS = [
+  { ...loopDemo(), icon: Repeat, gradient: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)' },
   { ...weatherDemo(), icon: Cloud, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
   { ...csvDemo(), icon: FileJson, gradient: 'linear-gradient(135deg, #2dd4bf 0%, #3b82f6 100%)' },
   { ...webhookDemo(), icon: MessageSquare, gradient: 'linear-gradient(135deg, #c084fc 0%, #818cf8 100%)' },

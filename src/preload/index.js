@@ -39,6 +39,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // AI APIs
   getOllamaModels: () => ipcRenderer.invoke('ollama:get-tags'),
+  generateOllama: (prompt, model, options = {}) => ipcRenderer.invoke('ollama:generate', prompt, model, options),
 
   // Workflow file export/import
   exportWorkflow: (workflow) => ipcRenderer.invoke('workflow:export', workflow),

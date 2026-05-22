@@ -79,7 +79,7 @@ async function callOpenAI(config, params) {
 }
 
 async function callOllama(config, params) {
-  const baseUrl = config.baseUrl || 'http://localhost:11434'
+  const baseUrl = config.baseUrl || 'http://127.0.0.1:11434'
 
   const response = await fetch(`${baseUrl}/api/generate`, {
     method: 'POST',
