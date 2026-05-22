@@ -90,7 +90,7 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
         fitView
         snapToGrid
         snapGrid={[16, 16]}
-        deleteKeyCode={['Backspace', 'Delete']}
+        deleteKeyCode={['Delete']}
         className="flow-canvas"
       >
         <Background

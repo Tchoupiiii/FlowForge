@@ -82,12 +82,20 @@ export default function GuideModal({ onClose }) {
               <div className="guide-section">
                 <h3>Utiliser les Variables Magiques</h3>
                 <p>FlowForge vous permet d'injecter des données dynamiques d'un nœud précédent dans la configuration d'un nœud suivant grâce à la syntaxe <strong>&#123;&#123;input.nom_du_champ&#125;&#125;</strong>.</p>
+                <div style={{ background: 'var(--bg-surface)', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', margin: '10px 0' }}>
+                  <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--accent)' }}>Comment les insérer ?</h4>
+                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px' }}>
+                    <li>Tapez simplement deux accolades ouvrantes <code>&#123;&#123;</code> dans n'importe quel champ de texte.</li>
+                    <li>Ajoutez <code>input.</code> suivi du nom de la clé que vous voulez récupérer (ex: <code>price</code>, <code>title</code>).</li>
+                    <li>Fermez avec deux accolades <code>&#125;&#125;</code>.</li>
+                  </ul>
+                </div>
                 <ul>
                   <li><strong>&#123;&#123;input.price&#125;&#125;</strong> : Récupère la valeur du champ "price" du nœud précédent.</li>
                   <li><strong>&#123;&#123;input.data.name&#125;&#125;</strong> : Récupère une valeur imbriquée.</li>
                   <li><strong>&#123;&#123;input&#125;&#125;</strong> : Injecte l'objet complet au format JSON.</li>
                 </ul>
-                <p>Les variables sont surlignées en violet dans les champs de texte pour confirmer qu'elles sont reconnues.</p>
+                <p>Une fois saisies correctement, les variables s'affichent sous forme de "pilules" colorées (<span className="var-highlight">&#123;&#123;input.exemple&#125;&#125;</span>) sur le résumé du nœud dans le Canvas pour confirmer qu'elles sont reconnues !</p>
               </div>
 
               <div className="guide-section">

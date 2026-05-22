@@ -17,6 +17,7 @@ import GuideModal from './components/GuideModal'
 import CopilotPanel from './components/CopilotPanel'
 import SettingsModal from './components/SettingsModal'
 import WorkflowsModal from './components/WorkflowsModal'
+import NotificationsModal from './components/NotificationsModal'
 import { ToastProvider, useToast } from './components/ToastProvider'
 
 function AppContent() {
@@ -27,6 +28,8 @@ function AppContent() {
   const [showCopilot, setShowCopilot] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showWorkflows, setShowWorkflows] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notificationsHistory, setNotificationsHistory] = useState([])
   const [showExecutionLog, setShowExecutionLog] = useState(false)
   const [contextMenu, setContextMenu] = useState(null)
   const [updateReady, setUpdateReady] = useState(false)
@@ -52,6 +55,11 @@ function AppContent() {
           if (toast[type]) {
             toast[type](data.title || 'Notification', data.body || '')
           }
+        })
+      }
+      if (window.electronAPI.onAppNotificationHistory) {
+        window.electronAPI.onAppNotificationHistory((data) => {
+          setNotificationsHistory(prev => [data, ...prev])
         })
       }
       if (window.electronAPI.getVersion) {
@@ -94,8 +102,8 @@ function AppContent() {
     setShowGuide(true)
   }, [])
 
-  const handleShowCopilot = useCallback(() => {
-    setShowCopilot(true)
+  const handleToggleCopilot = useCallback(() => {
+    setShowCopilot(prev => !prev)
   }, [])
 
   const handleToggleLog = useCallback(() => {
@@ -144,9 +152,10 @@ function AppContent() {
             <Toolbar
               onShowDemos={handleShowDemos}
               onShowGuide={handleShowGuide}
-              onShowCopilot={handleShowCopilot}
+              onShowCopilot={handleToggleCopilot}
               onShowSettings={() => setShowSettings(true)}
               onShowWorkflows={() => setShowWorkflows(true)}
+              onShowNotifications={() => setShowNotifications(true)}
               onToggleLog={handleToggleLog}
               showLog={showExecutionLog}
             />
@@ -170,6 +179,9 @@ function AppContent() {
             <ExecutionLog onClose={() => setShowExecutionLog(false)} />
           )}
         </div>
+        {showCopilot && (
+          <CopilotPanel onClose={() => setShowCopilot(false)} />
+        )}
       </div>
       {contextMenu && (
         <ContextMenu
@@ -189,14 +201,14 @@ function AppContent() {
       {showGuide && (
         <GuideModal onClose={() => setShowGuide(false)} />
       )}
-      {showCopilot && (
-        <CopilotPanel onClose={() => setShowCopilot(false)} />
-      )}
       {showSettings && (
         <SettingsModal onClose={() => setShowSettings(false)} />
       )}
       {showWorkflows && (
         <WorkflowsModal onClose={() => setShowWorkflows(false)} />
+      )}
+      {showNotifications && (
+        <NotificationsModal notifications={notificationsHistory} onClose={() => setShowNotifications(false)} />
       )}
       
       {updateReady && (

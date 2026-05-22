@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { X, FolderOpen, Trash2, Download, Upload } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { useToast } from './ToastProvider'
 
 export default function WorkflowsModal({ onClose }) {
   const { listWorkflows, savedWorkflows, loadWorkflow, deleteWorkflow, nodes, edges, workflowName, loadDemoWorkflow } = useWorkflow()
+  const [confirmDelete, setConfirmDelete] = useState(null)
   const toast = useToast()
 
   useEffect(() => {
@@ -19,10 +20,9 @@ export default function WorkflowsModal({ onClose }) {
 
   const handleDelete = async (id, e) => {
     e.stopPropagation()
-    if (confirm('Voulez-vous vraiment supprimer ce workflow ?')) {
-      await deleteWorkflow(id)
-      toast.info('Workflow supprimé', 'Le workflow a été supprimé.')
-    }
+    await deleteWorkflow(id)
+    toast.info('Workflow supprimé', 'Le workflow a été supprimé.')
+    setConfirmDelete(null)
   }
 
   const handleExport = async () => {
@@ -89,22 +89,46 @@ export default function WorkflowsModal({ onClose }) {
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
-                  onClick={() => handleLoad(wf.id)}
+                  onClick={() => confirmDelete !== wf.id && handleLoad(wf.id)}
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span style={{ fontWeight: '600', color: 'var(--text)', fontSize: '14px' }}>{wf.name || 'Sans nom'}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                      {wf.nodeCount || 0} nœuds · Modifié le {new Date(wf.updatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                  <button 
-                    className="icon-btn" 
-                    onClick={(e) => handleDelete(wf.id, e)}
-                    style={{ color: 'var(--error)' }}
-                    title="Supprimer"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  {confirmDelete === wf.id ? (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      <span style={{ fontSize: '13px', color: 'var(--text)' }}>Supprimer ce workflow ?</span>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button 
+                          className="btn-secondary" 
+                          style={{ padding: '4px 10px' }} 
+                          onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }}
+                        >
+                          Annuler
+                        </button>
+                        <button 
+                          className="btn-primary" 
+                          style={{ background: 'var(--danger)', padding: '4px 10px' }} 
+                          onClick={(e) => handleDelete(wf.id, e)}
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontWeight: '600', color: 'var(--text)', fontSize: '14px' }}>{wf.name || 'Sans nom'}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                          {wf.nodeCount || 0} nœuds · Modifié le {new Date(wf.updatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <button 
+                        className="icon-btn" 
+                        onClick={(e) => { e.stopPropagation(); setConfirmDelete(wf.id); }}
+                        style={{ color: 'var(--error)' }}
+                        title="Supprimer"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

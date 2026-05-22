@@ -6,37 +6,40 @@ export default function loopDemo() {
     nodes: [
       {
         id: 'trigger',
-        type: 'triggerManual',
+        type: 'customNode',
         position: { x: 50, y: 150 },
-        data: { type: 'triggerManual', label: 'Déclencheur' }
+        data: { type: 'triggerManual', label: 'Déclencheur', icon: 'Play', color: '#4ade80', category: 'core', inputs: 0, outputs: 1, config: {}, status: 'idle' }
       },
       {
         id: 'rss',
-        type: 'rssParser',
+        type: 'customNode',
         position: { x: 300, y: 150 },
         data: {
           type: 'rssParser',
           label: 'Flux RSS',
-          config: { url: 'https://news.ycombinator.com/rss' }
+          icon: 'Rss', color: '#f97316', category: 'core', inputs: 1, outputs: 1, status: 'idle',
+          config: { rssUrl: 'https://news.ycombinator.com/rss' }
         }
       },
       {
         id: 'loop',
-        type: 'loopForEach',
+        type: 'customNode',
         position: { x: 550, y: 150 },
         data: {
           type: 'loopForEach',
           label: 'Boucle (Articles)',
+          icon: 'RefreshCw', color: '#22d3ee', category: 'core', inputs: 1, outputs: 1, status: 'idle',
           config: { arrayField: 'items', maxIterations: 3 }
         }
       },
       {
         id: 'notify',
-        type: 'notification',
+        type: 'customNode',
         position: { x: 800, y: 150 },
         data: {
           type: 'notification',
           label: 'Notification',
+          icon: 'Bell', color: '#f87171', category: 'core', inputs: 1, outputs: 1, status: 'idle',
           config: {
             title: 'Nouvel article',
             body: '{{input.title}} - Par: {{input.creator}}'

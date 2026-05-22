@@ -136,80 +136,78 @@ Positionne les noeuds avec un x croissant (ex: 100, 350, 600).`
   }
 
   return (
-    <div className="help-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="copilot-panel slide-in-right">
-        <div className="copilot-header">
-          <div className="copilot-title">
-            <Sparkles size={24} color="#818cf8" />
-            <h2>FlowForge Copilot</h2>
-          </div>
-          <button className="help-close-btn" onClick={onClose}>
-            <X size={20} />
+    <div className="copilot-panel slide-in-right">
+      <div className="copilot-header">
+        <div className="copilot-title">
+          <Sparkles size={24} color="#818cf8" />
+          <h2>FlowForge Copilot</h2>
+        </div>
+        <button className="help-close-btn" onClick={onClose}>
+          <X size={20} />
+        </button>
+      </div>
+
+      <div className="copilot-body">
+        <p className="copilot-intro">Décrivez le workflow de vos rêves, et l'IA s'occupe de le créer pour vous sur le Canvas.</p>
+        
+        <div className="copilot-config">
+          <label className="config-field-label">Fournisseur d'IA</label>
+          <select className="config-select" value={provider} onChange={(e) => setProvider(e.target.value)}>
+            <option value="ollama">Local (Ollama)</option>
+            <option value="openai">OpenAI (Cloud)</option>
+          </select>
+
+          {provider === 'openai' && (
+            <>
+              <label className="config-field-label">Clé API OpenAI</label>
+              <input type="password" className="config-input" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="sk-..." />
+            </>
+          )}
+
+          {provider === 'ollama' && (
+            <>
+              <label className="config-field-label">Modèle local</label>
+              <select className="config-select" value={model} onChange={e => setModel(e.target.value)}>
+                {ollamaModels.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </>
+          )}
+        </div>
+
+        <div className="copilot-chat">
+          <label className="config-field-label">Que souhaitez-vous automatiser ?</label>
+          <textarea 
+            className="config-textarea" 
+            rows={4} 
+            value={prompt} 
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="Ex: Un workflow qui télécharge un flux RSS, filtre les articles sur l'IA, et m'envoie un résumé sur Slack..."
+          />
+          
+          <button 
+            className="toolbar-btn toolbar-btn-primary" 
+            style={{ width: '100%', justifyContent: 'center', marginTop: '12px' }}
+            onClick={handleGenerate}
+            disabled={loading || !prompt || (provider === 'openai' && !apiKey)}
+          >
+            {loading ? <span className="toolbar-status-dot running" /> : <Send size={16} />}
+            <span>{loading ? 'Génération en cours...' : 'Générer le Workflow'}</span>
           </button>
         </div>
 
-        <div className="copilot-body">
-          <p className="copilot-intro">Décrivez le workflow de vos rêves, et l'IA s'occupe de le créer pour vous sur le Canvas.</p>
-          
-          <div className="copilot-config">
-            <label className="config-field-label">Fournisseur d'IA</label>
-            <select className="config-select" value={provider} onChange={(e) => setProvider(e.target.value)}>
-              <option value="ollama">Local (Ollama)</option>
-              <option value="openai">OpenAI (Cloud)</option>
-            </select>
-
-            {provider === 'openai' && (
-              <>
-                <label className="config-field-label">Clé API OpenAI</label>
-                <input type="password" className="config-input" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="sk-..." />
-              </>
-            )}
-
-            {provider === 'ollama' && (
-              <>
-                <label className="config-field-label">Modèle local</label>
-                <select className="config-select" value={model} onChange={e => setModel(e.target.value)}>
-                  {ollamaModels.map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
-              </>
-            )}
+        {error && (
+          <div className="copilot-message error">
+            <AlertCircle size={16} />
+            <span>{error}</span>
           </div>
+        )}
 
-          <div className="copilot-chat">
-            <label className="config-field-label">Que souhaitez-vous automatiser ?</label>
-            <textarea 
-              className="config-textarea" 
-              rows={4} 
-              value={prompt} 
-              onChange={e => setPrompt(e.target.value)}
-              placeholder="Ex: Un workflow qui télécharge un flux RSS, filtre les articles sur l'IA, et m'envoie un résumé sur Slack..."
-            />
-            
-            <button 
-              className="toolbar-btn toolbar-btn-primary" 
-              style={{ width: '100%', justifyContent: 'center', marginTop: '12px' }}
-              onClick={handleGenerate}
-              disabled={loading || !prompt || (provider === 'openai' && !apiKey)}
-            >
-              {loading ? <span className="toolbar-status-dot running" /> : <Send size={16} />}
-              <span>{loading ? 'Génération en cours...' : 'Générer le Workflow'}</span>
-            </button>
+        {message && (
+          <div className={`copilot-message ${message.includes('impossible') ? 'warning' : 'success'}`}>
+            <Bot size={16} />
+            <span>{message}</span>
           </div>
-
-          {error && (
-            <div className="copilot-message error">
-              <AlertCircle size={16} />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {message && (
-            <div className={`copilot-message ${message.includes('impossible') ? 'warning' : 'success'}`}>
-              <Bot size={16} />
-              <span>{message}</span>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   )

@@ -1,11 +1,11 @@
 import React from 'react'
-import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings } from 'lucide-react'
+import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings, Bell } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { useExecution } from '../context/ExecutionContext'
 import { useToast } from './ToastProvider'
 import ThemeToggle from './ThemeToggle'
 
-export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot, onShowSettings, onShowWorkflows }) {
+export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowCopilot, onShowSettings, onShowWorkflows, onShowNotifications }) {
   const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas } = useWorkflow()
   const { isRunning, execute, stop } = useExecution()
   const toast = useToast()
@@ -79,6 +79,11 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
         <button className="toolbar-btn" onClick={onShowSettings} title="Paramètres">
           <Settings size={16} />
           <span>Paramètres</span>
+        </button>
+
+        <button className="toolbar-btn" onClick={onShowNotifications} title="Notifications">
+          <Bell size={16} />
+          <span>Notifications</span>
         </button>
 
         <button className="toolbar-btn" onClick={() => onToggleLog && onToggleLog()} title="Logs">

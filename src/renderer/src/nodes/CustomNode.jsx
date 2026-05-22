@@ -103,7 +103,7 @@ function CustomNode({ data, selected }) {
         {isEditing ? (
           <input
             ref={inputRef}
-            className="node-rename-input"
+            className="node-rename-input nodrag nopan"
             value={editLabel}
             onChange={e => setEditLabel(e.target.value)}
             onBlur={handleBlur}

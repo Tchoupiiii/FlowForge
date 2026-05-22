@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, Notification } from 'electron'
 
 export default {
   meta: {
@@ -16,12 +16,16 @@ export default {
 
     // Send notification to renderer for in-app toast display
     try {
+      if (Notification.isSupported()) {
+        new Notification({ title, body }).show()
+      }
+      
       const windows = BrowserWindow.getAllWindows()
       if (windows.length > 0) {
-        windows[0].webContents.send('app-notification', { title, body, type: 'info' })
+        windows[0].webContents.send('app-notification-history', { title, body, timestamp: Date.now() })
       }
     } catch (err) {
-      console.log('Could not send in-app notification:', err)
+      console.log('Could not send notification:', err)
     }
 
     return { notified: true, title, body, timestamp: Date.now() }

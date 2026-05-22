@@ -13,10 +13,24 @@ export function WorkflowProvider({ children }) {
   
   // Tab Management State
   // A tab has: tabId, workflowId, workflowName, nodes, edges
-  const [tabs, setTabs] = useState([
-    { tabId: 'tab_1', workflowId: null, workflowName: 'Nouveau Workflow', nodes: [], edges: [] }
-  ])
-  const [activeTabId, setActiveTabId] = useState('tab_1')
+  const [tabs, setTabs] = useState(() => {
+    try {
+      const saved = localStorage.getItem('flowforge_tabs')
+      if (saved) return JSON.parse(saved)
+    } catch(e) {}
+    return [{ tabId: 'tab_1', workflowId: null, workflowName: 'Nouveau Workflow', nodes: [], edges: [] }]
+  })
+  const [activeTabId, setActiveTabId] = useState(() => {
+    return localStorage.getItem('flowforge_active_tab') || 'tab_1'
+  })
+
+  useEffect(() => {
+    localStorage.setItem('flowforge_tabs', JSON.stringify(tabs))
+  }, [tabs])
+
+  useEffect(() => {
+    localStorage.setItem('flowforge_active_tab', activeTabId)
+  }, [activeTabId])
   
   const [savedWorkflows, setSavedWorkflows] = useState([])
   const reactFlowWrapper = useRef(null)
