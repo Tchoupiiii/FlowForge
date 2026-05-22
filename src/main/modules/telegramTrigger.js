@@ -69,10 +69,14 @@ export async function execute(config, inputData) {
       return { _skipped: true, message: 'Aucun nouveau message' }
     }
 
+    const firstMsg = results[0] || {}
+
     return {
       success: true,
       messages: results,
-      count: results.length
+      count: results.length,
+      // Expose first message fields directly so {{text}} or {{chatId}} works out of the box
+      ...firstMsg
     }
   } catch (error) {
     return {
