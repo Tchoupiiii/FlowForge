@@ -1,7 +1,7 @@
 {
   "name": "flowforge",
-  "version": "1.4.7",
-  "description": "Un constructeur visuel de workflows",
+  "version": "1.4.8",
+  "description": "Un clone open-source de n8n avec une belle interface.",
   "main": "./out/main/index.js",
   "author": "FlowForge",
   "license": "MIT",
