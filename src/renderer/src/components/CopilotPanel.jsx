@@ -89,9 +89,7 @@ INSTRUCTIONS :
 3. Si un module essentiel manque pour réaliser ce qu'il demande, retourne STRICTEMENT le JSON : { "impossible": true }
 `
 
-    const systemPrompt = mode === 'modify' 
-      ? `${basePrompt}\nWORKFLOW ACTUEL :\n${currentWorkflowJson}\n\nApplique les modifications demandées sur le workflow actuel ou réponds à la question.`
-      : `${basePrompt}\nCrée un nouveau workflow de zéro ou réponds à la question de l'utilisateur.`
+    const systemPrompt = `${basePrompt}\n\n[CONTEXTE] Voici le workflow actuellement sur le Canvas (s'il est vide, tu peux l'ignorer) :\n${currentWorkflowJson}\n\nSi l'utilisateur demande une modification, applique-la sur ce workflow. S'il demande une création, crée un nouveau workflow de zéro.`
 
     // Prepare messages array for API
     const messages = [
@@ -152,10 +150,16 @@ INSTRUCTIONS :
       } else if (workflow && workflow.nodes) {
         // Hydrate node data with required defaults
         workflow.nodes = workflow.nodes.map(n => {
-          const modDef = MODULE_DEFINITIONS.find(m => m.type === n.data.type)
+          const rawType = n.data?.type || n.type
+          const modDef = MODULE_DEFINITIONS.find(m => m.type === rawType)
+          
+          // Force type to customNode so React Flow renders it correctly
+          n.type = 'customNode'
+          
           if (modDef) {
             n.data = {
               ...n.data,
+              type: modDef.type, // ensure correct data.type
               label: modDef.label,
               icon: modDef.icon,
               color: modDef.color,
@@ -164,6 +168,8 @@ INSTRUCTIONS :
               outputs: modDef.outputs,
               status: 'idle'
             }
+          } else if (!n.data) {
+            n.data = { type: rawType, label: 'Inconnu' }
           }
           return n
         })
