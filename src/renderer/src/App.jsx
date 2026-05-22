@@ -158,7 +158,7 @@ function AppContent() {
               onToggleLog={handleToggleLog}
               showLog={showExecutionLog}
             />
-            <div className="workspace-area">
+            <div className="content-area">
               <Canvas onNodeSelect={handleNodeSelect} onContextMenu={handleContextMenu} />
               {showDemoGallery && <DemoGallery onClose={handleCloseDemos} />}
               {showExecutionLog && <ExecutionLog onClose={handleToggleLog} />}

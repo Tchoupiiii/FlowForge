@@ -212,9 +212,6 @@ INSTRUCTIONS :
             <button className="help-close-btn" onClick={() => setShowSettings(!showSettings)} title="Paramètres IA">
               <Settings size={18} color={showSettings ? 'var(--accent)' : 'inherit'} />
             </button>
-            <button className="help-close-btn" onClick={onClose}>
-              <X size={20} />
-            </button>
           </div>
         </div>
         
