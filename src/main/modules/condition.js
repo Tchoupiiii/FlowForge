@@ -47,6 +47,9 @@ export default {
 function resolveField(obj, path) {
   if (obj === null || obj === undefined) return undefined
 
+  // Si le champ est déjà un objet/tableau (ex: variable écrasée par un câble), c'est la valeur finale
+  if (typeof path !== 'string') return path
+
   const parts = path.split('.')
   let current = obj
 
@@ -114,10 +117,10 @@ function evaluateCondition(fieldValue, operator, compareValue) {
       return !isNaN(numField) && !isNaN(numCompare) && numField <= numCompare
 
     case 'contains':
-      return String(fieldValue).includes(String(compareValue))
+      return (typeof fieldValue === 'object' ? JSON.stringify(fieldValue) : String(fieldValue)).includes(String(compareValue))
 
     case 'notContains':
-      return !String(fieldValue).includes(String(compareValue))
+      return !(typeof fieldValue === 'object' ? JSON.stringify(fieldValue) : String(fieldValue)).includes(String(compareValue))
 
     case 'startsWith':
       return String(fieldValue).startsWith(String(compareValue))

@@ -102,10 +102,10 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
           duplicateNode(clipboard)
         }
       }
-      // Don't trigger shortcuts if user is typing in an input/textarea
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
-
-      if (e.ctrlKey || e.metaKey) {
+      if ((e.ctrlKey || e.metaKey) && !e.repeat) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          return // Let the user copy/paste text inside inputs
+        }
         switch (e.key.toLowerCase()) {
           case 'z':
             e.preventDefault()
@@ -123,7 +123,15 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
             break
           case 'v':
             e.preventDefault()
-            pasteSelection()
+            let position = null
+            if (reactFlowInstance.current && reactFlowWrapper.current) {
+              const bounds = reactFlowWrapper.current.getBoundingClientRect()
+              position = reactFlowInstance.current.project({
+                x: bounds.width / 2,
+                y: bounds.height / 2
+              })
+            }
+            pasteSelection(position)
             break
           default:
             break

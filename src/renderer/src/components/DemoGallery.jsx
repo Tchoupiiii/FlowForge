@@ -3,6 +3,7 @@ import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, 
 import { useWorkflow } from '../context/WorkflowContext'
 
 import { DEMOS as RAW_DEMOS } from '../demos'
+import { MODULE_DEFINITIONS } from '../data/moduleDefinitions'
 
 const getIconAndGradient = (demo) => {
   if (demo.id === 'demo-crypto-bot') return { icon: Bitcoin, gradient: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' }
@@ -24,10 +25,32 @@ export default function DemoGallery({ onClose }) {
   const handleLoad = (demo) => {
     const processedDemo = {
       ...demo,
+      nodes: (demo.nodes || []).map(n => {
+        const rawType = n.data?.type || n.type
+        const modDef = MODULE_DEFINITIONS.find(m => m.type === rawType)
+        if (modDef) {
+          return {
+            ...n,
+            type: 'customNode',
+            data: {
+              ...n.data,
+              type: modDef.type,
+              label: n.data?.label || modDef.label,
+              icon: modDef.icon,
+              color: n.data?.color || modDef.color,
+              category: modDef.category,
+              inputs: modDef.inputs,
+              outputs: modDef.outputs,
+              status: 'idle'
+            }
+          }
+        }
+        return n
+      }),
       edges: (demo.edges || []).map(e => ({
+        ...e,
         sourceHandle: 'a', 
-        targetHandle: 'a', 
-        ...e 
+        targetHandle: 'a'
       }))
     }
     loadDemoWorkflow(processedDemo)

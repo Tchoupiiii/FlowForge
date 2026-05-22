@@ -117,7 +117,7 @@ Un workflow est un objet JSON de cette forme :
 }
 
 Voici la liste des modules disponibles (TYPE_DU_MODULE) :
-${MODULE_DEFINITIONS.map(m => `- ${m.type} : ${m.label} (${m.help.description})`).join('\n')}
+${MODULE_DEFINITIONS.map(m => `- ${m.type} : ${m.label} (${m.help.description}). Pour "sourceHandle" et "targetHandle" utilise "a" (générique) ou une clé spécifique. Entrées spécifiques: ${m.configFields?.map(f => f.key).join(', ') || 'aucune'}. Sorties spécifiques: ${m.type === 'condition' ? 'true, false' : (m.outputFields?.map(f => f.key).join(', ') || 'aucune')}`).join('\n')}
 
 INSTRUCTIONS :
 1. Si l'utilisateur te pose une question générale, réponds lui en texte clair et naturel (sans JSON).
@@ -276,8 +276,9 @@ INSTRUCTIONS :
             <h2>FlowForge Copilot</h2>
           </div>
           <div style={{ display: 'flex', gap: '5px' }}>
-            <button className="help-close-btn" onClick={() => setShowSettings(!showSettings)} title="Paramètres IA">
-              <Settings size={18} color={showSettings ? 'var(--accent)' : 'inherit'} />
+            <button className="toolbar-btn" onClick={() => setShowSettings(!showSettings)} title="Paramètres IA" style={{ padding: '6px 10px', background: showSettings ? 'var(--bg-surface-2)' : 'transparent', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
+              <Settings size={16} color={showSettings ? 'var(--accent)' : 'var(--text)'} />
+              <span style={{ color: 'var(--text)', fontWeight: '500' }}>Paramètres IA</span>
             </button>
           </div>
         </div>

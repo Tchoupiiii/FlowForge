@@ -190,7 +190,20 @@ export class ExecutionEngine {
             }
             
             // Standard data merging for {{input.xxx}} usage
-            inputData = { ...inputData, ...results[pe.source] }
+            const newResults = results[pe.source]
+            for (const [key, value] of Object.entries(newResults)) {
+              if (key === '_skipped') continue
+              if (inputData[key] !== undefined) {
+                // Find next available suffix
+                let suffix = 2
+                while (inputData[`${key}_${suffix}`] !== undefined) {
+                  suffix++
+                }
+                inputData[`${key}_${suffix}`] = value
+              } else {
+                inputData[key] = value
+              }
+            }
           }
         }
 

@@ -13,8 +13,14 @@ export default {
   async execute(config, inputData) {
     const provider = (config.provider || 'openai').toLowerCase()
     const model = config.model || (provider === 'openai' ? 'gpt-4o-mini' : 'llama3')
-    const systemPrompt = interpolate(config.systemPrompt || 'You are a helpful assistant.', inputData)
-    const userPrompt = interpolate(config.userPrompt || '', inputData)
+    let systemPrompt = interpolate(config.systemPrompt || 'You are a helpful assistant.', inputData)
+    if (typeof systemPrompt === 'object') systemPrompt = JSON.stringify(systemPrompt, null, 2)
+    else systemPrompt = String(systemPrompt)
+
+    let userPrompt = interpolate(config.userPrompt || '', inputData)
+    if (typeof userPrompt === 'object') userPrompt = JSON.stringify(userPrompt, null, 2)
+    else userPrompt = String(userPrompt)
+    
     const temperature = config.temperature !== undefined ? Number(config.temperature) : 0.7
     const maxTokens = config.maxTokens || 2048
 

@@ -384,19 +384,36 @@ export function WorkflowProvider({ children }) {
     })
   }, [])
 
-  const pasteSelection = useCallback(() => {
+  const pasteSelection = useCallback((centerPos = null) => {
     if (clipboard.nodes.length === 0) return
     takeSnapshot()
     
     // Create mapping of old ID to new ID
     const idMap = {}
-    const newNodes = clipboard.nodes.map(n => {
+    const newNodes = clipboard.nodes.map((n, idx) => {
       const newId = `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       idMap[n.id] = newId
+      // If we have centerPos, offset the first node to the center, and others relative to it
+      let finalX = n.position.x + 50
+      let finalY = n.position.y + 50
+      
+      if (centerPos) {
+        if (idx === 0) {
+          finalX = centerPos.x
+          finalY = centerPos.y
+        } else {
+          // Keep relative distance from the first node
+          const dx = n.position.x - clipboard.nodes[0].position.x
+          const dy = n.position.y - clipboard.nodes[0].position.y
+          finalX = centerPos.x + dx
+          finalY = centerPos.y + dy
+        }
+      }
+
       return {
         ...n,
         id: newId,
-        position: { x: n.position.x + 50, y: n.position.y + 50 },
+        position: { x: finalX, y: finalY },
         selected: true
       }
     })
