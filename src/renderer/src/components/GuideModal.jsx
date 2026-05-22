@@ -67,6 +67,7 @@ export default function GuideModal({ onClose }) {
             )}
 
             {activeTab === 'modules' && (
+              <>
               <div className="guide-section">
                 <h3>Comprendre les Modules</h3>
                 <p>FlowForge dispose de 4 catégories principales :</p>
@@ -98,6 +99,7 @@ export default function GuideModal({ onClose }) {
                 </ul>
                 <p>Connectez simplement la sortie du nœud Boucle au nœud suivant. Ce dernier sera exécuté <em>pour chaque élément</em> du tableau !</p>
               </div>
+              </>
             )}
 
             {activeTab === 'faq' && (
