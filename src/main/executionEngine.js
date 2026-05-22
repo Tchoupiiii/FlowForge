@@ -139,6 +139,7 @@ export class ExecutionEngine {
 
         // Gather input data from parent nodes
         let inputData = {}
+        let explicitConfigOverrides = {}
         const parentEdges = edges.filter(e => e.target === nodeId)
         let wasSkipped = false
 
@@ -168,7 +169,17 @@ export class ExecutionEngine {
               wasSkipped = true
               break
             }
+            
+            // Standard data merging for {{input.xxx}} usage
             inputData = { ...inputData, ...results[pe.source] }
+            
+            // Blueprint routing (Explicit Handle to Handle)
+            if (pe.sourceHandle && pe.targetHandle && pe.sourceHandle !== 'true' && pe.sourceHandle !== 'false' && pe.sourceHandle !== 'a' && pe.targetHandle !== 'a') {
+              const sourceValue = results[pe.source][pe.sourceHandle]
+              if (sourceValue !== undefined) {
+                explicitConfigOverrides[pe.targetHandle] = sourceValue
+              }
+            }
           }
         }
 
@@ -177,7 +188,10 @@ export class ExecutionEngine {
         onProgress(nodeId, 'running', { message: `Exécution de ${label}...` })
 
         // ★ INTERPOLATE all {{input.xxx}} variables in config before executing
-        const config = interpolateConfig(rawConfig, inputData)
+        let config = interpolateConfig(rawConfig, inputData)
+        
+        // ★ APPLY explicit blueprint routing overrides (allows raw object/array passing!)
+        config = { ...config, ...explicitConfigOverrides }
 
         if (!executor) {
           // Trigger nodes just pass through

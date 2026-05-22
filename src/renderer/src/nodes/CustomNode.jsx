@@ -9,6 +9,9 @@ function CustomNode({ data, selected }) {
   const inputsCount = data.inputs !== undefined ? data.inputs : (moduleDef.inputs || 0)
   const outputsCount = data.outputs !== undefined ? data.outputs : (moduleDef.outputs || 0)
   
+  const configFields = moduleDef.configFields || []
+  const outputFields = moduleDef.outputFields || []
+  
   const [isEditing, setIsEditing] = useState(false)
   const [editLabel, setEditLabel] = useState(data.label || '')
   const inputRef = useRef(null)
@@ -86,14 +89,33 @@ function CustomNode({ data, selected }) {
 
   return (
     <div className={`custom-node ${statusClass} ${selected ? 'selected' : ''}`}>
-      {/* Input handle */}
+      {/* Target (Input) Handles */}
       {inputsCount > 0 && (
-        <Handle
-          type="target"
-          position={Position.Left}
-          className="custom-handle"
-          style={{ background: data.color }}
-        />
+        <div className="custom-handles-target">
+          {configFields.length > 0 ? (
+            configFields.map((field, i) => (
+              <div key={field.key} className="handle-wrapper target">
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={field.key}
+                  className="custom-handle"
+                  style={{ top: `${((i + 1) / (configFields.length + 1)) * 100}%`, background: data.color }}
+                />
+                <span className="handle-label target-label" style={{ top: `calc(${((i + 1) / (configFields.length + 1)) * 100}% - 6px)` }}>
+                  {field.label}
+                </span>
+              </div>
+            ))
+          ) : (
+            <Handle
+              type="target"
+              position={Position.Left}
+              className="custom-handle"
+              style={{ background: data.color }}
+            />
+          )}
+        </div>
       )}
 
       <div className="custom-node-header">
@@ -133,34 +155,41 @@ function CustomNode({ data, selected }) {
         </div>
       )}
 
-      {/* Output handles */}
-      {outputsCount === 1 && (
-        <Handle
-          type="source"
-          position={Position.Right}
-          className="custom-handle"
-          style={{ background: data.color }}
-        />
-      )}
-
-      {outputsCount === 2 && (
-        <>
-          <Handle
-            type="source"
-            position={Position.Right}
-            id="true"
-            className="custom-handle handle-true"
-            style={{ background: '#4ade80', top: '30%' }}
-          />
-          <Handle
-            type="source"
-            position={Position.Right}
-            id="false"
-            className="custom-handle handle-false"
-            style={{ background: '#f87171', top: '70%' }}
-          />
-        </>
-      )}
+      {/* Source (Output) Handles */}
+      {outputsCount > 0 && data.type === 'condition' ? (
+        <div className="custom-handles-multiple">
+          <Handle type="source" position={Position.Right} id="true" className="custom-handle handle-true" style={{ background: '#4ade80', top: '30%' }} />
+          <span className="handle-label source-label" style={{ top: 'calc(30% - 6px)', color: '#4ade80' }}>Vrai</span>
+          <Handle type="source" position={Position.Right} id="false" className="custom-handle handle-false" style={{ background: '#f87171', top: '70%' }} />
+          <span className="handle-label source-label" style={{ top: 'calc(70% - 6px)', color: '#f87171' }}>Faux</span>
+        </div>
+      ) : outputsCount > 0 ? (
+        <div className="custom-handles-source">
+          {outputFields.length > 0 ? (
+            outputFields.map((field, i) => (
+              <div key={field.key} className="handle-wrapper source">
+                <span className="handle-label source-label" style={{ top: `calc(${((i + 1) / (outputFields.length + 1)) * 100}% - 6px)` }}>
+                  {field.label}
+                </span>
+                <Handle
+                  type="source"
+                  position={Position.Right}
+                  id={field.key}
+                  className="custom-handle"
+                  style={{ top: `${((i + 1) / (outputFields.length + 1)) * 100}%`, background: data.color }}
+                />
+              </div>
+            ))
+          ) : (
+            <Handle
+              type="source"
+              position={Position.Right}
+              className="custom-handle"
+              style={{ background: data.color }}
+            />
+          )}
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -1,8 +1,10 @@
 export const execute = async (config, inputData) => {
   try {
     let text = config.text || (config.inputField ? inputData[config.inputField] : inputData);
+    if (text === null || text === undefined) text = '';
     if (typeof text !== 'string') {
-      throw new Error('Target must be a string.');
+      if (typeof text === 'object') text = JSON.stringify(text);
+      else text = String(text);
     }
     
     let result = text;

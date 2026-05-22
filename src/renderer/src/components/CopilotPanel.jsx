@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Sparkles, Send, Bot, AlertCircle } from 'lucide-react'
+import { X, Sparkles, Send, Bot, AlertCircle, Settings, Plus, MessageSquare } from 'lucide-react'
 import { MODULE_DEFINITIONS } from '../data/moduleDefinitions'
 import { useWorkflow } from '../context/WorkflowContext'
 
@@ -14,21 +14,27 @@ export default function CopilotPanel({ onClose }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const [chatHistory, setChatHistory] = useState(() => {
+  const [showSettings, setShowSettings] = useState(false)
+  const [discussions, setDiscussions] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('copilot_chat')) || []
+      const stored = JSON.parse(localStorage.getItem('copilot_discussions'))
+      return stored && stored.length > 0 ? stored : [{ id: Date.now().toString(), title: 'Nouvelle discussion', history: [] }]
     } catch {
-      return []
+      return [{ id: Date.now().toString(), title: 'Nouvelle discussion', history: [] }]
     }
   })
+  const [activeId, setActiveId] = useState(() => localStorage.getItem('copilot_active_id') || discussions[0]?.id)
+  const activeDiscussion = discussions.find(d => d.id === activeId) || discussions[0]
+  const chatHistory = activeDiscussion.history || []
 
   useEffect(() => {
     localStorage.setItem('copilot_mode', mode)
     localStorage.setItem('copilot_provider', provider)
     localStorage.setItem('copilot_apiKey', apiKey)
     localStorage.setItem('copilot_model', model)
-    localStorage.setItem('copilot_chat', JSON.stringify(chatHistory))
-  }, [mode, provider, apiKey, model, chatHistory])
+    localStorage.setItem('copilot_discussions', JSON.stringify(discussions))
+    localStorage.setItem('copilot_active_id', activeId)
+  }, [mode, provider, apiKey, model, discussions, activeId])
 
   useEffect(() => {
     if (provider === 'ollama') {
@@ -55,7 +61,7 @@ export default function CopilotPanel({ onClose }) {
     if (!prompt) return
     
     const userMessage = { role: 'user', content: prompt }
-    setChatHistory(prev => [...prev, userMessage])
+    setDiscussions(prev => prev.map(d => d.id === activeId ? { ...d, history: [...d.history, userMessage] } : d))
     setPrompt('')
     setLoading(true)
     setError('')
@@ -130,7 +136,7 @@ INSTRUCTIONS :
         responseText = data.choices[0].message.content
       }
 
-      setChatHistory(prev => [...prev, { role: 'assistant', content: responseText }])
+      setDiscussions(prev => prev.map(d => d.id === activeId ? { ...d, history: [...d.history, { role: 'assistant', content: responseText }] } : d))
 
       let workflow
       try {
@@ -187,20 +193,52 @@ INSTRUCTIONS :
 
   return (
     <div className="copilot-panel slide-in-right">
-      <div className="copilot-header">
-        <div className="copilot-title">
-          <Sparkles size={24} color="#818cf8" />
-          <h2>FlowForge Copilot</h2>
+      <div className="copilot-header" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="copilot-title">
+            <Sparkles size={24} color="#818cf8" />
+            <h2>FlowForge Copilot</h2>
+          </div>
+          <div style={{ display: 'flex', gap: '5px' }}>
+            <button className="help-close-btn" onClick={() => setShowSettings(!showSettings)} title="Paramètres IA">
+              <Settings size={18} color={showSettings ? 'var(--accent)' : 'inherit'} />
+            </button>
+            <button className="help-close-btn" onClick={onClose}>
+              <X size={20} />
+            </button>
+          </div>
         </div>
-        <button className="help-close-btn" onClick={onClose}>
-          <X size={20} />
-        </button>
+        
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+          <select 
+            className="config-select" 
+            style={{ flex: 1, padding: '4px 8px', fontSize: '12px' }}
+            value={activeId} 
+            onChange={(e) => setActiveId(e.target.value)}
+          >
+            {discussions.map(d => (
+              <option key={d.id} value={d.id}>Discussion {new Date(parseInt(d.id)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</option>
+            ))}
+          </select>
+          <button 
+            className="toolbar-btn" 
+            style={{ padding: '4px', background: 'var(--bg-surface-2)' }}
+            onClick={() => {
+              const newId = Date.now().toString()
+              setDiscussions(prev => [...prev, { id: newId, title: 'Nouvelle discussion', history: [] }])
+              setActiveId(newId)
+            }}
+            title="Nouvelle discussion"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="copilot-body">
         <p className="copilot-intro">Décrivez le workflow de vos rêves, et l'IA s'occupe de le créer pour vous sur le Canvas.</p>
         
-        <div className="copilot-config">
+        {showSettings && (<div className="copilot-config">
           <label className="config-field-label">Action</label>
           <select className="config-select" value={mode} onChange={(e) => setMode(e.target.value)}>
             <option value="create">Créer un nouveau workflow</option>
@@ -228,7 +266,7 @@ INSTRUCTIONS :
               </select>
             </>
           )}
-        </div>
+        </div>)}
 
         <div className="copilot-chat">
           {chatHistory.length > 0 && (
