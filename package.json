@@ -1,6 +1,6 @@
 {
   "name": "flowforge",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Automatisez vos tâches avec des modules IA",
   "main": "./out/main/index.js",
   "author": "FlowForge",

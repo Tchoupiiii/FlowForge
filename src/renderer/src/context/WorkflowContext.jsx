@@ -158,6 +158,32 @@ export function WorkflowProvider({ children }) {
     return id
   }, [setNodes, modulePreferences])
 
+  const duplicateNode = useCallback((nodeToDuplicate) => {
+    if (!nodeToDuplicate) return
+
+    const id = `node_${Date.now()}_${nodeIdCounter++}`
+    const newNode = {
+      id,
+      type: 'customNode',
+      position: {
+        x: nodeToDuplicate.position.x + 30,
+        y: nodeToDuplicate.position.y + 30
+      },
+      data: {
+        ...JSON.parse(JSON.stringify(nodeToDuplicate.data)),
+        status: 'idle'
+      }
+    }
+
+    setNodes((nds) => [...nds, newNode])
+    // Deselect all other nodes and select the new one
+    setNodes((nds) => nds.map(n => ({
+      ...n,
+      selected: n.id === newNode.id
+    })))
+    return id
+  }, [setNodes])
+
   const updateNodeConfig = useCallback((nodeId, config) => {
     setNodes((nds) => nds.map(n => {
       if (n.id === nodeId) {
@@ -300,7 +326,7 @@ export function WorkflowProvider({ children }) {
       onNodesChange, onEdgesChange, onConnect,
       workflowName, setWorkflowName,
       workflowId,
-      addNode, updateNodeConfig, updateNodeStatus, resetAllStatus, renameNode,
+      addNode, duplicateNode, updateNodeConfig, updateNodeStatus, resetAllStatus, renameNode,
       saveWorkflow, loadWorkflow, loadDemoWorkflow,
       listWorkflows, deleteWorkflow, savedWorkflows,
       clearCanvas, reactFlowWrapper

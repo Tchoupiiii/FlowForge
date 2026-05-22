@@ -32,6 +32,7 @@ export default {
 
       return {
         symbol: symbol.toUpperCase(),
+        ticker: symbol.toUpperCase(),
         name: name,
         price: price,
         currency: currency,
@@ -42,6 +43,7 @@ export default {
       // Fallback au cas où
       return {
         symbol: symbol.toUpperCase(),
+        ticker: symbol.toUpperCase(),
         error: `Impossible de récupérer le cours: ${err.message}`,
         timestamp: Date.now()
       }

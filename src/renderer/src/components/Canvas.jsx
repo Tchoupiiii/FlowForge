@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useMemo } from 'react'
+import React, { useCallback, useRef, useMemo, useEffect, useState } from 'react'
 import ReactFlow, { Background, Controls, MiniMap } from 'reactflow'
 import { useWorkflow } from '../context/WorkflowContext'
 import CustomNode from '../nodes/CustomNode'
@@ -14,7 +14,7 @@ const defaultEdgeOptions = {
 export default function Canvas({ onNodeSelect, onContextMenu }) {
   const {
     nodes, edges, onNodesChange, onEdgesChange, onConnect,
-    addNode, reactFlowWrapper, renameNode
+    addNode, duplicateNode, reactFlowWrapper, renameNode
   } = useWorkflow()
   const reactFlowInstance = useRef(null)
 
@@ -70,6 +70,34 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
     }
   }, [onContextMenu])
 
+  const [clipboard, setClipboard] = useState(null)
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignore if user is typing in an input field
+      const activeTag = document.activeElement?.tagName
+      if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') {
+        return
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        const selectedNode = augmentedNodes.find(n => n.selected)
+        if (selectedNode) {
+          setClipboard(selectedNode)
+        }
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+        if (clipboard) {
+          duplicateNode(clipboard)
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [augmentedNodes, clipboard, duplicateNode])
+
   return (
     <div className="canvas-wrapper" ref={reactFlowWrapper}>
       <ReactFlow
@@ -90,7 +118,7 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
         fitView
         snapToGrid
         snapGrid={[16, 16]}
-        deleteKeyCode={['Delete']}
+        deleteKeyCode={['Delete', 'Backspace']}
         className="flow-canvas"
       >
         <Background
