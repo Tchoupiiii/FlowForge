@@ -48,12 +48,21 @@ export function ExecutionProvider({ children }) {
         }
         
         let result
-        const timerNode = workflow.nodes.find(n => n.type === 'timerCron' || n.data?.type === 'timerCron')
+        const timerNode = workflow.nodes.find(n => ['timerCron', 'telegramTrigger', 'webhook'].includes(n.data?.type || n.type))
         
         if (timerNode) {
-          const configInterval = timerNode.data?.config?.interval
-          // Interval is in seconds, fallback to 60 if not specified
-          const waitMs = (configInterval ? parseInt(configInterval) : 60) * 1000
+          const type = timerNode.data?.type || timerNode.type
+          
+          let waitMs = 0
+          if (type === 'timerCron') {
+            const configInterval = timerNode.data?.config?.interval
+            // Interval is in seconds, fallback to 60 if not specified
+            waitMs = (configInterval ? parseInt(configInterval) : 60) * 1000
+          } else {
+            // For webhook and telegramTrigger, they block on their own (long polling / server),
+            // so we don't need a huge delay between loops, just a tiny one to prevent CPU spin if they error immediately.
+            waitMs = 1000 
+          }
 
           while (!shouldStopRef.current) {
             result = await window.electronAPI.executeWorkflow({ ...workflow, globalSettings })
@@ -62,7 +71,7 @@ export function ExecutionProvider({ children }) {
             // Wait based on configured interval
             await new Promise(resolve => setTimeout(resolve, waitMs))
             if (!shouldStopRef.current) {
-               setLogs(prev => [...prev, { id: Date.now().toString(), status: 'info', message: `--- Nouvelle itération du Timer (${waitMs/1000}s) ---`, timestamp: Date.now() }])
+               setLogs(prev => [...prev, { id: Date.now().toString(), status: 'info', message: `--- Nouvelle itération du Trigger (${waitMs/1000}s) ---`, timestamp: Date.now() }])
             }
           }
         } else {

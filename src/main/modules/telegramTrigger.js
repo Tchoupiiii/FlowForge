@@ -62,17 +62,21 @@ export async function execute(config, inputData) {
       ? Math.max(...results.map(r => r.updateId)) + 1
       : offset
 
+    config._lastOffset = newOffset
+
+    if (results.length === 0) {
+      return { _skipped: true, message: 'Aucun nouveau message' }
+    }
+
     return {
       success: true,
       messages: results,
-      count: results.length,
-      lastOffset: newOffset,
-      triggered: results.length > 0
+      count: results.length
     }
   } catch (error) {
     return {
       success: false,
-      error: `Erreur: ${error.message}`,
+      error: error.message,
       messages: []
     }
   }
