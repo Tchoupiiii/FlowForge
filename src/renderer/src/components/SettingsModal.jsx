@@ -59,7 +59,8 @@ export default function SettingsModal({ onClose }) {
           anthropicApiKey: data.anthropicApiKey || '',
           trelloApiKey: data.trelloApiKey || '',
           trelloToken: data.trelloToken || '',
-          githubToken: data.githubToken || ''
+          githubToken: data.githubToken || '',
+          defaultSaveOutputs: data.defaultSaveOutputs || false
         })
         setLoading(false)
       })
@@ -109,6 +110,19 @@ export default function SettingsModal({ onClose }) {
               <PasswordField name="trelloApiKey" label="Trello API Key" value={settings.trelloApiKey} onChange={handleChange} placeholder="Clé développeur Trello" />
               <PasswordField name="trelloToken" label="Trello Token" value={settings.trelloToken} onChange={handleChange} placeholder="Token serveur Trello" />
               <PasswordField name="githubToken" label="GitHub Personal Access Token" value={settings.githubToken} onChange={handleChange} placeholder="ghp_..." />
+              
+              <div className="settings-field" style={{ marginTop: '10px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', textTransform: 'none', color: 'var(--text)', fontSize: '13px' }}>
+                  <input 
+                    type="checkbox" 
+                    name="defaultSaveOutputs" 
+                    checked={settings.defaultSaveOutputs || false} 
+                    onChange={e => setSettings(prev => ({ ...prev, defaultSaveOutputs: e.target.checked }))} 
+                    style={{ width: '16px', height: '16px' }}
+                  />
+                  Sauvegarde par défaut (Activer l'option de sauvegarde de résultat pour les nouveaux modules)
+                </label>
+              </div>
             </div>
           )}
         </div>

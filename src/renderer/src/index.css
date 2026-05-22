@@ -664,7 +664,6 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   transition: all var(--transition);
-  /* overflow: hidden removed to prevent handle clipping */
 }
 
 .custom-node:hover {

@@ -5,6 +5,7 @@ const ExecutionContext = createContext()
 export function ExecutionProvider({ children }) {
   const [isRunning, setIsRunning] = useState(false)
   const [logs, setLogs] = useState([])
+  const shouldStopRef = React.useRef(false)
 
   useEffect(() => {
     if (window.electronAPI) {
@@ -17,10 +18,6 @@ export function ExecutionProvider({ children }) {
           data: data.data,
           timestamp: data.timestamp || Date.now()
         }])
-
-        if (data.status === 'error' || data.status === 'success') {
-          // Individual node completion
-        }
       })
     }
 
@@ -33,11 +30,45 @@ export function ExecutionProvider({ children }) {
 
   const execute = useCallback(async (workflow) => {
     setIsRunning(true)
+    shouldStopRef.current = false
     setLogs([])
 
     try {
       if (window.electronAPI) {
-        const result = await window.electronAPI.executeWorkflow(workflow)
+        let savedSettings = {}
+        if (window.electronAPI.getSettings) {
+          savedSettings = await window.electronAPI.getSettings()
+        }
+        
+        const globalSettings = {
+          openaiKey: savedSettings.openaiApiKey || '',
+          telegramToken: savedSettings.telegramToken || '',
+          discordUrl: savedSettings.discordUrl || '',
+          githubToken: savedSettings.githubToken || ''
+        }
+        
+        let result
+        const timerNode = workflow.nodes.find(n => n.type === 'timerCron' || n.data?.type === 'timerCron')
+        
+        if (timerNode) {
+          const configInterval = timerNode.data?.config?.interval
+          // Interval is in seconds, fallback to 60 if not specified
+          const waitMs = (configInterval ? parseInt(configInterval) : 60) * 1000
+
+          while (!shouldStopRef.current) {
+            result = await window.electronAPI.executeWorkflow({ ...workflow, globalSettings })
+            if (shouldStopRef.current) break
+            
+            // Wait based on configured interval
+            await new Promise(resolve => setTimeout(resolve, waitMs))
+            if (!shouldStopRef.current) {
+               setLogs(prev => [...prev, { id: Date.now().toString(), status: 'info', message: `--- Nouvelle itération du Timer (${waitMs/1000}s) ---`, timestamp: Date.now() }])
+            }
+          }
+        } else {
+          result = await window.electronAPI.executeWorkflow({ ...workflow, globalSettings })
+        }
+
         setIsRunning(false)
         return result
       } else {
@@ -66,6 +97,7 @@ export function ExecutionProvider({ children }) {
   }, [])
 
   const stop = useCallback(async () => {
+    shouldStopRef.current = true
     try {
       if (window.electronAPI) {
         await window.electronAPI.stopWorkflow()

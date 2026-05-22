@@ -33,7 +33,18 @@ export function WorkflowProvider({ children }) {
   }, [activeTabId])
   
   const [savedWorkflows, setSavedWorkflows] = useState([])
+  const [modulePreferences, setModulePreferences] = useState({})
   const reactFlowWrapper = useRef(null)
+
+  useEffect(() => {
+    if (window.electronAPI && window.electronAPI.getSettings) {
+      window.electronAPI.getSettings().then(data => {
+        setModulePreferences({
+          defaultSaveOutputs: data.defaultSaveOutputs || false
+        })
+      }).catch(e => console.error("Error loading module preferences", e))
+    }
+  }, [])
 
   // When activeTabId changes, load its nodes/edges into ReactFlow
   useEffect(() => {
@@ -138,9 +149,14 @@ export function WorkflowProvider({ children }) {
       })
     }
 
+    // Apply module preferences
+    if (modulePreferences.defaultSaveOutputs) {
+      newNode.data.config.saveOutputs = true
+    }
+
     setNodes((nds) => [...nds, newNode])
     return id
-  }, [setNodes])
+  }, [setNodes, modulePreferences])
 
   const updateNodeConfig = useCallback((nodeId, config) => {
     setNodes((nds) => nds.map(n => {

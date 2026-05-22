@@ -4,7 +4,8 @@ import { MODULE_DEFINITIONS } from '../data/moduleDefinitions'
 import { useWorkflow } from '../context/WorkflowContext'
 
 export default function CopilotPanel({ onClose }) {
-  const { loadDemoWorkflow } = useWorkflow()
+  const { loadDemoWorkflow, nodes, edges } = useWorkflow()
+  const [mode, setMode] = useState('create')
   const [provider, setProvider] = useState('ollama')
   const [apiKey, setApiKey] = useState('')
   const [model, setModel] = useState('')
@@ -41,7 +42,8 @@ export default function CopilotPanel({ onClose }) {
     setError('')
     setMessage('')
 
-    const systemPrompt = `Tu es FlowForge Copilot. Ton rôle est de générer des workflows automatisés (no-code).
+    const currentWorkflowJson = JSON.stringify({ nodes, edges })
+    const basePrompt = `Tu es FlowForge Copilot. Ton rôle est de générer ou modifier des workflows automatisés (no-code).
 Un workflow est un objet JSON de cette forme :
 {
   "name": "Nom du workflow",
@@ -65,15 +67,19 @@ ${MODULE_DEFINITIONS.map(m => `- ${m.type} : ${m.label} (${m.help.description})`
 INSTRUCTIONS :
 1. Analyse la demande de l'utilisateur.
 2. Si un module essentiel manque pour réaliser ce qu'il demande, retourne STRICTEMENT le JSON : { "impossible": true }
-3. Sinon, crée un workflow complet et retourne STRICTEMENT et UNIQUEMENT le JSON du workflow (pas de texte avant ou après, pas de balises Markdown).
-Positionne les noeuds avec un x croissant (ex: 100, 350, 600).`
+3. Sinon, retourne STRICTEMENT et UNIQUEMENT le JSON du workflow (pas de texte, pas de balises).
+`
+
+    const systemPrompt = mode === 'modify' 
+      ? `${basePrompt}\nWORKFLOW ACTUEL :\n${currentWorkflowJson}\n\nApplique les modifications demandées sur le workflow actuel et renvoie le JSON complet modifié.`
+      : `${basePrompt}\nCrée un nouveau workflow de zéro en positionnant les nœuds avec un x croissant.`
 
     try {
       let responseText = ''
 
       if (provider === 'ollama') {
         if (window.electronAPI && window.electronAPI.generateOllama) {
-          const options = { system: systemPrompt, format: 'json' }
+          const options = { system: systemPrompt, format: 'json', num_predict: 2048 }
           const res = await window.electronAPI.generateOllama(prompt, model, options)
           if (!res.success) throw new Error(res.error)
           responseText = res.response
@@ -101,7 +107,18 @@ Positionne les noeuds avec un x croissant (ex: 100, 350, 600).`
         responseText = data.choices[0].message.content
       }
 
-      const workflow = JSON.parse(responseText)
+      let workflow
+      try {
+        workflow = JSON.parse(responseText)
+      } catch (err) {
+        // Fallback for partial/markdown JSON from local models
+        const match = responseText.match(/\{[\s\S]*\}/)
+        if (match) {
+          workflow = JSON.parse(match[0])
+        } else {
+          throw err
+        }
+      }
 
       if (workflow.impossible) {
         setMessage("C'est impossible pour l'instant, aucun module ne permet de faire ça. Veuillez me contacter !")
@@ -151,6 +168,12 @@ Positionne les noeuds avec un x croissant (ex: 100, 350, 600).`
         <p className="copilot-intro">Décrivez le workflow de vos rêves, et l'IA s'occupe de le créer pour vous sur le Canvas.</p>
         
         <div className="copilot-config">
+          <label className="config-field-label">Action</label>
+          <select className="config-select" value={mode} onChange={(e) => setMode(e.target.value)}>
+            <option value="create">Créer un nouveau workflow</option>
+            <option value="modify">Modifier le workflow actuel</option>
+          </select>
+
           <label className="config-field-label">Fournisseur d'IA</label>
           <select className="config-select" value={provider} onChange={(e) => setProvider(e.target.value)}>
             <option value="ollama">Local (Ollama)</option>

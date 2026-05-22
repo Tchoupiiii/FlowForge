@@ -11,24 +11,40 @@ export default {
   async execute(config, inputData) {
     const symbol = config.symbol || inputData.symbol || 'AAPL'
     
-    // Simulation d'une requête API (ex: Alpha Vantage, Yahoo Finance)
-    await new Promise(resolve => setTimeout(resolve, 600))
-    
-    // Génération d'un prix aléatoire réaliste pour la démo
-    const basePrices = { AAPL: 175.50, MSFT: 400.20, GOOGL: 140.10, TSLA: 210.80 }
-    const base = basePrices[symbol.toUpperCase()] || 100 + Math.random() * 50
-    const variation = (Math.random() - 0.5) * 5
-    const price = +(base + variation).toFixed(2)
+    try {
+      // API Publique de Yahoo Finance (non-officielle mais fonctionnelle)
+      const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`)
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`)
+      }
+      
+      const data = await res.json()
+      const result = data.chart?.result?.[0]
+      
+      if (!result || !result.meta) {
+        throw new Error(`Symbole ${symbol} introuvable`)
+      }
+      
+      const price = result.meta.regularMarketPrice
+      const currency = result.meta.currency || 'USD'
+      const name = result.meta.shortName || symbol.toUpperCase()
 
-    const baseNames = { AAPL: 'Apple Inc.', MSFT: 'Microsoft Corp.', GOOGL: 'Alphabet Inc.', TSLA: 'Tesla, Inc.' }
-    const name = baseNames[symbol.toUpperCase()] || `${symbol.toUpperCase()} Corp.`
-
-    return {
-      symbol: symbol.toUpperCase(),
-      name: name,
-      price: price,
-      currency: 'USD',
-      timestamp: Date.now()
+      return {
+        symbol: symbol.toUpperCase(),
+        name: name,
+        price: price,
+        currency: currency,
+        timestamp: Date.now()
+      }
+    } catch (err) {
+      console.error('Erreur Yahoo Finance:', err)
+      // Fallback au cas où
+      return {
+        symbol: symbol.toUpperCase(),
+        error: `Impossible de récupérer le cours: ${err.message}`,
+        timestamp: Date.now()
+      }
     }
   }
 }

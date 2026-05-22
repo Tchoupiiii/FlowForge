@@ -58,7 +58,7 @@ export class ExecutionEngine {
   async execute(workflow, onProgress) {
     this.isRunning = true
     this.shouldStop = false
-    const { nodes, edges } = workflow
+    const { nodes, edges, globalSettings = {} } = workflow
     const results = {}
 
     try {
@@ -117,7 +117,24 @@ export class ExecutionEngine {
         if (!node) continue
         const moduleType = node.data?.type || node.type
         const executor = getModuleExecutor(moduleType)
-        const rawConfig = node.data?.config || {}
+        let rawConfig = node.data?.config || {}
+        
+        // --- Injection des paramètres globaux ---
+        if (globalSettings) {
+          if (!rawConfig.apiKey && globalSettings.openaiKey && ['openAiChat', 'aiAgent', 'aiTextAnalyzer', 'aiClassifier', 'aiImageGenerator'].includes(moduleType)) {
+            rawConfig.apiKey = globalSettings.openaiKey
+          }
+          if (!rawConfig.botToken && globalSettings.telegramToken && ['telegramSend', 'telegramTrigger'].includes(moduleType)) {
+            rawConfig.botToken = globalSettings.telegramToken
+          }
+          if (!rawConfig.webhookUrl && globalSettings.discordUrl && moduleType === 'discordWebhook') {
+            rawConfig.webhookUrl = globalSettings.discordUrl
+          }
+          if (!rawConfig.token && globalSettings.githubToken && ['githubRepoInfo', 'githubCreateIssue'].includes(moduleType)) {
+            rawConfig.token = globalSettings.githubToken
+          }
+        }
+
         const label = node.data?.label || moduleType
 
         // Gather input data from parent nodes
