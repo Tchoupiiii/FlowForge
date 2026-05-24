@@ -43,9 +43,15 @@ function getUniqueFilePath(originalPath) {
 }
 
 // Global helper for conversation processing
-async function runAiDialogue(config, userQuery, chatHistory) {
-  // 1. Compile file contents from config.files
+async function runAiDialogue(config, inputData, userQuery, chatHistory) {
+  // 1. Compile file contents from config.files and inputData
   let filesContent = ''
+  
+  // Inject text data from upstream node (e.g., readFile) connected to "source" handle
+  if (inputData && inputData.data && typeof inputData.data === 'string') {
+    filesContent += `\n[Données Sources (Connexion entrante)]\n${inputData.data.substring(0, 8000)}\n`
+  }
+
   const filesList = config.files || []
   if (Array.isArray(filesList) && filesList.length > 0) {
     for (const filePath of filesList) {
@@ -60,7 +66,7 @@ async function runAiDialogue(config, userQuery, chatHistory) {
               const pdfData = await pdfParse(buffer)
               filesContent += `\n[Fichier PDF: ${path.basename(resolvedPath)}]\n${pdfData.text.substring(0, 8000)}\n`
             } else {
-              filesContent += `\n[Fichier PDF: ${path.basename(resolvedPath)} - (Module pdf-parse manquant, texte brut non extrait)]\n`
+              filesContent += `\n[Fichier PDF: ${path.basename(resolvedPath)} - (Module pdf-parse manquant)]\n`
             }
           } else {
             const txt = fs.readFileSync(resolvedPath, 'utf8')
@@ -75,6 +81,11 @@ async function runAiDialogue(config, userQuery, chatHistory) {
 
   // 2. Fetch live calendar events
   const liveEvents = getEvents()
+  // Inject events from upstream node (e.g. googleCalendarGet) connected to "source" handle
+  if (inputData && Array.isArray(inputData.events)) {
+    inputData.events.forEach(e => liveEvents.push(e))
+  }
+
   const formattedEvents = liveEvents.map(e => {
     const d = new Date(e.date)
     return `- ${e.summary} le ${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
@@ -325,7 +336,7 @@ export async function execute(config, inputData) {
 
     const chatHistory = inputData.chatHistory || []
     const userQuery = inputData.text || ''
-    const result = await runAiDialogue(config, userQuery, chatHistory)
+    const result = await runAiDialogue(config, inputData, userQuery, chatHistory)
 
     return {
       success: true,
@@ -358,6 +369,7 @@ export async function execute(config, inputData) {
     if (activeServers.has(port)) {
       const serverEntry = activeServers.get(port)
       serverEntry.config = config
+      serverEntry.inputData = inputData
       serverEntry.resolvePromise = resolve
       console.log(`Twilio Server port ${port} already active. Listening for real call...`)
       return
@@ -388,7 +400,13 @@ export async function execute(config, inputData) {
           }
 
           const callSid = params.CallSid || 'default'
-          const voice = config.voice || 'Polly.Celine'
+          
+          // Use config and inputData from the active context!
+          const activeContext = activeServers.get(port)
+          const currentConfig = activeContext ? activeContext.config : config
+          const currentInputData = activeContext ? activeContext.inputData : inputData
+
+          const voice = currentConfig.voice || 'Polly.Celine'
           const twilioVoice = voice.startsWith('Polly') ? voice : 'Polly.Celine'
 
           if (isStatus || params.CallStatus === 'completed') {
@@ -401,9 +419,9 @@ export async function execute(config, inputData) {
               }).join('\n')
 
               // Write log file
-              if (config.logPath) {
+              if (currentConfig.logPath) {
                 try {
-                  const resolvedPath = path.resolve(config.logPath)
+                  const resolvedPath = path.resolve(currentConfig.logPath)
                   const uniquePath = getUniqueFilePath(resolvedPath)
                   const dir = path.dirname(uniquePath)
                   if (!fs.existsSync(dir)) {
@@ -416,7 +434,7 @@ export async function execute(config, inputData) {
               }
 
               // Resolve the workflow execution node promise!
-              const currentResolve = activeServers.get(port)?.resolvePromise
+              const currentResolve = activeContext?.resolvePromise
               if (currentResolve) {
                 currentResolve({
                   success: true,
@@ -450,7 +468,7 @@ export async function execute(config, inputData) {
             const userSpeech = params.SpeechResult
             callData.chatHistory.push({ role: 'caller', text: userSpeech })
 
-            const executionResult = await runAiDialogue(config, userSpeech, callData.chatHistory)
+            const executionResult = await runAiDialogue(currentConfig, currentInputData, userSpeech, callData.chatHistory)
             replyText = executionResult.response
             callData.lastResult = executionResult.result
             

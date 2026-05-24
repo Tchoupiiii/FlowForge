@@ -11,7 +11,7 @@ export async function execute(config, inputData) {
     const parseMode = config.parseMode || 'HTML'
 
     let text = config.message
-    if (!text) {
+    if (text === undefined || text === null || text === '') {
       if (inputData?.price !== undefined && inputData?.symbol !== undefined) {
         text = `Bourse : ${inputData.symbol} est à ${inputData.price} ${inputData.currency || 'USD'}`
       } else if (inputData?.result) {

@@ -24,7 +24,7 @@ export default {
       // Create a function with inputData as the argument
       // The user code should return a value
       const fn = new Function(
-        'inputData',
+        'input',
         'console',
         `
         "use strict";

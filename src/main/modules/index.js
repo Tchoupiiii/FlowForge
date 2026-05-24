@@ -47,6 +47,7 @@ import * as youtubeTranscript from './youtubeTranscript.js'
 import * as pdfParser from './pdfParser.js'
 import * as phoneAgent from './phoneAgent.js'
 import * as tts from './tts.js'
+import * as twilioTrigger from './twilioTrigger.js'
 
 const modules = {
   phoneAgent,
@@ -97,7 +98,8 @@ const modules = {
   githubCreateIssue,
   openAiChat,
   anthropicClaude,
-  loopForEach
+  loopForEach,
+  twilioTrigger
 }
 
 export function getModule(type) {

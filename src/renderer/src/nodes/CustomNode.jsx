@@ -126,9 +126,17 @@ function CustomNode({ id, data, selected }) {
       onDrop={handleDrop}
     >
       {/* Target (Input) Handles */}
-      {inputsCount > 0 && (
+      {inputsCount > 0 && isPhoneAgent ? (
+        <div className="custom-handles-multiple">
+          <Handle type="target" position={Position.Left} id="a" className="custom-handle generic-handle" style={{ background: '#64748b', top: '30%', width: '12px', height: '12px', borderRadius: '2px' }} />
+          <span className="handle-label target-label" style={{ top: 'calc(30% - 6px)' }}>Déclencheur</span>
+          
+          <Handle type="target" position={Position.Left} id="source" className="custom-handle" style={{ background: '#ec4899', top: '70%', width: '12px', height: '12px', borderRadius: '2px' }} />
+          <span className="handle-label target-label" style={{ top: 'calc(70% - 6px)' }}>Source</span>
+        </div>
+      ) : inputsCount > 0 && (
         <div className="custom-handles-target">
-          {configFields.length > 0 && !isPhoneAgent ? (
+          {configFields.length > 0 ? (
             <>
               {/* Generic Input Handle */}
               <Handle

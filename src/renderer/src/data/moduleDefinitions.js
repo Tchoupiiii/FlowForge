@@ -29,7 +29,9 @@ export const MODULE_DEFINITIONS = [
     type: 'timerCron', label: 'Timer / Cron', icon: 'Clock', color: '#f59e0b', category: 'trigger',
     inputs: 0, outputs: 1,
     configFields: [
-      { key: 'interval', label: 'Intervalle (ex: 5s, 10m, 1h)', type: 'text', default: '5m' }
+      { key: 'repetition', label: 'Répétition', type: 'select', options: ['every_minute', 'hourly', 'daily'], default: 'daily' },
+      { key: 'hour', label: 'Heure (0-23)', type: 'number', default: 15, showIf: (c) => c.repetition === 'daily' },
+      { key: 'minute', label: 'Minute (0-59)', type: 'number', default: 0, showIf: (c) => c.repetition === 'daily' || c.repetition === 'hourly' }
     ],
     outputFields: [
       { key: 'timestamp', label: 'Timestamp' },
@@ -37,8 +39,8 @@ export const MODULE_DEFINITIONS = [
     ],
     help: {
       description: 'Déclenche le workflow à un intervalle régulier.',
-      example: 'Intervalle: 10s (toutes les 10 secondes), 5m (5 minutes)',
-      tip: "Laissez le champ cron vide pour utiliser l'intervalle simple."
+      example: 'Ex: Tous les jours à 15h00',
+      tip: 'Sélectionnez "daily" pour choisir une heure précise.'
     }
   },
   {
@@ -55,6 +57,23 @@ export const MODULE_DEFINITIONS = [
       description: "Effectue une requête HTTP vers n'importe quelle API REST.",
       example: 'URL: https://api.weather.com/current\nMéthode: GET',
       tip: 'Utilisez {{input.field}} pour injecter des données dynamiques du nœud précédent.'
+    }
+  },
+  {
+    type: 'twilioTrigger', label: 'Appel Entrant (Twilio)', icon: 'Phone', color: '#10b981', category: 'trigger',
+    inputs: 0, outputs: 1,
+    configFields: [
+      { key: 'mockFrom', label: 'Numéro Appelant (Simulation)', type: 'text', default: '+33612345678' }
+    ],
+    outputFields: [
+      { key: 'From', label: 'Numéro Appelant' },
+      { key: 'CallSid', label: 'ID Appel (Twilio)' },
+      { key: 'trigger', label: 'Lancer la suite' }
+    ],
+    help: {
+      description: 'Déclenche le workflow lors d\'un appel entrant sur un numéro Twilio.',
+      example: 'Associez la sortie de ce nœud à un Agent Téléphonique.',
+      tip: 'En mode simulation, le numéro appelant est défini manuellement.'
     }
   },
   {
@@ -652,7 +671,7 @@ export const MODULE_DEFINITIONS = [
   },
   {
     type: 'phoneAgent', label: 'Agent Téléphonique', icon: 'Phone', color: '#10b981', category: 'ai',
-    inputs: 1, outputs: 1,
+    inputs: 2, outputs: 1,
     configFields: [
       { key: 'twilioPort', label: 'Port Webhook Twilio', type: 'number', default: 9090 },
       { key: 'twilioPath', label: 'Chemin Webhook Twilio', type: 'text', default: '/twilio-voice' },

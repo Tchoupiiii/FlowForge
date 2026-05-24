@@ -5,6 +5,7 @@ export const meta = {
 }
 
 const sessionOffsets = new Map()
+const activeControllers = new Map()
 
 export async function execute(config, inputData) {
   try {
@@ -19,11 +20,25 @@ export async function execute(config, inputData) {
       }
     }
 
+    // Abort previous long-poll for this bot token if it exists
+    if (activeControllers.has(botToken)) {
+      activeControllers.get(botToken).abort()
+      activeControllers.delete(botToken)
+    }
+
+    const controller = new AbortController()
+    activeControllers.set(botToken, controller)
+
     // Get updates via long polling
     const offset = sessionOffsets.get(botToken) || 0
     const url = `https://api.telegram.org/bot${botToken}/getUpdates?offset=${offset}&timeout=${timeout}&limit=10`
 
-    const response = await fetch(url)
+    const response = await fetch(url, { signal: controller.signal })
+
+    // Clean up controller
+    if (activeControllers.get(botToken) === controller) {
+      activeControllers.delete(botToken)
+    }
 
     if (!response.ok) {
       if (response.status === 409) {
@@ -92,6 +107,9 @@ export async function execute(config, inputData) {
       ...lowerFirstMsg
     }
   } catch (error) {
+    if (error.name === 'AbortError') {
+      return { _skipped: true, message: 'Requête annulée (nouvelle exécution ou arrêt)' }
+    }
     return {
       success: false,
       error: error.message,

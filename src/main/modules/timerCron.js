@@ -14,14 +14,18 @@ export default {
   },
 
   async execute(config, _inputData) {
-    const interval = config.interval || '*/5 * * * *'
+    const repetition = config.repetition || 'daily'
+    const hour = config.hour || 15
+    const minute = config.minute || 0
     const timezone = config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
 
     return {
       triggered: true,
       trigger: true,
       timestamp: Date.now(),
-      interval,
+      repetition,
+      hour,
+      minute,
       timezone,
       source: 'cron'
     }
