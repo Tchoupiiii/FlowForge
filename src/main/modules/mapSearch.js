@@ -85,6 +85,10 @@ export async function execute(config, inputData) {
 
     filteredPlaces.sort((a, b) => a.distanceMeters - b.distanceMeters)
 
+    const resultSummary = filteredPlaces.length > 0 
+      ? filteredPlaces.map((p, i) => `${i+1}. ${p.name} (${p.street || ''}, ${p.city || ''}) - à ${p.distanceMeters}m`).join('\n')
+      : 'Aucun lieu trouvé.'
+
     return {
       success: true,
       query,
@@ -93,7 +97,8 @@ export async function execute(config, inputData) {
       radius: config.radius || 5,
       places: filteredPlaces,
       count: filteredPlaces.length,
-      totalFound: searchData.length
+      totalFound: searchData.length,
+      result: resultSummary
     }
   } catch (error) {
     return {

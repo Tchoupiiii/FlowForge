@@ -8,8 +8,23 @@ export async function execute(config, inputData) {
   try {
     const botToken = config.botToken || ''
     const chatId = config.chatId || inputData?.chatId || inputData?.chatid || ''
-    const text = config.message || inputData?.text || inputData?.response || ''
     const parseMode = config.parseMode || 'HTML'
+
+    let text = config.message
+    if (!text) {
+      if (inputData?.result) {
+        text = inputData.result
+      } else if (inputData?.latest) {
+        text = `${inputData.latest.title || 'Nouvel article'}\n${inputData.latest.link || ''}`
+      } else if (inputData?.items) {
+        text = Array.isArray(inputData.items)
+          ? inputData.items.slice(0, 5).map(item => `• ${item.title || item}`).join('\n')
+          : String(inputData.items)
+      } else {
+        text = inputData?.text || inputData?.response || ''
+      }
+    }
+
 
     if (!botToken) {
       return {

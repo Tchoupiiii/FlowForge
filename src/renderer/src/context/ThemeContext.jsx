@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const ThemeContext = createContext()
 
+const THEMES = ['dark', 'light', 'mono', 'cyberpunk', 'ocean', 'forest', 'dracula', 'sakura']
+
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('dark')
 
@@ -23,16 +25,24 @@ export function ThemeProvider({ children }) {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
+  const changeTheme = (newTheme) => {
+    if (THEMES.includes(newTheme)) {
+      setTheme(newTheme)
+      try {
+        if (window.electronAPI) window.electronAPI.setTheme(newTheme)
+      } catch (e) {}
+    }
+  }
+
   const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    try {
-      if (window.electronAPI) window.electronAPI.setTheme(next)
-    } catch (e) {}
+    const currentIndex = THEMES.indexOf(theme)
+    const nextIndex = (currentIndex + 1) % THEMES.length
+    const next = THEMES[nextIndex]
+    changeTheme(next)
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, changeTheme, themes: THEMES }}>
       {children}
     </ThemeContext.Provider>
   )
@@ -45,3 +55,4 @@ export function useTheme() {
 }
 
 export default ThemeContext
+

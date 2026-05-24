@@ -1,3 +1,5 @@
+import { addEvent } from '../calendarStore.js'
+
 export default {
   meta: {
     type: 'googleCalendar',
@@ -15,13 +17,17 @@ export default {
     // Simulation API
     await new Promise(resolve => setTimeout(resolve, 800))
     
+    const newEvent = addEvent(summary, date)
+    
     return {
       success: true,
-      eventId: `gcal_${Math.random().toString(36).substr(2, 9)}`,
+      eventId: newEvent.id,
       summary: summary,
       date: date,
       link: 'https://calendar.google.com/calendar/u/0/r/eventedit',
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      result: `Événement "${summary}" planifié pour le ${date}.`
     }
   }
 }
+

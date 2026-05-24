@@ -39,14 +39,19 @@ function PasswordField({ name, label, value, onChange, placeholder }) {
   )
 }
 
+import { useTheme } from '../context/ThemeContext'
+
 export default function SettingsModal({ onClose }) {
   const toast = useToast()
+  const { changeTheme } = useTheme()
   const [settings, setSettings] = useState({
     openaiApiKey: '',
     anthropicApiKey: '',
     trelloApiKey: '',
     trelloToken: '',
-    githubToken: ''
+    githubToken: '',
+    defaultSaveOutputs: false,
+    theme: 'dark'
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -60,7 +65,8 @@ export default function SettingsModal({ onClose }) {
           trelloApiKey: data.trelloApiKey || '',
           trelloToken: data.trelloToken || '',
           githubToken: data.githubToken || '',
-          defaultSaveOutputs: data.defaultSaveOutputs || false
+          defaultSaveOutputs: data.defaultSaveOutputs || false,
+          theme: data.theme || 'dark'
         })
         setLoading(false)
       })
@@ -74,13 +80,19 @@ export default function SettingsModal({ onClose }) {
     setSettings(prev => ({ ...prev, [name]: value }))
   }
 
+  const handleThemeChange = (e) => {
+    const nextTheme = e.target.value
+    setSettings(prev => ({ ...prev, theme: nextTheme }))
+    changeTheme(nextTheme)
+  }
+
   const handleSave = async () => {
     setSaving(true)
     try {
       if (window.electronAPI && window.electronAPI.setSettings) {
         await window.electronAPI.setSettings(settings)
       }
-      toast.success('Paramètres sauvegardés', 'Vos clés API ont été enregistrées avec succès.')
+      toast.success('Paramètres sauvegardés', 'Vos clés API et préférences ont été enregistrées.')
     } catch (e) {
       toast.error('Erreur', 'Impossible de sauvegarder les paramètres.')
     }
@@ -98,7 +110,7 @@ export default function SettingsModal({ onClose }) {
         
         <div className="modal-body">
           <p style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '13px', lineHeight: '1.6' }}>
-            Configurez vos clés API par défaut. Elles seront utilisées automatiquement par les modules si aucune clé n'est renseignée dans le nœud.
+            Configurez vos clés API par défaut et le thème de votre espace de travail.
           </p>
 
           {loading ? (
@@ -111,6 +123,34 @@ export default function SettingsModal({ onClose }) {
               <PasswordField name="trelloToken" label="Trello Token" value={settings.trelloToken} onChange={handleChange} placeholder="Token serveur Trello" />
               <PasswordField name="githubToken" label="GitHub Personal Access Token" value={settings.githubToken} onChange={handleChange} placeholder="ghp_..." />
               
+              <div className="settings-field">
+                <label>Thème de l'interface</label>
+                <select 
+                  name="theme" 
+                  value={settings.theme} 
+                  onChange={handleThemeChange}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--bg-surface-2)',
+                    border: '1px solid var(--glass-border)',
+                    color: 'var(--text)',
+                    outline: 'none',
+                    marginTop: '4px'
+                  }}
+                >
+                  <option value="dark">Sombre (Défaut)</option>
+                  <option value="light">Clair</option>
+                  <option value="mono">Noir & Gris (Monochrome)</option>
+                  <option value="cyberpunk">Cyberpunk (Néon)</option>
+                  <option value="ocean">Océan (Lagune)</option>
+                  <option value="forest">Forêt (Nature)</option>
+                  <option value="dracula">Dracula (Vampire)</option>
+                  <option value="sakura">Sakura (Cerisier)</option>
+                </select>
+              </div>
+
               <div className="settings-field" style={{ marginTop: '10px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', textTransform: 'none', color: 'var(--text)', fontSize: '13px' }}>
                   <input 
@@ -137,3 +177,4 @@ export default function SettingsModal({ onClose }) {
     </div>
   )
 }
+

@@ -170,10 +170,6 @@ function AppContent() {
                   onClose={handleCloseConfig}
                 />
               )}
-              {showGuide && <GuideModal onClose={() => setShowGuide(false)} />}
-              {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
-              {showWorkflows && <WorkflowsModal onClose={() => setShowWorkflows(false)} />}
-              {showNotifications && <NotificationsModal notifications={notificationsHistory} onClose={() => setShowNotifications(false)} />}
               {contextMenu && (
                 <ContextMenu
                   x={contextMenu.x}
@@ -190,12 +186,12 @@ function AppContent() {
         </div>
         {!showDemoGallery && <CopilotPanel />}
       </div>
-      {showWorkflows && (
-        <WorkflowsModal onClose={() => setShowWorkflows(false)} />
-      )}
-      {showNotifications && (
-        <NotificationsModal notifications={notificationsHistory} onClose={() => setShowNotifications(false)} />
-      )}
+      
+      {showGuide && <GuideModal onClose={() => setShowGuide(false)} />}
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showWorkflows && <WorkflowsModal onClose={() => setShowWorkflows(false)} />}
+      {showNotifications && <NotificationsModal notifications={notificationsHistory} onClose={() => setShowNotifications(false)} />}
+
       
       {updateReady && (
         <div className="update-banner">

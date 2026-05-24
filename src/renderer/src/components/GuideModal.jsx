@@ -30,9 +30,9 @@ export default function GuideModal({ onClose }) {
               const Icon = tab.icon
               return (
                 <button
-                  key={tab.id}
-                  className={`guide-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab.id)}
+                   key={tab.id}
+                   className={`guide-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                   onClick={() => setActiveTab(tab.id)}
                 >
                   <Icon size={16} />
                   <span>{tab.label}</span>
@@ -68,56 +68,63 @@ export default function GuideModal({ onClose }) {
 
             {activeTab === 'modules' && (
               <>
-              <div className="guide-section">
-                <h3>Comprendre les Modules</h3>
-                <p>FlowForge dispose de 4 catégories principales :</p>
-                <ul className="guide-list">
-                  <li><strong style={{color: 'var(--accent)'}}>Core :</strong> Logique de base (HTTP, JSON, Filtre, Trigger, Lecture de fichier, Discord, Slack, RSS).</li>
-                  <li><strong style={{color: '#818cf8'}}>Intelligence Artificielle :</strong> Agents, Classificateurs et analyseurs avec OpenAI ou Ollama.</li>
-                  <li><strong style={{color: '#34d399'}}>Finance :</strong> Cours de bourse, crypto-monnaies.</li>
-                  <li><strong style={{color: '#f472b6'}}>Divers :</strong> APIs spécifiques (FDA, traductions, github, trello, google calendar).</li>
-                </ul>
-              </div>
-
-              <div className="guide-section">
-                <h3>Utiliser les Variables Magiques</h3>
-                <p>FlowForge vous permet d'injecter des données dynamiques d'un nœud précédent dans la configuration d'un nœud suivant grâce à la syntaxe <strong>&#123;&#123;input.nom_du_champ&#125;&#125;</strong>.</p>
-                <div style={{ background: 'var(--bg-surface)', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', margin: '10px 0' }}>
-                  <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--accent)' }}>Comment les insérer ?</h4>
-                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px' }}>
-                    <li>Tapez simplement deux accolades ouvrantes <code>&#123;&#123;</code> dans n'importe quel champ de texte.</li>
-                    <li>Ajoutez <code>input.</code> suivi du nom de la clé que vous voulez récupérer (ex: <code>price</code>, <code>title</code>).</li>
-                    <li>Fermez avec deux accolades <code>&#125;&#125;</code>.</li>
+                <div className="guide-section">
+                  <h3>Comprendre les Modules</h3>
+                  <p>FlowForge dispose de plusieurs catégories de modules pour concevoir des processus puissants :</p>
+                  <ul className="guide-list">
+                    <li><strong style={{color: 'var(--accent)'}}>Core :</strong> Logique de base (HTTP, JSON, Filtre, Trigger, Lecture/Écriture de fichiers, Discord, Slack, RSS).</li>
+                    <li><strong style={{color: '#818cf8'}}>Intelligence Artificielle :</strong> Agents autonomes, Chat GPT, Classificateurs et analyseurs avec OpenAI ou Ollama.</li>
+                    <li><strong style={{color: '#10b981'}}>Agent Téléphonique (Nouveau) :</strong> Simule une IA vocale répondant en moins de 500ms pour répondre à des questions sur l'entreprise ou prendre rendez-vous.</li>
+                    <li><strong style={{color: '#a78bfa'}}>Synthèse Vocale TTS (Nouveau) :</strong> Génère des fichiers audio (.mp3) parlés à partir de textes (via l'API Google Translate).</li>
+                    <li><strong style={{color: '#34d399'}}>Finance & Divers :</strong> Cours de bourse, crypto-monnaies, APIs externes (FDA, Google Calendar, Trello, Notion, GitHub).</li>
                   </ul>
                 </div>
-                <ul>
-                  <li><strong>&#123;&#123;input.price&#125;&#125;</strong> : Récupère la valeur du champ "price" du nœud précédent.</li>
-                  <li><strong>&#123;&#123;input.data.name&#125;&#125;</strong> : Récupère une valeur imbriquée.</li>
-                  <li><strong>&#123;&#123;input&#125;&#125;</strong> : Injecte l'objet complet au format JSON.</li>
-                </ul>
-                <p>Une fois saisies correctement, les variables s'affichent sous forme de "pilules" colorées (<span className="var-highlight">&#123;&#123;input.exemple&#125;&#125;</span>) sur le résumé du nœud dans le Canvas pour confirmer qu'elles sont reconnues !</p>
-              </div>
 
-              <div className="guide-section">
-                <h3>Utiliser les Boucles (Loops)</h3>
-                <p>Le module "Boucle (Loop)" permet de traiter un tableau d'éléments un par un.</p>
-                <ul>
-                  <li><strong>Champ tableau</strong> : Le nom de la clé contenant votre tableau (ex: "items"). Si laissé vide ou introuvable, FlowForge cherchera automatiquement le premier tableau dans les données d'entrée.</li>
-                  <li><strong>Max itérations</strong> : Pratique pour tester, cela limite le nombre d'éléments traités.</li>
-                </ul>
-                <p>Connectez simplement la sortie du nœud Boucle au nœud suivant. Ce dernier sera exécuté <em>pour chaque élément</em> du tableau !</p>
-              </div>
-              <div className="guide-section">
-                <h3>Raccourcis Clavier</h3>
-                <p>Pour aller plus vite dans votre création :</p>
-                <ul>
-                  <li><strong>Ctrl + C / Cmd + C</strong> : Copier les nœuds sélectionnés</li>
-                  <li><strong>Ctrl + V / Cmd + V</strong> : Coller les nœuds copiés</li>
-                  <li><strong>Ctrl + Z / Cmd + Z</strong> : Annuler la dernière action (Undo)</li>
-                  <li><strong>Ctrl + Y / Cmd + Y</strong> : Refaire l'action annulée (Redo)</li>
-                  <li><strong>Suppr / Backspace</strong> : Supprimer l'élément sélectionné</li>
-                </ul>
-              </div>
+                <div className="guide-section">
+                  <h3>Utiliser les Variables & Fallbacks</h3>
+                  <p>Injectez des données dynamiques du nœud précédent dans le nœud suivant via la syntaxe <strong>&#123;&#123;input.nom_du_champ&#125;&#125;</strong> ou <strong>&#123;&#123;items&#125;&#125;</strong>.</p>
+                  <div style={{ background: 'var(--bg-surface-2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)', margin: '10px 0' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', color: 'var(--accent)' }}>Fonctionnement des Fallbacks Automatiques :</h4>
+                    <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', lineHeight: '1.6' }}>
+                      <li><strong>Pas besoin de configurer !</strong> Si vous connectez un nœud (ex: Lecture RSS) à un nœud de messagerie (ex: Discord Webhook) sans écrire de message, FlowForge formatera automatiquement le résultat.</li>
+                      <li><strong>Flux RSS :</strong> Si l'input contient une liste d'articles (<code>items</code>), le message affichera automatiquement la liste à puces des 5 derniers articles.</li>
+                      <li><strong>Lieux (Cartes) :</strong> Les adresses trouvées seront listées proprement de façon textuelle.</li>
+                      <li><strong>Variables de sortie standard :</strong> Tous les modules exportent désormais une variable de résultat uniforme <code>result</code> pour simplifier les liaisons.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="guide-section">
+                  <h3>Agent Téléphonique Vocal & TTS</h3>
+                  <p>Le module <strong>Agent Téléphonique</strong> simule un répondeur vocal intelligent à faible latence (inférieure à 500ms).</p>
+                  <ul style={{ paddingLeft: '20px', fontSize: '13px', lineHeight: '1.6' }}>
+                    <li><strong>Intégration d'agenda :</strong> S'il détecte une intention de rendez-vous dans la question (ex: "Je veux réserver pour demain"), il interroge l'agenda partagé de l'application. En cas de conflit, il propose un autre créneau libre, puis insère l'événement !</li>
+                    <li><strong>FAQ d'entreprise :</strong> L'agent répond intelligemment aux questions sur l'activité (basé sur la Description) ou sur les prix (basé sur Produits/Tarifs).</li>
+                    <li><strong>Liaison TTS :</strong> En reliant la sortie <code>response</code> (Réponse Vocale) du nœud de l'Agent au nœud <strong>Synthèse Vocale (TTS)</strong>, vous générez instantanément une URL audio écoutable (.mp3).</li>
+                  </ul>
+                </div>
+
+                <div className="guide-section">
+                  <h3>Utiliser les Boucles (Loops)</h3>
+                  <p>Le module <strong>Boucle (Loop)</strong> permet de traiter un tableau d'éléments un par un.</p>
+                  <ul>
+                    <li><strong>Champ tableau</strong> : Le nom de la clé contenant votre tableau (ex: <code>items</code>). Si laissé vide ou introuvable, FlowForge cherchera automatiquement le premier tableau dans les données d'entrée.</li>
+                    <li><strong>Max itérations</strong> : Pratique pour tester, cela limite le nombre d'éléments traités.</li>
+                  </ul>
+                  <p>Connectez simplement la sortie du nœud Boucle au nœud suivant. Ce dernier sera exécuté <em>pour chaque élément</em> du tableau !</p>
+                </div>
+
+                <div className="guide-section">
+                  <h3>Raccourcis Clavier</h3>
+                  <p>Pour aller plus vite dans votre création :</p>
+                  <ul>
+                    <li><strong>Ctrl + C / Cmd + C</strong> : Copier les nœuds sélectionnés</li>
+                    <li><strong>Ctrl + V / Cmd + V</strong> : Coller les nœuds copiés</li>
+                    <li><strong>Ctrl + Z / Cmd + Z</strong> : Annuler la dernière action (Undo)</li>
+                    <li><strong>Ctrl + Y / Cmd + Y</strong> : Refaire l'action annulée (Redo)</li>
+                    <li><strong>Suppr / Backspace</strong> : Supprimer l'élément sélectionné</li>
+                  </ul>
+                </div>
               </>
             )}
 

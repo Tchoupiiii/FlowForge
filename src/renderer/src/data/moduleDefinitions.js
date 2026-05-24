@@ -5,8 +5,9 @@ import {
   MessageSquare, Hash, Rss, Filter, Bitcoin,
   Github, Languages, Heart, LineChart, Calendar, Database,
   Terminal, FileText, Search, Table, Binary, FileDigit,
-  Calculator, Scissors, Layout, MessageCircleQuestion
+  Calculator, Scissors, Layout, MessageCircleQuestion, Phone, Volume2
 } from 'lucide-react'
+
 
 export const MODULE_DEFINITIONS = [
   // ──── Triggers ────
@@ -312,6 +313,45 @@ export const MODULE_DEFINITIONS = [
   },
   // ──── Data & APIs ────
   {
+    type: 'webScraper', label: 'Scraper Web', icon: 'Globe', color: '#10b981', category: 'core',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'url', label: 'URL à Scraper', type: 'text', default: 'https://fr.wikipedia.org' }
+    ],
+    outputFields: [{ key: 'content', label: 'Texte Extrait' }, { key: 'title', label: 'Titre' }],
+    help: {
+      description: 'Extrait le texte propre d\'une page web (sans menus, pubs, etc.).',
+      example: 'URL: https://fr.wikipedia.org/wiki/OpenAI',
+      tip: 'Idéal pour alimenter un Agent IA avec le contenu d\'un article web.'
+    }
+  },
+  {
+    type: 'youtubeTranscript', label: 'YouTube Transcript', icon: 'Play', color: '#ef4444', category: 'core',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'url', label: 'URL YouTube', type: 'text', default: '' }
+    ],
+    outputFields: [{ key: 'transcript', label: 'Sous-titres' }],
+    help: {
+      description: 'Récupère les sous-titres complets d\'une vidéo YouTube.',
+      example: 'URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      tip: 'Utile pour résumer une longue vidéo ou en extraire les idées clés avec l\'IA.'
+    }
+  },
+  {
+    type: 'pdfParser', label: 'Extracteur PDF', icon: 'FileText', color: '#ec4899', category: 'core',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'filePath', label: 'Chemin local ou URL HTTP', type: 'text', default: '' }
+    ],
+    outputFields: [{ key: 'text', label: 'Texte du PDF' }, { key: 'pages', label: 'Nombre de pages' }],
+    help: {
+      description: 'Lit un fichier PDF pour en extraire le texte brut.',
+      example: 'Chemin: C:\\Users\\MonFichier.pdf ou https://site.com/doc.pdf',
+      tip: 'Attention : extraire un PDF très long (plus de 100 pages) peut prendre beaucoup de tokens pour l\'IA.'
+    }
+  },
+  {
     type: 'rssParser', label: 'Lecture RSS', icon: 'Rss', color: '#f97316', category: 'core',
     inputs: 1, outputs: 1,
     configFields: [
@@ -593,6 +633,44 @@ export const MODULE_DEFINITIONS = [
       tip: 'Simule une traduction en temps réel via l\'IA locale ou distante.'
     }
   },
+  {
+    type: 'phoneAgent', label: 'Agent Téléphonique', icon: 'Phone', color: '#10b981', category: 'ai',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'userQuery', label: 'Question de l\'appelant', type: 'textarea', default: 'Bonjour, que vendez-vous ?' },
+      { key: 'businessDescription', label: 'Description de l\'entreprise', type: 'textarea', default: 'FlowForge Inc. propose des solutions d\'automatisation sans code de niveau entreprise.' },
+      { key: 'businessProducts', label: 'Produits / Tarifs', type: 'textarea', default: 'FlowForge Pro à 49€/mois, FlowForge Enterprise sur devis.' },
+      { key: 'calendarCheck', label: 'Vérifier l\'agenda', type: 'select', options: ['Oui', 'Non'], default: 'Oui' }
+    ],
+    outputFields: [
+      { key: 'response', label: 'Réponse Vocale' },
+      { key: 'latencyMs', label: 'Latence (ms)' },
+      { key: 'appointmentBooked', label: 'Rendez-vous créé' },
+      { key: 'appointmentDate', label: 'Date du rendez-vous' }
+    ],
+    help: {
+      description: 'Simule un agent vocal intelligent répondant au téléphone en moins de 500ms.',
+      example: 'Question: Je souhaite prendre rendez-vous pour demain.',
+      tip: 'Si l\'appelant demande un rendez-vous, l\'agent insère automatiquement l\'événement dans l\'agenda simulé.'
+    }
+  },
+  {
+    type: 'tts', label: 'Synthèse Vocale (TTS)', icon: 'Volume2', color: '#a78bfa', category: 'ai',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'text', label: 'Texte à synthétiser', type: 'textarea', default: 'Bonjour et bienvenue chez FlowForge !' },
+      { key: 'language', label: 'Langue', type: 'select', options: ['fr', 'en', 'es', 'de', 'it'], default: 'fr' }
+    ],
+    outputFields: [
+      { key: 'audioUrl', label: 'URL Audio' },
+      { key: 'result', label: 'Résultat (URL Audio)' }
+    ],
+    help: {
+      description: 'Génère un fichier audio parlé à partir d\'un texte.',
+      example: 'Texte: Votre rendez-vous est confirmé pour demain.',
+      tip: 'Génère une URL audio Google Translate TTS prête à être lue.'
+    }
+  },
   // ──── Map ────
   {
     type: 'mapSearch', label: 'Recherche Carte', icon: 'MapPin', color: '#fb7185', category: 'map',
@@ -653,8 +731,9 @@ export const ICON_MAP = {
   MessageSquare, Hash, Rss, Filter, Bitcoin,
   Github, Languages, Heart, LineChart, Calendar, Database,
   Terminal, FileText, Search, Table, Binary, FileDigit,
-  Calculator, Scissors, Layout, MessageCircleQuestion
+  Calculator, Scissors, Layout, MessageCircleQuestion, Phone, Volume2
 }
+
 
 /** Category labels for sidebar display */
 const CATEGORY_LABELS = {

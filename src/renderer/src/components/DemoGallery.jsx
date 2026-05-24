@@ -1,11 +1,12 @@
 import React from 'react'
-import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout, Repeat } from 'lucide-react'
+import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout, Repeat, Phone } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 
 import { DEMOS as RAW_DEMOS } from '../demos'
 import { MODULE_DEFINITIONS } from '../data/moduleDefinitions'
 
 const getIconAndGradient = (demo) => {
+  if (demo.id === 'demo-phone-agent') return { icon: Phone, gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }
   if (demo.id === 'demo-crypto-bot') return { icon: Bitcoin, gradient: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' }
   if (demo.id === 'demo-api-monitor') return { icon: Activity, gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)' }
   if (demo.id === 'demo-macro-economy') return { icon: BarChart, gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' }
@@ -13,6 +14,7 @@ const getIconAndGradient = (demo) => {
   if (demo.id === 'demo-loop') return { icon: Repeat, gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)' }
   return { icon: Layout, gradient: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' }
 }
+
 
 const DEMOS = RAW_DEMOS.map((demo) => ({
   ...demo,

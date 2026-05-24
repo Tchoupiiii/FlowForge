@@ -94,13 +94,40 @@ function CustomNode({ data, selected }) {
       {/* Target (Input) Handles */}
       {inputsCount > 0 && (
         <div className="custom-handles-target">
-          <Handle
-            type="target"
-            position={Position.Left}
-            id="a"
-            className="custom-handle generic-handle"
-            style={{ background: data.color }}
-          />
+          {configFields.length > 0 ? (
+            <>
+              {/* Generic Input Handle */}
+              <Handle
+                type="target"
+                position={Position.Left}
+                id="a"
+                className="custom-handle generic-handle"
+                style={{ top: '10%', background: '#64748b', width: '12px', height: '12px', borderRadius: '2px' }}
+              />
+              {configFields.map((field, i) => (
+                <div key={field.key} className="handle-wrapper target">
+                  <Handle
+                    type="target"
+                    position={Position.Left}
+                    id={field.key}
+                    className="custom-handle"
+                    style={{ top: `${((i + 1) / (configFields.length + 1)) * 80 + 20}%`, background: data.color }}
+                  />
+                  <span className="handle-label target-label" style={{ top: `calc(${((i + 1) / (configFields.length + 1)) * 80 + 20}% - 6px)` }}>
+                    {field.label}
+                  </span>
+                </div>
+              ))}
+            </>
+          ) : (
+            <Handle
+              type="target"
+              position={Position.Left}
+              id="a"
+              className="custom-handle"
+              style={{ background: data.color }}
+            />
+          )}
         </div>
       )}
 
@@ -151,13 +178,40 @@ function CustomNode({ data, selected }) {
         </div>
       ) : outputsCount > 0 ? (
         <div className="custom-handles-source">
-          <Handle
-            type="source"
-            position={Position.Right}
-            id="a"
-            className="custom-handle generic-handle"
-            style={{ background: data.color }}
-          />
+          {outputFields.length > 0 ? (
+            <>
+              {/* Generic Output Handle */}
+              <Handle
+                type="source"
+                position={Position.Right}
+                id="a"
+                className="custom-handle generic-handle"
+                style={{ top: '10%', background: '#64748b', width: '12px', height: '12px', borderRadius: '2px' }}
+              />
+              {outputFields.map((field, i) => (
+                <div key={field.key} className="handle-wrapper source">
+                  <span className="handle-label source-label" style={{ top: `calc(${((i + 1) / (outputFields.length + 1)) * 80 + 20}% - 6px)` }}>
+                    {field.label}
+                  </span>
+                  <Handle
+                    type="source"
+                    position={Position.Right}
+                    id={field.key}
+                    className="custom-handle"
+                    style={{ top: `${((i + 1) / (outputFields.length + 1)) * 80 + 20}%`, background: data.color }}
+                  />
+                </div>
+              ))}
+            </>
+          ) : (
+            <Handle
+              type="source"
+              position={Position.Right}
+              id="a"
+              className="custom-handle"
+              style={{ background: data.color }}
+            />
+          )}
         </div>
       ) : null}
     </div>

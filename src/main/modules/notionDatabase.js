@@ -20,7 +20,8 @@ export default {
       pageId: `notion_page_${Math.random().toString(36).substr(2, 9)}`,
       databaseId: databaseId,
       title: title,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      result: `Page "${title}" créée avec succès dans la base de données Notion.`
     }
   }
 }

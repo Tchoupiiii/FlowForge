@@ -29,7 +29,7 @@ export const execute = async (config, inputData) => {
         throw new Error(`Unknown action: ${config.action}`);
     }
     
-    return { success: true, result };
+    return { success: true, result, text: result };
   } catch (error) {
     throw new Error(`String manipulation failed: ${error.message}`);
   }

@@ -34,7 +34,7 @@ export const execute = async (config, inputData) => {
     const data = await response.json();
     const result = data.choices[0]?.message?.content || '';
     
-    return { success: true, result };
+    return { success: true, result, message: result };
   } catch (error) {
     throw new Error(`OpenAI Chat failed: ${error.message}`);
   }

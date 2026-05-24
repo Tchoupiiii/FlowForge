@@ -31,7 +31,8 @@ export default {
         endpoint,
         resultsCount: data.meta?.results?.total || 0,
         results: data.results || [],
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        result: `Recherche OpenFDA pour "${query}" sur l'endpoint "${endpoint}" : ${data.meta?.results?.total || 0} résultats trouvés.`
       }
     } catch (error) {
       throw new Error(`Erreur OpenFDA: ${error.message}`)

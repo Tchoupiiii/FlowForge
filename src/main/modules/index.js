@@ -41,7 +41,18 @@ import * as githubCreateIssue from './githubCreateIssue.js'
 import * as openAiChat from './openAiChat.js'
 import * as anthropicClaude from './anthropicClaude.js'
 import * as loopForEach from './loopForEach.js'
+import * as webScraper from './webScraper.js'
+import * as youtubeTranscript from './youtubeTranscript.js'
+import * as pdfParser from './pdfParser.js'
+import * as phoneAgent from './phoneAgent.js'
+import * as tts from './tts.js'
+
 const modules = {
+  phoneAgent,
+  tts,
+  webScraper,
+  youtubeTranscript,
+  pdfParser,
   triggerManual,
   timerCron,
   httpRequest,

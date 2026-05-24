@@ -13,11 +13,11 @@ export default {
   async execute(config, inputData) {
     const provider = (config.provider || 'openai').toLowerCase()
     const model = config.model || (provider === 'openai' ? 'gpt-4o-mini' : 'llama3')
-    let systemPrompt = interpolate(config.systemPrompt || 'You are a helpful assistant.', inputData)
+    let systemPrompt = config.systemPrompt || 'You are a helpful assistant.'
     if (typeof systemPrompt === 'object') systemPrompt = JSON.stringify(systemPrompt, null, 2)
     else systemPrompt = String(systemPrompt)
 
-    let userPrompt = interpolate(config.userPrompt || '', inputData)
+    let userPrompt = config.userPrompt || ''
     if (typeof userPrompt === 'object') userPrompt = JSON.stringify(userPrompt, null, 2)
     else userPrompt = String(userPrompt)
     
@@ -122,21 +122,3 @@ async function callOllama(config, params) {
   }
 }
 
-function interpolate(template, data) {
-  if (!data || typeof template !== 'string') return template
-
-  return template.replace(/\{\{(.+?)\}\}/g, (_match, key) => {
-    const trimmedKey = key.trim()
-    const parts = trimmedKey.split('.')
-    let value = data
-
-    for (const part of parts) {
-      if (value === null || value === undefined) return ''
-      value = value[part]
-    }
-
-    if (value === null || value === undefined) return ''
-    if (typeof value === 'object') return JSON.stringify(value)
-    return String(value)
-  })
-}

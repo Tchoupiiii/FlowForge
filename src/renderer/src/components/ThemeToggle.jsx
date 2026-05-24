@@ -10,9 +10,10 @@ export default function ThemeToggle() {
     <button
       className="theme-toggle"
       onClick={toggleTheme}
-      title={isDark ? 'Mode clair' : 'Mode sombre'}
+      title="Changer de thème (Clic pour faire défiler)"
       aria-label="Toggle theme"
     >
+
       <div className={`theme-toggle-track ${isDark ? 'dark' : 'light'}`}>
         <Sun size={12} className="theme-toggle-sun" />
         <Moon size={12} className="theme-toggle-moon" />

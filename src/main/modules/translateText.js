@@ -30,7 +30,8 @@ export default {
       original: text,
       translated,
       targetLanguage: targetLang,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      result: translated
     }
   }
 }

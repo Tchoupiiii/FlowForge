@@ -23,9 +23,22 @@ export default {
       throw new Error('Email: "to" address is required')
     }
 
-    // Interpolate template variables from inputData
-    const resolvedSubject = interpolate(subject, inputData)
-    const resolvedBody = interpolate(body, inputData)
+    // Fallback formatting for body content if empty
+    let resolvedBody = config.body
+    if (!resolvedBody) {
+      if (inputData?.result) resolvedBody = inputData.result
+      else if (inputData?.latest) {
+        resolvedBody = `${inputData.latest.title}\n${inputData.latest.link || ''}`
+      } else if (inputData?.items) {
+        resolvedBody = Array.isArray(inputData.items)
+          ? inputData.items.slice(0, 5).map(item => `- ${item.title || item}`).join('\n')
+          : String(inputData.items)
+      } else {
+        resolvedBody = inputData?.message || inputData?.text || inputData?.response || ''
+      }
+    }
+
+    const resolvedSubject = config.subject || 'No Subject'
 
     // If SMTP config is fully provided, attempt real send via fetch to an SMTP relay
     // For now, we simulate the send
@@ -51,24 +64,3 @@ export default {
   }
 }
 
-/**
- * Simple template interpolation: replaces {{fieldName}} with values from data.
- */
-function interpolate(template, data) {
-  if (!data || typeof template !== 'string') return template
-
-  return template.replace(/\{\{(.+?)\}\}/g, (_match, key) => {
-    const trimmedKey = key.trim()
-    const parts = trimmedKey.split('.')
-    let value = data
-
-    for (const part of parts) {
-      if (value === null || value === undefined) return ''
-      value = value[part]
-    }
-
-    if (value === null || value === undefined) return ''
-    if (typeof value === 'object') return JSON.stringify(value)
-    return String(value)
-  })
-}

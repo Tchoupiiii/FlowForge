@@ -7,8 +7,22 @@ export const meta = {
 export async function execute(config, inputData) {
   try {
     const webhookUrl = config.webhookUrl || ''
-    const content = config.content || inputData?.message || inputData?.text || ''
     const username = config.username || 'FlowForge Bot'
+
+    let content = config.content
+    if (!content) {
+      if (inputData?.result) {
+        content = inputData.result
+      } else if (inputData?.latest) {
+        content = `**${inputData.latest.title || 'Nouvel article'}**\n${inputData.latest.link || ''}`
+      } else if (inputData?.items) {
+        content = Array.isArray(inputData.items)
+          ? inputData.items.slice(0, 5).map(item => `• ${item.title || item}`).join('\n')
+          : String(inputData.items)
+      } else {
+        content = inputData?.message || inputData?.text || inputData?.response || ''
+      }
+    }
 
     if (!webhookUrl) {
       return { success: false, error: 'URL du Webhook Discord requise' }
@@ -30,8 +44,9 @@ export async function execute(config, inputData) {
       return { success: false, error: `Erreur HTTP: ${response.status} ${response.statusText}` }
     }
 
-    return { success: true, message: 'Message envoyé sur Discord' }
+    return { success: true, message: 'Message envoyé sur Discord', result: 'Message envoyé sur Discord' }
   } catch (error) {
     return { success: false, error: `Erreur: ${error.message}` }
   }
 }
+

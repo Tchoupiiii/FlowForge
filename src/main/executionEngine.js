@@ -180,15 +180,6 @@ export class ExecutionEngine {
               wasSkipped = true
               break
             }
-            
-            if (pe.sourceHandle && pe.targetHandle && pe.targetHandle !== 'trigger' && pe.targetHandle !== 'a') {
-              const srcValue = results[pe.source][pe.sourceHandle]
-              if (srcValue !== undefined) {
-                // Determine if we should override. If it's an array/object, we overwrite directly
-                rawConfig = { ...rawConfig, [pe.targetHandle]: srcValue }
-              }
-            }
-            
             // Standard data merging for {{input.xxx}} usage
             const newResults = results[pe.source]
             for (const [key, value] of Object.entries(newResults)) {
@@ -233,6 +224,10 @@ export class ExecutionEngine {
           const startTime = Date.now()
           const result = await executor(config, inputData)
           const duration = Date.now() - startTime
+
+          if (result && result.success === false) {
+            throw new Error(result.error || 'Erreur inconnue')
+          }
 
           // Pass all upstream data downstream to allow global interpolation
           results[nodeId] = { ...inputData, ...result }
