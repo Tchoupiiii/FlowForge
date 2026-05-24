@@ -497,7 +497,23 @@ export const MODULE_DEFINITIONS = [
     }
   },
   {
-    type: 'googleCalendar', label: 'Google Calendar', icon: 'Calendar', color: '#4285F4', category: 'planning',
+    type: 'googleCalendarGet', label: 'Request Google Calendar', icon: 'Calendar', color: '#4285F4', category: 'planning',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'filter', label: 'Recherche / Filtre', type: 'text', default: '' }
+    ],
+    outputFields: [
+      { key: 'events', label: 'Événements (Array)' },
+      { key: 'result', label: 'Résultat' }
+    ],
+    help: {
+      description: 'Récupère la liste des événements enregistrés dans Google Calendar (simulé).',
+      example: 'Filtre: Présentation',
+      tip: 'Retourne un tableau d\'événements et un résumé texte.'
+    }
+  },
+  {
+    type: 'googleCalendar', label: 'Write Google Calendar', icon: 'Calendar', color: '#4285F4', category: 'planning',
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'summary', label: 'Titre de l\'événement', type: 'text', default: 'Réunion importante' },
@@ -505,7 +521,7 @@ export const MODULE_DEFINITIONS = [
     ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {
-      description: 'Ajoute un événement directement dans votre Google Calendar.',
+      description: 'Ajoute un événement directement dans votre Google Calendar (simulé).',
       example: 'Titre: Point d\'équipe',
       tip: 'Si vous laissez la date vide, l\'heure actuelle sera utilisée.'
     }
@@ -637,10 +653,13 @@ export const MODULE_DEFINITIONS = [
     type: 'phoneAgent', label: 'Agent Téléphonique', icon: 'Phone', color: '#10b981', category: 'ai',
     inputs: 1, outputs: 1,
     configFields: [
-      { key: 'userQuery', label: 'Question de l\'appelant', type: 'textarea', default: 'Bonjour, que vendez-vous ?' },
-      { key: 'businessDescription', label: 'Description de l\'entreprise', type: 'textarea', default: 'FlowForge Inc. propose des solutions d\'automatisation sans code de niveau entreprise.' },
-      { key: 'businessProducts', label: 'Produits / Tarifs', type: 'textarea', default: 'FlowForge Pro à 49€/mois, FlowForge Enterprise sur devis.' },
-      { key: 'calendarCheck', label: 'Vérifier l\'agenda', type: 'select', options: ['Oui', 'Non'], default: 'Oui' }
+      { key: 'source', label: 'Source de données', type: 'select', options: ['Calendar', 'PDF', 'XLS', 'None'], default: 'None' },
+      { key: 'provider', label: 'Fournisseur', type: 'select', options: ['openai', 'ollama'], default: 'openai' },
+      { key: 'model', label: 'Modèle', type: 'text', default: 'gpt-4o' },
+      { key: 'voice', label: 'Voix', type: 'select', options: ['Alloy', 'Echo', 'Fable', 'Onyx', 'Nova', 'Shimmer'], default: 'Alloy' },
+      { key: 'systemPrompt', label: 'Prompt Système', type: 'textarea', default: 'Tu es un assistant vocal téléphonique poli et concis.' },
+      { key: 'userPrompt', label: 'Prompt Utilisateur (Transcription)', type: 'textarea', default: 'Bonjour, je voudrais prendre un rendez-vous mardi s\'il vous plaît.' },
+      { key: 'logPath', label: 'Chemin du fichier de Log', type: 'text', default: 'C:\\Users\\Arthur\\Desktop\\appel_log.txt' }
     ],
     outputFields: [
       { key: 'response', label: 'Réponse Vocale' },
@@ -651,8 +670,8 @@ export const MODULE_DEFINITIONS = [
     ],
     help: {
       description: 'Simule un agent vocal intelligent répondant au téléphone en moins de 500ms.',
-      example: 'Question: Je souhaite prendre rendez-vous pour demain.',
-      tip: 'Si l\'appelant demande un rendez-vous, l\'agent insère automatiquement l\'événement dans l\'agenda simulé.'
+      example: 'Prompt Utilisateur: Je souhaite prendre rendez-vous pour demain.',
+      tip: 'Si la source est Calendar et qu\'un rendez-vous est demandé, l\'agent insère automatiquement l\'événement.'
     }
   },
   {

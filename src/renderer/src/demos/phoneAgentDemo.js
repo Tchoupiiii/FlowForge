@@ -24,10 +24,13 @@ export const demoPhoneAgent = {
         label: 'Agent Vocal IA',
         color: '#10b981',
         config: {
-          userQuery: "Bonjour, je voudrais prendre rendez-vous pour mardi s'il vous plaît.",
-          businessDescription: "FlowForge Inc. propose des solutions d'automatisation sans code de niveau entreprise.",
-          businessProducts: "FlowForge Pro à 49€/mois, FlowForge Enterprise sur devis.",
-          calendarCheck: "Oui"
+          source: "Calendar",
+          provider: "openai",
+          model: "gpt-4o",
+          voice: "Alloy",
+          systemPrompt: "Tu es l'agent vocal de FlowForge Inc. qui propose des solutions d'automatisation sans code.",
+          userPrompt: "Bonjour, je voudrais prendre rendez-vous pour mardi s'il vous plaît.",
+          logPath: "C:\\Users\\Arthur\\Desktop\\appel_log.txt"
         }
       }
     },

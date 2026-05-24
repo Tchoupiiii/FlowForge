@@ -1,4 +1,6 @@
 import { getEvents, addEvent } from '../calendarStore.js'
+import fs from 'fs'
+import path from 'path'
 
 export const meta = {
   type: 'phoneAgent',
@@ -9,11 +11,31 @@ export const meta = {
   outputs: 1
 }
 
+function getUniqueFilePath(originalPath) {
+  if (!fs.existsSync(originalPath)) {
+    return originalPath
+  }
+  const ext = path.extname(originalPath)
+  const dir = path.dirname(originalPath)
+  const base = path.basename(originalPath, ext)
+  
+  let counter = 1
+  let newPath = path.join(dir, `${base} (${counter})${ext}`)
+  while (fs.existsSync(newPath)) {
+    counter++
+    newPath = path.join(dir, `${base} (${counter})${ext}`)
+  }
+  return newPath
+}
+
 export async function execute(config, inputData) {
-  const userQuery = config.userQuery || inputData?.text || inputData?.message || inputData?.result || 'Bonjour, que proposez-vous ?'
-  const businessDescription = config.businessDescription || 'FlowForge Inc. propose des solutions d\'automatisation sans code de niveau entreprise.'
-  const businessProducts = config.businessProducts || 'FlowForge Pro à 49€/mois, FlowForge Enterprise sur devis.'
-  const calendarCheck = config.calendarCheck || 'Oui'
+  const source = config.source || 'None'
+  const provider = config.provider || 'openai'
+  const model = config.model || 'gpt-4o'
+  const voice = config.voice || 'Alloy'
+  const systemPrompt = config.systemPrompt || 'Tu es un assistant vocal téléphonique poli et concis.'
+  const userQuery = config.userPrompt || inputData?.text || inputData?.message || inputData?.result || 'Bonjour, je voudrais prendre un rendez-vous mardi s\'il vous plaît.'
+  const logPath = config.logPath || ''
 
   const startTime = Date.now()
 
@@ -26,43 +48,51 @@ export async function execute(config, inputData) {
   let response = ''
   let appointmentBooked = false
   let appointmentDate = null
+  let sourceLookup = 'Aucune source de données connectée.'
+  let matchedInfo = ''
 
-  // 1. Scan for local document text / PDF Menu context passed from parents
+  // 1. Scan for local document text / PDF / XLS context passed from parents or config
   let documentText = inputData?.text || inputData?.content || inputData?.result || ''
   if (documentText.trim() === userQuery.trim()) {
     documentText = '' // avoid self-loop
   }
 
-  let pdfLookup = 'Aucun document PDF/Menu connecté.'
-  let matchedInfo = ''
-
-  if (documentText) {
-    pdfLookup = 'Analyse du document PDF/Menu...'
-    const lines = documentText.split('\n').map(l => l.trim()).filter(Boolean)
-    const matches = []
-    const queryWords = query.split(/\s+/).filter(w => w.length > 3)
-    
-    for (const line of lines) {
-      if (queryWords.some(w => line.toLowerCase().includes(w))) {
-        matches.push(line)
+  if (source === 'PDF' || source === 'XLS') {
+    if (documentText) {
+      sourceLookup = `Analyse du document ${source}...`
+      const lines = documentText.split('\n').map(l => l.trim()).filter(Boolean)
+      const matches = []
+      const queryWords = query.split(/\s+/).filter(w => w.length > 3)
+      
+      for (const line of lines) {
+        if (queryWords.some(w => line.toLowerCase().includes(w))) {
+          matches.push(line)
+        }
       }
-    }
-    
-    if (matches.length > 0) {
-      matchedInfo = matches.slice(0, 2).join(' / ')
-      pdfLookup = `Match trouvé dans le PDF : "${matchedInfo}"`
+      
+      if (matches.length > 0) {
+        matchedInfo = matches.slice(0, 2).join(' / ')
+        sourceLookup = `Match trouvé dans le ${source} : "${matchedInfo}"`
+      } else {
+        matchedInfo = lines.slice(0, 2).join(' / ')
+        sourceLookup = `Lecture des premières lignes du ${source} : "${matchedInfo}"`
+      }
     } else {
-      // Fallback to first few lines of document
-      matchedInfo = lines.slice(0, 2).join(' / ')
-      pdfLookup = `Lecture des premières lignes : "${matchedInfo}"`
+      // Mock document text if none passed from parent node
+      matchedInfo = source === 'PDF'
+        ? "Menu de la Pizzeria : Pizza Margherita à 10€, Pizza Regina à 12€, Panna Cotta à 6€."
+        : "Liste de Prix XLS : Licence Standard à 49€/mois, Licence Premium à 99€/mois."
+      sourceLookup = `Lecture simulée du fichier ${source} (aucun nœud parent connecté)`
     }
+  } else if (source === 'Calendar') {
+    sourceLookup = 'Vérification de l\'agenda Google Calendar...'
   }
 
   // 2. Check for Appointment Booking / Agenda inquiries
   const bookingKeywords = ['rdv', 'rendez-vous', 'rendez vous', 'reserver', 'réserver', 'book', 'agenda', 'calendrier', 'creneau', 'créneau', 'rencontrer']
   const matchesBooking = bookingKeywords.some(kw => query.includes(kw))
 
-  if (matchesBooking && calendarCheck === 'Oui') {
+  if (matchesBooking && source === 'Calendar') {
     let targetDate = new Date()
     targetDate.setDate(targetDate.getDate() + 1) // Tomorrow
     targetDate.setHours(14, 0, 0, 0) // 14:00
@@ -108,25 +138,17 @@ export async function execute(config, inputData) {
       response = `Allô ? Parfait, j'ai vérifié notre agenda et c'est tout à fait libre. J'ai bloqué votre rendez-vous pour le ${formattedDate}. On se reparle à ce moment-là !`
     }
   } 
-  // 3. Query relates to products / menu with PDF content present
-  else if (matchedInfo && (query.includes('menu') || query.includes('plat') || query.includes('vend') || query.includes('carte') || query.includes('manger') || query.includes('pizza') || query.includes('tarif') || query.includes('prix'))) {
-    response = `Allô ? Oui, j'ai notre carte sous les yeux : ${matchedInfo}. Souhaitez-vous réserver une table ou commander ?`
+  // 3. Query relates to menu/prices and PDF/XLS context is present
+  else if (matchedInfo && (query.includes('menu') || query.includes('plat') || query.includes('vend') || query.includes('carte') || query.includes('manger') || query.includes('pizza') || query.includes('tarif') || query.includes('prix') || query.includes('combien') || query.includes('produit'))) {
+    response = `Allô ? Oui, j'ai les données de notre fichier ${source} sous les yeux : ${matchedInfo}. Souhaitez-vous commander ou réserver ?`
   }
-  // 4. What does the company do
-  else if (query.includes('fait') || query.includes('propose') || query.includes('activité') || query.includes('entreprise') || query.includes('c\'est quoi') || query.includes('est-ce que vous faites')) {
-    response = `Allô ? Alors, en quelques mots : ${businessDescription} Nous aidons nos clients à automatiser tous leurs processus quotidiens facilement.`
-  }
-  // 5. Products and Pricing (without specific PDF matches)
-  else if (query.includes('vend') || query.includes('prix') || query.includes('tarif') || query.includes('combien') || query.includes('offre') || query.includes('produit')) {
-    response = `Allô ? Concernant nos offres et nos tarifs, nous proposons : ${businessProducts} N'hésitez pas si vous souhaitez que l'on planifie un appel de démo !`
-  }
-  // 6. Default / Greetings
+  // 4. Default / Greetings
   else if (query.includes('bonjour') || query.includes('salut') || query.includes('allo') || query.includes('allô')) {
-    response = `Bonjour ! Bienvenue chez nous. Je suis l'assistant vocal de l'entreprise. Comment puis-je vous aider aujourd'hui ? Prendre rendez-vous, découvrir nos tarifs ?`
+    response = `Bonjour ! Bienvenue. Je suis l'assistant vocal téléphonique (voix : ${voice}). Je suis connecté à notre source : ${source === 'None' ? 'Aucune' : source}. Comment puis-je vous aider ?`
   } 
-  // 7. General fallback
+  // 5. General fallback
   else {
-    response = `Allô ? J'ai bien reçu votre demande. Pour votre information : ${businessDescription} Je peux aussi prendre vos rendez-vous directement par téléphone, demandez-moi !`
+    response = `Allô ? J'ai bien reçu votre demande. En tant qu'agent vocal intelligent avec le modèle ${model} via ${provider}, je suis configuré avec le prompt système : "${systemPrompt.substring(0, 35)}...". Comment puis-je vous renseigner ?`
   }
 
   const latencyMs = Date.now() - startTime
@@ -136,17 +158,36 @@ export async function execute(config, inputData) {
 [📞 APPEL TÉLÉPHONIQUE ENTRANT]
 Tonalité... Clic.
 
+[Fournisseur]: ${provider} | [Modèle]: ${model} | [Voix]: ${voice}
+[Prompt Système]: "${systemPrompt}"
+
 [APPELANT]: "${userQuery}"
-🎙️ STT (Transcription vocale) : "${userQuery}" [Fiabilité : 98%]
-🧠 Détermination intention : ${matchesBooking ? 'Planification de RDV' : documentText ? 'Consultation Menu/PDF' : 'Demande d\'information'}
-🔍 Lecture Document : ${pdfLookup}
-📅 Consultation Agenda : ${matchesBooking ? `Vérification de disponibilité (${calendarCheck === 'Oui' ? 'Active' : 'Désactivée'}). Création d'événement...` : 'Aucune action requise'}
+🎙️ STT (Transcription vocale) : "${userQuery}" [Fiabilité : 99%]
+🧠 Détermination intention : ${matchesBooking ? 'Planification de RDV' : source !== 'None' ? `Consultation source ${source}` : 'Demande d\'information'}
+🔍 Source de données : ${sourceLookup}
+📅 Action Agenda : ${matchesBooking && source === 'Calendar' ? `Création d'un rendez-vous le ${appointmentDate}.` : 'Aucune action agenda'}
 
 [AGENT VOCAL IA] : "${response}"
 
 [⏱️ Latence système : ${latencyMs}ms | Statut RDV : ${appointmentBooked ? 'Confirmé' : 'Aucun'}]
 [Fin de l'appel]
 `.trim()
+
+  // Save log transcript if logPath is configured
+  if (logPath) {
+    try {
+      const resolvedPath = path.resolve(logPath)
+      const uniquePath = getUniqueFilePath(resolvedPath)
+      // Ensure the parent directory exists
+      const dir = path.dirname(uniquePath)
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
+      fs.writeFileSync(uniquePath, transcript, 'utf8')
+    } catch (e) {
+      console.error('Erreur lors de l\'écriture du log d\'appel:', e)
+    }
+  }
 
   return {
     success: true,

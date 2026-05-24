@@ -89,40 +89,54 @@ async function callOpenAI(config, params) {
 async function callOllama(config, params) {
   const baseUrl = config.baseUrl || 'http://127.0.0.1:11434'
 
-  const response = await fetch(`${baseUrl}/api/generate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: params.model,
-      system: params.systemPrompt,
-      prompt: params.userPrompt,
-      options: {
-        temperature: params.temperature
+  try {
+    const response = await fetch(`${baseUrl}/api/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      stream: false
-    }),
-    signal: AbortSignal.timeout(300000) // Ollama can be slow
-  })
+      body: JSON.stringify({
+        model: params.model,
+        system: params.systemPrompt,
+        prompt: params.userPrompt,
+        options: {
+          temperature: params.temperature
+        },
+        stream: false
+      }),
+      signal: AbortSignal.timeout(45000) // Shortened to 45s
+    })
 
-  if (!response.ok) {
-    const errorBody = await response.text()
-    throw new Error(`AI Agent (Ollama): API error ${response.status} — ${errorBody}`)
-  }
+    if (!response.ok) {
+      const errorBody = await response.text()
+      let msg = `API error ${response.status} — ${errorBody}`
+      if (response.status === 500 || errorBody.toLowerCase().includes('limitations') || errorBody.toLowerCase().includes('failed to load') || errorBody.toLowerCase().includes('vram')) {
+        msg += "\n\n💡 ASTUCE VRAM: Votre GPU GTX 1660 (6 Go de VRAM) ne dispose pas de suffisamment de mémoire pour charger ce modèle. Veuillez basculer vers un modèle plus léger comme 'qwen2.5:1.5b' ou 'llama3.2:3b' dans les paramètres de l'Agent."
+      }
+      throw new Error(msg)
+    }
 
-  const data = await response.json()
-  const content = data.response || ''
+    const data = await response.json()
+    const content = data.response || ''
 
-  return {
-    provider: 'ollama',
-    model: params.model,
-    response: content,
-    result: content,
-    done: data.done,
-    totalDuration: data.total_duration,
-    evalCount: data.eval_count,
-    timestamp: Date.now()
+    return {
+      provider: 'ollama',
+      model: params.model,
+      response: content,
+      result: content,
+      done: data.done,
+      totalDuration: data.total_duration,
+      evalCount: data.eval_count,
+      timestamp: Date.now()
+    }
+  } catch (error) {
+    let errorMsg = error.message
+    if (error.name === 'TimeoutError' || errorMsg.includes('timeout') || errorMsg.includes('aborted')) {
+      errorMsg = `Délai d'attente dépassé (45s). Le modèle local est trop lent à répondre ou charge un modèle trop lourd pour votre GTX 1660 (6 Go de VRAM). Essayez un modèle plus léger comme 'qwen2.5:1.5b'.`
+    } else if (errorMsg.includes('fetch') || errorMsg.includes('refused')) {
+      errorMsg = `Connexion refusée. Assurez-vous qu'Ollama est démarré localement sur ${baseUrl}.`
+    }
+    throw new Error(`AI Agent (Ollama): ${errorMsg}`)
   }
 }
 

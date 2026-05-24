@@ -4,6 +4,51 @@ export const meta = {
   category: 'map'
 }
 
+const queryMap = {
+  boulangerie: ['boulangerie', 'bakery'],
+  boulangeries: ['boulangerie', 'bakery'],
+  bakery: ['bakery', 'boulangerie'],
+  restaurant: ['restaurant'],
+  restaurants: ['restaurant'],
+  pharmacie: ['pharmacie', 'pharmacy'],
+  pharmacies: ['pharmacie', 'pharmacy'],
+  pharmacy: ['pharmacy', 'pharmacie'],
+  epicerie: ['epicerie', 'épicerie', 'grocery', 'supermarket', 'convenience'],
+  épicerie: ['epicerie', 'épicerie', 'grocery', 'supermarket', 'convenience'],
+  grocery: ['grocery', 'epicerie', 'supermarket'],
+  cafe: ['cafe', 'café', 'coffee'],
+  café: ['cafe', 'café', 'coffee'],
+  coffee: ['coffee', 'cafe', 'café'],
+  bar: ['bar', 'pub'],
+  pub: ['pub', 'bar'],
+  coiffeur: ['coiffeur', 'hairdresser', 'salon'],
+  hairdresser: ['hairdresser', 'coiffeur'],
+  banque: ['banque', 'bank'],
+  bank: ['bank', 'banque'],
+  hotel: ['hotel', 'hôtel', 'hostel', 'motel'],
+  hôtel: ['hotel', 'hôtel', 'hostel', 'motel'],
+  supermarche: ['supermarket', 'supermarché'],
+  supermarché: ['supermarket', 'supermarché'],
+  supermarket: ['supermarket', 'supermarché'],
+  fleuriste: ['florist', 'fleuriste', 'flowers'],
+  florist: ['florist', 'fleuriste'],
+  boucherie: ['butcher', 'boucherie', 'meat'],
+  butcher: ['butcher', 'boucherie']
+}
+
+function getSearchTerms(query) {
+  const normalized = query.toLowerCase().trim()
+  if (queryMap[normalized]) {
+    return queryMap[normalized]
+  }
+  for (const [key, synonyms] of Object.entries(queryMap)) {
+    if (normalized.includes(key)) {
+      return Array.from(new Set([query, ...synonyms]))
+    }
+  }
+  return [query]
+}
+
 export async function execute(config, inputData) {
   try {
     const query = config.query || inputData?.query || 'boulangerie'
@@ -40,8 +85,6 @@ export async function execute(config, inputData) {
     const lon = parseFloat(geoData[0].lon)
 
     // Step 2: Calculate bounding box coordinates around center
-    // 1 degree latitude ~ 111.32 km
-    // 1 degree longitude ~ 111.32 * cos(lat) km
     const deltaLat = radiusKm / 111.32
     const cosLat = Math.cos(lat * Math.PI / 180)
     const deltaLon = radiusKm / (111.32 * (Math.abs(cosLat) > 0.01 ? cosLat : 0.01))
@@ -54,24 +97,38 @@ export async function execute(config, inputData) {
     // Use Nominatim search limit (max 50 to avoid OSM rate limits)
     const osmLimit = limitValue === 0 ? 50 : Math.min(50, limitValue)
 
-    // Step 3: Search for POIs bounded within the viewbox
-    const searchUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&viewbox=${left},${top},${right},${bottom}&bounded=1&format=json&limit=${osmLimit}&addressdetails=1&extratags=1`
-    const searchResponse = await fetch(searchUrl, {
-      headers: { 'User-Agent': 'FlowForge/1.0 (workflow-automation)' }
+    // Step 3: Search for POIs bounded within the viewbox with expanded queries
+    const searchTerms = getSearchTerms(query)
+    const searchPromises = searchTerms.map(async (term) => {
+      const searchUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(term)}&viewbox=${left},${top},${right},${bottom}&bounded=1&format=json&limit=${osmLimit}&addressdetails=1&extratags=1`
+      try {
+        const response = await fetch(searchUrl, {
+          headers: { 'User-Agent': 'FlowForge/1.0 (workflow-automation)' }
+        })
+        if (response.ok) {
+          return await response.json()
+        }
+      } catch (e) {
+        console.error(`Erreur recherche pour ${term}:`, e)
+      }
+      return []
     })
 
-    if (!searchResponse.ok) {
-      return {
-        success: false,
-        error: `Erreur recherche: ${searchResponse.status}`,
-        places: [],
-        count: 0
+    const resultsArray = await Promise.all(searchPromises)
+    const allResults = resultsArray.flat()
+
+    // Deduplicate by place_id
+    const seen = new Set()
+    const uniqueResults = []
+    for (const place of allResults) {
+      const id = place.place_id || `${place.lat}_${place.lon}`
+      if (!seen.has(id)) {
+        seen.add(id)
+        uniqueResults.push(place)
       }
     }
 
-    const searchData = await searchResponse.json()
-
-    const places = searchData.map(place => {
+    const places = uniqueResults.map(place => {
       const address = place.address || {}
       return {
         name: place.display_name?.split(',')[0] || place.name || 'Sans nom',
@@ -120,7 +177,7 @@ export async function execute(config, inputData) {
       radius: radiusKm,
       places: finalPlaces,
       count: finalPlaces.length,
-      totalFound: searchData.length,
+      totalFound: uniqueResults.length,
       result: resultSummary
     }
   } catch (error) {

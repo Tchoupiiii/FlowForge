@@ -27,6 +27,7 @@ import * as translateText from './translateText.js'
 import * as openFda from './openFda.js'
 import * as stockPrice from './stockPrice.js'
 import * as googleCalendar from './googleCalendar.js'
+import * as googleCalendarGet from './googleCalendarGet.js'
 import * as notionDatabase from './notionDatabase.js'
 import * as executeCommand from './executeCommand.js'
 import * as regexMatch from './regexMatch.js'
@@ -82,6 +83,7 @@ const modules = {
   openFda,
   stockPrice,
   googleCalendar,
+  googleCalendarGet,
   notionDatabase,
   executeCommand,
   regexMatch,

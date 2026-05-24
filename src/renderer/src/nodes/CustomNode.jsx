@@ -95,7 +95,7 @@ function CustomNode({ data, selected }) {
 
   const isPhoneAgent = data.type === 'phoneAgent'
   const customStyle = isPhoneAgent 
-    ? { minWidth: '380px', maxWidth: '420px', minHeight: '260px', paddingBottom: '20px' } 
+    ? { minWidth: '300px', maxWidth: '340px', minHeight: '160px', paddingBottom: '10px' } 
     : {}
 
   return (
@@ -103,7 +103,7 @@ function CustomNode({ data, selected }) {
       {/* Target (Input) Handles */}
       {inputsCount > 0 && (
         <div className="custom-handles-target">
-          {configFields.length > 0 ? (
+          {configFields.length > 0 && !isPhoneAgent ? (
             <>
               {/* Generic Input Handle */}
               <Handle
