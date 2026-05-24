@@ -12,7 +12,9 @@ export async function execute(config, inputData) {
 
     let text = config.message
     if (!text) {
-      if (inputData?.result) {
+      if (inputData?.price !== undefined && inputData?.symbol !== undefined) {
+        text = `Bourse : ${inputData.symbol} est à ${inputData.price} ${inputData.currency || 'USD'}`
+      } else if (inputData?.result) {
         text = inputData.result
       } else if (inputData?.latest) {
         text = `${inputData.latest.title || 'Nouvel article'}\n${inputData.latest.link || ''}`

@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   exportScript: (workflow) => ipcRenderer.invoke('workflow:export-script', workflow),
   importWorkflow: () => ipcRenderer.invoke('workflow:import'),
   executeWorkflow: (workflow) => ipcRenderer.invoke('workflow:execute', workflow),
+  executeModule: (type, config, inputData) => ipcRenderer.invoke('module:execute', type, config, inputData),
   stopWorkflow: () => ipcRenderer.invoke('workflow:stop'),
 
   // Execution progress listener

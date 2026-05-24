@@ -113,8 +113,8 @@ export function WorkflowProvider({ children }) {
 
   // --- REACT FLOW HELPERS ---
   const onConnect = useCallback((params) => {
-    // Si c'est une connexion de type variable explicite (pas les points centraux "a")
-    if (params.targetHandle && params.sourceHandle && params.targetHandle !== 'a' && params.sourceHandle !== 'a') {
+    // Si c'est une connexion de type variable (pas les points centraux "a" aux deux extrémités)
+    if (params.targetHandle && params.sourceHandle && params.targetHandle !== 'a') {
       setNodes(nds => nds.map(n => {
         if (n.id === params.target) {
           // Compter les connexions existantes sur le même port de départ
@@ -125,8 +125,18 @@ export function WorkflowProvider({ children }) {
           )
           
           let handleName = params.sourceHandle
+          if (handleName === 'a') {
+            const sourceNode = nds.find(node => node.id === params.source)
+            const sourceDef = sourceNode ? getModuleByType(sourceNode.data?.type) : null
+            if (sourceDef && sourceDef.outputFields && sourceDef.outputFields.length > 0) {
+              handleName = sourceDef.outputFields[0].key
+            } else {
+              handleName = 'input'
+            }
+          }
+          
           if (existingSameHandleEdges.length > 0) {
-            handleName = `${params.sourceHandle}_${existingSameHandleEdges.length + 1}`
+            handleName = `${handleName}_${existingSameHandleEdges.length + 1}`
           }
 
           const currentVal = n.data.config?.[params.targetHandle] || ''

@@ -120,6 +120,79 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
             ))}
           </select>
         )
+      case 'fileList': {
+        const filePaths = Array.isArray(value) ? value : []
+        const handleDragOver = (e) => {
+          e.preventDefault()
+        }
+        const handleDrop = (e) => {
+          e.preventDefault()
+          const files = Array.from(e.dataTransfer.files)
+          const newPaths = files.map(f => f.path).filter(Boolean)
+          if (newPaths.length > 0) {
+            handleChange(field.key, [...filePaths, ...newPaths])
+          }
+        }
+        const handleFileChange = (e) => {
+          const files = Array.from(e.target.files)
+          const newPaths = files.map(f => f.path).filter(Boolean)
+          if (newPaths.length > 0) {
+            handleChange(field.key, [...filePaths, ...newPaths])
+          }
+        }
+        const removeFile = (indexToRemove) => {
+          handleChange(field.key, filePaths.filter((_, idx) => idx !== indexToRemove))
+        }
+        return (
+          <div 
+            className="config-file-dropzone"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            style={{
+              border: '2px dashed var(--glass-border)',
+              borderRadius: '8px',
+              padding: '16px',
+              textAlign: 'center',
+              background: 'rgba(255,255,255,0.02)',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}
+          >
+            <input 
+              type="file" 
+              multiple 
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+              id={`file-input-${field.key}`}
+            />
+            <label htmlFor={`file-input-${field.key}`} style={{ cursor: 'pointer', display: 'block' }}>
+              <p style={{ fontSize: '11px', margin: 0, color: 'var(--text-muted)' }}>
+                Glissez-déposez des fichiers ici ou <span style={{ color: 'var(--accent)', fontWeight: '600' }}>parcourez</span>
+              </p>
+            </label>
+            {filePaths.length > 0 && (
+              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'left' }}>
+                {filePaths.map((p, idx) => (
+                  <div key={idx} style={{ fontSize: '10.5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-2)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--glass-border)' }}>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80%' }} title={p}>
+                      {p.split(/[/\\]/).pop()}
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.stopPropagation(); removeFile(idx); }} 
+                      style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      }
       case 'textarea':
       case 'code':
         return (

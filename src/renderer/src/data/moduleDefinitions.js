@@ -135,7 +135,8 @@ export const MODULE_DEFINITIONS = [
     inputs: 1, outputs: 1,
     configFields: [
       { key: 'path', label: 'Chemin du fichier', type: 'text', default: '' },
-      { key: 'format', label: 'Format', type: 'select', options: ['text', 'json', 'csv'], default: 'json' }
+      { key: 'format', label: 'Format', type: 'select', options: ['text', 'json', 'csv'], default: 'json' },
+      { key: 'data', label: 'Contenu du fichier', type: 'textarea', default: '{{input.result}}' }
     ],
     outputFields: [{ key: 'success', label: 'Succès' }],
     help: {
@@ -653,25 +654,24 @@ export const MODULE_DEFINITIONS = [
     type: 'phoneAgent', label: 'Agent Téléphonique', icon: 'Phone', color: '#10b981', category: 'ai',
     inputs: 1, outputs: 1,
     configFields: [
-      { key: 'source', label: 'Source de données', type: 'select', options: ['Calendar', 'PDF', 'XLS', 'None'], default: 'None' },
+      { key: 'twilioPort', label: 'Port Webhook Twilio', type: 'number', default: 9090 },
+      { key: 'twilioPath', label: 'Chemin Webhook Twilio', type: 'text', default: '/twilio-voice' },
+      { key: 'files', label: 'Fichiers Sources (Glissez-déposez)', type: 'fileList', default: [] },
       { key: 'provider', label: 'Fournisseur', type: 'select', options: ['openai', 'ollama'], default: 'openai' },
       { key: 'model', label: 'Modèle', type: 'text', default: 'gpt-4o' },
-      { key: 'voice', label: 'Voix', type: 'select', options: ['Alloy', 'Echo', 'Fable', 'Onyx', 'Nova', 'Shimmer'], default: 'Alloy' },
+      { key: 'voice', label: 'Voix', type: 'select', options: ['Alice', 'Polly.Celine', 'Polly.Mathieu', 'Polly.Lea'], default: 'Polly.Celine' },
       { key: 'systemPrompt', label: 'Prompt Système', type: 'textarea', default: 'Tu es un assistant vocal téléphonique poli et concis.' },
-      { key: 'userPrompt', label: 'Prompt Utilisateur (Transcription)', type: 'textarea', default: 'Bonjour, je voudrais prendre un rendez-vous mardi s\'il vous plaît.' },
+      { key: 'userPrompt', label: 'Prompt Utilisateur (Simulation)', type: 'textarea', default: 'Bonjour, je voudrais prendre un rendez-vous mardi s\'il vous plaît.' },
       { key: 'logPath', label: 'Chemin du fichier de Log', type: 'text', default: 'C:\\Users\\Arthur\\Desktop\\appel_log.txt' }
     ],
     outputFields: [
-      { key: 'response', label: 'Réponse Vocale' },
-      { key: 'latencyMs', label: 'Latence (ms)' },
-      { key: 'appointmentBooked', label: 'Rendez-vous créé' },
-      { key: 'appointmentDate', label: 'Date du rendez-vous' },
-      { key: 'transcript', label: 'Transcription de l\'appel' }
+      { key: 'transcript', label: 'Transcription de l\'appel' },
+      { key: 'result', label: 'Résultat / Conséquence' }
     ],
     help: {
-      description: 'Simule un agent vocal intelligent répondant au téléphone en moins de 500ms.',
-      example: 'Prompt Utilisateur: Je souhaite prendre rendez-vous pour demain.',
-      tip: 'Si la source est Calendar et qu\'un rendez-vous est demandé, l\'agent insère automatiquement l\'événement.'
+      description: 'Démarre un serveur webhook Twilio pour répondre en temps réel à des appels de vrais numéros de téléphone.',
+      example: 'Port: 9090, Chemin: /twilio-voice → Configurez Twilio pour envoyer ses webhooks vers http://<votre_ip_publique>:9090/twilio-voice',
+      tip: 'Utilisez un outil comme ngrok pour exposer votre port local 9090 publiquement. L\'IA répondra en parlant et transcrira l\'appel.'
     }
   },
   {

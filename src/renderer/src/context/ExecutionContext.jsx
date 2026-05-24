@@ -88,24 +88,27 @@ function parseIntervalToMs(intervalStr) {
   
   const trimmed = intervalStr.trim();
   if (trimmed.split(/\s+/).length === 5) {
-    return getMsUntilNextCron(trimmed);
+    return Math.max(1000, getMsUntilNextCron(trimmed));
   }
   
   const match = trimmed.match(/^(\d+)\s*([smhd]?)$/i);
   if (match) {
     const value = parseInt(match[1], 10);
     const unit = (match[2] || 's').toLowerCase();
+    let ms = 1000;
     switch (unit) {
-      case 's': return value * 1000;
-      case 'm': return value * 60 * 1000;
-      case 'h': return value * 60 * 60 * 1000;
-      case 'd': return value * 24 * 60 * 60 * 1000;
-      default: return value * 1000;
+      case 's': ms = value * 1000; break;
+      case 'm': ms = value * 60 * 1000; break;
+      case 'h': ms = value * 60 * 60 * 1000; break;
+      case 'd': ms = value * 24 * 60 * 60 * 1000; break;
+      default: ms = value * 1000; break;
     }
+    return Math.max(1000, ms);
   }
   
   const parsed = parseInt(trimmed, 10);
-  return isNaN(parsed) ? 60 * 1000 : parsed * 1000;
+  if (isNaN(parsed) || parsed <= 0) return 60 * 1000;
+  return Math.max(1000, parsed * 1000);
 }
 
 export function ExecutionProvider({ children }) {

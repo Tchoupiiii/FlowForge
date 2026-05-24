@@ -3,7 +3,7 @@ import { Handle, Position } from 'reactflow'
 import { Loader2 } from 'lucide-react'
 import { ICON_MAP, getModuleByType } from '../data/moduleDefinitions'
 
-function CustomNode({ data, selected }) {
+function CustomNode({ id, data, selected }) {
   const IconComp = ICON_MAP[data.icon]
   const statusClass = data.status || 'idle'
   const moduleDef = getModuleByType(data.type) || {}
@@ -95,11 +95,36 @@ function CustomNode({ data, selected }) {
 
   const isPhoneAgent = data.type === 'phoneAgent'
   const customStyle = isPhoneAgent 
-    ? { minWidth: '300px', maxWidth: '340px', minHeight: '160px', paddingBottom: '10px' } 
+    ? { minWidth: '180px', maxWidth: '210px', minHeight: '85px', paddingBottom: '6px' } 
     : {}
 
+  const handleDrop = (e) => {
+    if (isPhoneAgent) {
+      e.preventDefault()
+      e.stopPropagation()
+      const files = Array.from(e.dataTransfer.files)
+      const newPaths = files.map(f => f.path).filter(Boolean)
+      if (newPaths.length > 0 && data.updateConfig) {
+        const currentFiles = data.config?.files || []
+        data.updateConfig({ files: [...currentFiles, ...newPaths] })
+      }
+    }
+  }
+
+  const handleDragOver = (e) => {
+    if (isPhoneAgent) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
+
   return (
-    <div className={`custom-node ${statusClass} ${selected ? 'selected' : ''}`} style={customStyle}>
+    <div 
+      className={`custom-node ${statusClass} ${selected ? 'selected' : ''}`} 
+      style={customStyle}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       {/* Target (Input) Handles */}
       {inputsCount > 0 && (
         <div className="custom-handles-target">
@@ -171,9 +196,42 @@ function CustomNode({ data, selected }) {
         )}
       </div>
 
-      {configSummary && (
+      {configSummary && !isPhoneAgent && (
         <div className="custom-node-body">
           <span className="custom-node-summary">{renderSummary(configSummary)}</span>
+        </div>
+      )}
+
+      {isPhoneAgent && (
+        <div className="custom-node-body" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center', width: '100%' }}>
+          <button 
+            className="nodrag nopan"
+            onClick={(e) => {
+              e.stopPropagation()
+              window.dispatchEvent(new CustomEvent('open-call-simulator', {
+                detail: { nodeId: id, label: data.label, config: data.config }
+              }))
+            }}
+            style={{
+              background: '#10b981',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '6px 12px',
+              fontSize: '11px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              width: '90%',
+              boxShadow: '0 2px 6px rgba(16, 185, 129, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            📞 Simuler l'appel
+          </button>
         </div>
       )}
 

@@ -3,6 +3,7 @@ import { join } from 'path'
 import { autoUpdater } from 'electron-updater'
 import { ExecutionEngine } from './executionEngine.js'
 import * as storage from './storage.js'
+import { getModuleExecutor } from './modules/index.js'
 
 const isDev = !app.isPackaged
 
@@ -199,6 +200,17 @@ ipcMain.handle('workflow:execute', async (_event, workflow) => {
       }
     })
     return result
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('module:execute', async (_event, type, config, inputData) => {
+  try {
+    const executor = getModuleExecutor(type)
+    if (!executor) throw new Error(`Executor not found for "${type}"`)
+    const result = await executor(config, inputData)
+    return { success: true, ...result }
   } catch (error) {
     return { success: false, error: error.message }
   }

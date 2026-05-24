@@ -16,7 +16,7 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
     nodes, edges, onNodesChange, onEdgesChange, onConnect,
     addNode, duplicateNode, reactFlowWrapper, renameNode,
     undo, redo, copySelection, pasteSelection, takeSnapshot,
-    activeTabId
+    activeTabId, updateNodeConfig
   } = useWorkflow()
   const reactFlowInstance = useRef(null)
 
@@ -28,16 +28,17 @@ export default function Canvas({ onNodeSelect, onContextMenu }) {
     }
   }, [activeTabId])
 
-  // Inject onRename callback into each node's data
+  // Inject callbacks into each node's data
   const augmentedNodes = useMemo(() => {
     return nodes.map(n => ({
       ...n,
       data: {
         ...n.data,
-        onRename: (newLabel) => renameNode(n.id, newLabel)
+        onRename: (newLabel) => renameNode(n.id, newLabel),
+        updateConfig: (config) => updateNodeConfig(n.id, config)
       }
     }))
-  }, [nodes, renameNode])
+  }, [nodes, renameNode, updateNodeConfig])
 
   const onDrop = useCallback((e) => {
     e.preventDefault()

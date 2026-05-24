@@ -26,6 +26,14 @@ export async function execute(config, inputData) {
     const response = await fetch(url)
 
     if (!response.ok) {
+      if (response.status === 409) {
+        // Sleep 2 seconds to avoid fast spinning
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        return {
+          _skipped: true,
+          message: 'Telegram API 409 Conflict (Conflict: terminated by other getUpdates request). Passé.'
+        }
+      }
       const err = await response.json().catch(() => ({}))
       return {
         success: false,
