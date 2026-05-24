@@ -23,7 +23,8 @@ export default {
     try {
       // Create a function with inputData as the argument
       // The user code should return a value
-      const fn = new Function(
+      const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+      const fn = new AsyncFunction(
         'input',
         'console',
         `

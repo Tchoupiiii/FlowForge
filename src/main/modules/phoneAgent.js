@@ -86,6 +86,44 @@ async function runAiDialogue(config, inputData, userQuery, chatHistory) {
     inputData.events.forEach(e => liveEvents.push(e))
   }
 
+  // Fetch true Google Calendar iCal if configured
+  if (config.icalUrl) {
+    try {
+      const res = await fetch(config.icalUrl)
+      if (res.ok) {
+        const text = await res.text()
+        const events = text.split('BEGIN:VEVENT')
+        events.shift() // Enlever l'entête
+        events.forEach(evBlock => {
+          const summaryMatch = evBlock.match(/SUMMARY:(.*)/)
+          const dtstartMatch = evBlock.match(/DTSTART(?:[^:]*):([0-9TZ]+)/)
+          if (summaryMatch && dtstartMatch) {
+            let dateStr = dtstartMatch[1]
+            let d
+            if (dateStr.length === 8) { // YYYYMMDD
+              d = new Date(dateStr.slice(0,4) + '-' + dateStr.slice(4,6) + '-' + dateStr.slice(6,8))
+            } else {
+              // Format YYYYMMDDTHHMMSSZ
+              d = new Date(dateStr.slice(0,4) + '-' + dateStr.slice(4,6) + '-' + dateStr.slice(6,8) + 'T' + dateStr.slice(9,11) + ':' + dateStr.slice(11,13) + ':' + dateStr.slice(13,15) + 'Z')
+            }
+            if (d.getTime() > Date.now() - 86400000) { // Ne garder que les événements futurs ou très récents
+              liveEvents.push({
+                id: 'ical-' + Math.random().toString(36),
+                summary: summaryMatch[1].trim(),
+                date: d.toISOString()
+              })
+            }
+          }
+        })
+      }
+    } catch (err) {
+      console.error("Erreur téléchargement iCal:", err)
+    }
+  }
+
+  // Sort events chronologically to give better context to LLM
+  liveEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
   const formattedEvents = liveEvents.map(e => {
     const d = new Date(e.date)
     return `- ${e.summary} le ${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
@@ -501,8 +539,21 @@ export async function execute(config, inputData) {
       })
     })
 
-    server.listen(port, () => {
+    server.listen(port, async () => {
       console.log(`Persistent Twilio Webhook Server started on port ${port} at path ${pathPrefix}`)
+      try {
+        const localtunnel = require('localtunnel');
+        const tunnel = await localtunnel({ port, subdomain: 'flowforge-ai-agent' });
+        console.log(`Tunnel ouvert sur : ${tunnel.url}`);
+        
+        // Notify user via console log or store it in activeServers context
+        if (activeServers.has(port)) {
+          const entry = activeServers.get(port);
+          entry.publicUrl = tunnel.url;
+        }
+      } catch (err) {
+        console.error("Localtunnel error:", err);
+      }
     })
 
     activeServers.set(port, {

@@ -20,9 +20,16 @@ function getNestedValue(data, key) {
   
   const parts = cleanKey.replace(/\[(\d+)\]/g, '.$1').split('.')
   let value = data
-  for (const part of parts) {
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i]
     if (value === null || value === undefined) return undefined
-    value = getCaseInsensitive(value, part)
+    
+    let nextValue = getCaseInsensitive(value, part)
+    // If not found and we are at the root level, try looking inside 'item' (useful for loops)
+    if (nextValue === undefined && i === 0 && value.item && typeof value.item === 'object') {
+      nextValue = getCaseInsensitive(value.item, part)
+    }
+    value = nextValue
   }
   return value
 }

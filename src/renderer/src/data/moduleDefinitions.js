@@ -683,7 +683,8 @@ export const MODULE_DEFINITIONS = [
       { key: 'voice', label: 'Voix', type: 'select', options: ['Alice', 'Polly.Celine', 'Polly.Mathieu', 'Polly.Lea'], default: 'Polly.Celine' },
       { key: 'systemPrompt', label: 'Prompt Système', type: 'textarea', default: 'Tu es un assistant vocal téléphonique poli et concis.' },
       { key: 'userPrompt', label: 'Prompt Utilisateur (Simulation)', type: 'textarea', default: 'Bonjour, je voudrais prendre un rendez-vous mardi s\'il vous plaît.' },
-      { key: 'logPath', label: 'Chemin du fichier de Log', type: 'text', default: 'C:\\Users\\Arthur\\Desktop\\appel_log.txt' }
+      { key: 'logPath', label: 'Chemin Fichier de Log', type: 'text', default: 'C:/Users/Arthur/Desktop/n8n/appels_recus.txt' },
+      { key: 'icalUrl', label: 'Lien Google Calendar (iCal/ICS) - Optionnel', type: 'text', default: '' }
     ],
     outputFields: [
       { key: 'transcript', label: 'Transcription de l\'appel' },
