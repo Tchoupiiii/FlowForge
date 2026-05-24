@@ -90,6 +90,20 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
             </div>
           )
         }
+        if (field.key === 'model' && providerField && config['provider'] === 'openai') {
+          return (
+            <select
+              className="config-select"
+              value={value || 'gpt-4o'}
+              onChange={(e) => handleChange(field.key, e.target.value)}
+            >
+              <option value="gpt-4o">GPT-4o</option>
+              <option value="gpt-4o-mini">GPT-4o Mini</option>
+              <option value="o1-mini">o1 Mini</option>
+              <option value="gpt-4-turbo">GPT-4 Turbo</option>
+            </select>
+          )
+        }
         return (
           <input
             type={field.type}
