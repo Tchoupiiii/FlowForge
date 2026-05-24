@@ -330,9 +330,6 @@ function AppContent() {
       }
     }
   }, [])
-
-  const { addNode, nodes, setNodes, setEdges, activeTabId } = useWorkflow()
-
   // Reset selected node when switching tabs
   useEffect(() => {
     setSelectedNodeId(null)
