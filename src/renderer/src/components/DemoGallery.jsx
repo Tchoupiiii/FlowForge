@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout, Repeat, Phone, Play, Image, Database, Send, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Cloud, FileJson, MessageSquare, Activity, MapPin, BarChart, Bitcoin, Rss, Github, Heart, LineChart, Calendar, Terminal, Layout, Repeat, Phone, Play, Image, Database, Send, AlertTriangle, Globe } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 
 import { DEMOS as RAW_DEMOS } from '../demos'
