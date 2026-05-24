@@ -64,7 +64,7 @@ export default function CopilotPanel({ onClose }) {
           if (data.success) {
             const models = data.models?.map(m => m.name) || []
             setOllamaModels(models)
-            if (models.length > 0 && !model) {
+            if (models.length > 0 && (!model || !models.includes(model))) {
               setModel(models[0])
             }
           }
@@ -73,8 +73,10 @@ export default function CopilotPanel({ onClose }) {
           setError("Impossible de contacter Ollama.")
         })
       }
-    } else {
-      setModel('gpt-4o')
+    } else if (provider === 'openai') {
+      if (!model || !model.startsWith('gpt') && !model.startsWith('o1')) setModel('gpt-4o')
+    } else if (provider === 'anthropic') {
+      if (!model || !model.startsWith('claude')) setModel('claude-3-5-sonnet-20241022')
     }
   }, [provider])
 
