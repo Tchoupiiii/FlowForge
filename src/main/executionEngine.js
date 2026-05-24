@@ -240,7 +240,8 @@ export class ExecutionEngine {
               for (let idx = 0; idx < result.items.length; idx++) {
                 if (this.shouldStop) break
                 const item = result.items[idx]
-                results[nodeId] = { ...inputData, item: item, index: idx, success: true }
+                const itemProps = (item && typeof item === 'object') ? item : { value: item }
+                results[nodeId] = { ...inputData, ...itemProps, item: item, index: idx, success: true }
                 onProgress(nodeId, 'running', { message: `Itération ${idx + 1}/${result.items.length}...` })
                 await runSequence(remainingNodes)
               }

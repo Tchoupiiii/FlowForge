@@ -1,6 +1,6 @@
 {
   "name": "flowforge",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "description": "Un clone open-source de n8n avec une belle interface.",
   "main": "./out/main/index.js",
   "author": "FlowForge",
