@@ -8,6 +8,15 @@ function getMsUntilNextTimer(config) {
   const { repetition = 'daily', hour = 15, minute = 0 } = config;
   const now = new Date();
   
+  if (repetition === 'interval') {
+    const val = parseInt(config.intervalValue, 10) || 30;
+    const unit = config.intervalUnit || 'seconds';
+    let ms = val * 1000;
+    if (unit === 'minutes') ms *= 60;
+    if (unit === 'hours') ms *= 3600;
+    return ms;
+  }
+  
   if (repetition === 'every_minute') {
     const next = new Date(now.getTime());
     next.setSeconds(0);

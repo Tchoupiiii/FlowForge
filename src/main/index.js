@@ -245,7 +245,10 @@ ipcMain.handle('ollama:generate', async (_event, prompt, model, options = {}) =>
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     }))
-    if (!res.ok) return { success: false, error: 'Ollama API error' }
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '')
+      return { success: false, error: `Ollama API error ${res.status}: ${errText}` }
+    }
     const data = await res.json()
     return { success: true, response: data.response }
   } catch (error) {

@@ -29,7 +29,9 @@ export const MODULE_DEFINITIONS = [
     type: 'timerCron', label: 'Timer / Cron', icon: 'Clock', color: '#f59e0b', category: 'trigger',
     inputs: 0, outputs: 1,
     configFields: [
-      { key: 'repetition', label: 'Répétition', type: 'select', options: ['every_minute', 'hourly', 'daily'], default: 'daily' },
+      { key: 'repetition', label: 'Répétition', type: 'select', options: ['interval', 'every_minute', 'hourly', 'daily'], default: 'interval' },
+      { key: 'intervalValue', label: 'Valeur d\'intervalle', type: 'number', default: 30, showIf: (c) => c.repetition === 'interval' },
+      { key: 'intervalUnit', label: 'Unité d\'intervalle', type: 'select', options: ['seconds', 'minutes', 'hours'], default: 'seconds', showIf: (c) => c.repetition === 'interval' },
       { key: 'hour', label: 'Heure (0-23)', type: 'number', default: 15, showIf: (c) => c.repetition === 'daily' },
       { key: 'minute', label: 'Minute (0-59)', type: 'number', default: 0, showIf: (c) => c.repetition === 'daily' || c.repetition === 'hourly' }
     ],
