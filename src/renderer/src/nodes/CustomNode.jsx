@@ -10,7 +10,7 @@ function CustomNode({ id, data, selected }) {
   const inputsCount = data.inputs !== undefined ? data.inputs : (moduleDef.inputs || 0)
   const outputsCount = data.outputs !== undefined ? data.outputs : (moduleDef.outputs || 0)
   
-  const excludedKeys = ['token', 'apikey', 'bottoken', 'chatid', 'password', 'webhookurl']
+  const excludedKeys = ['token', 'apikey', 'bottoken', 'password', 'webhookurl']
   const configFields = (moduleDef.configFields || []).filter(f => !excludedKeys.some(k => f.key.toLowerCase().includes(k)))
   const outputFields = moduleDef.outputFields || []
   

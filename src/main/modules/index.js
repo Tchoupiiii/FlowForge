@@ -48,6 +48,7 @@ import * as pdfParser from './pdfParser.js'
 import * as phoneAgent from './phoneAgent.js'
 import * as tts from './tts.js'
 import * as twilioTrigger from './twilioTrigger.js'
+import * as setVariables from './setVariables.js'
 
 const modules = {
   phoneAgent,
@@ -96,10 +97,9 @@ const modules = {
   stringManipulation,
   trelloCard,
   githubCreateIssue,
-  openAiChat,
-  anthropicClaude,
   loopForEach,
-  twilioTrigger
+  twilioTrigger,
+  setVariables
 }
 
 export function getModule(type) {

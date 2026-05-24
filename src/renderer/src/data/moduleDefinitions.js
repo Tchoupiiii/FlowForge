@@ -65,6 +65,8 @@ export const MODULE_DEFINITIONS = [
     type: 'twilioTrigger', label: 'Appel Entrant (Twilio)', icon: 'Phone', color: '#10b981', category: 'trigger',
     inputs: 0, outputs: 1,
     configFields: [
+      { key: 'accountSid', label: 'Account SID', type: 'text', default: '' },
+      { key: 'authToken', label: 'Auth Token', type: 'password', default: '' },
       { key: 'mockFrom', label: 'Numéro Appelant (Simulation)', type: 'text', default: '+33612345678' }
     ],
     outputFields: [
@@ -105,6 +107,19 @@ export const MODULE_DEFINITIONS = [
       description: 'Dirige le flux selon une condition. Sortie 1 = Vrai, Sortie 2 = Faux.',
       example: 'Champ: data.temperature, Opérateur: >, Valeur: 30',
       tip: 'Les deux branches peuvent être connectées à des nœuds différents.'
+    }
+  },
+  {
+    type: 'setVariables', label: 'Déclarer Variables', icon: 'Hash', color: '#6366f1', category: 'core',
+    inputs: 1, outputs: 1,
+    configFields: [
+      { key: 'variables', label: 'Variables (JSON)', type: 'textarea', default: '{\n  "maVariable": "valeur",\n  "prixFixe": 100\n}' }
+    ],
+    outputFields: [{ key: 'variables', label: 'Variables déclarées' }],
+    help: {
+      description: 'Déclare des variables (statiques ou dynamiques) qui seront injectées dans le flux de données pour les nœuds suivants.',
+      example: '{"nomClient": "Dupont", "total": "{{input.prix * 2}}"}',
+      tip: 'Très utile pour préparer des données avant un appel API ou un envoi de message.'
     }
   },
   {
@@ -581,36 +596,7 @@ export const MODULE_DEFINITIONS = [
       tip: 'Pour Ollama (gratuit, local), installez Ollama et utilisez le modèle llama3.'
     }
   },
-  {
-    type: 'openAiChat', label: 'ChatGPT', icon: 'MessageCircleQuestion', color: '#10a37f', category: 'ai',
-    inputs: 1, outputs: 1,
-    configFields: [
-      { key: 'apiKey', label: 'Clé API', type: 'password', default: '' },
-      { key: 'model', label: 'Modèle', type: 'text', default: 'gpt-4o' },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', default: 'Bonjour' }
-    ],
-    outputFields: [{ key: 'message', label: 'Message IA' }],
-    help: {
-      description: 'Envoie une requête directement à l\'API cloud OpenAI.',
-      example: 'Prompt: Donne-moi une blague.',
-      tip: 'Si vous avez configuré Ollama, préférez le module Agent IA.'
-    }
-  },
-  {
-    type: 'anthropicClaude', label: 'Claude (Anthropic)', icon: 'Bot', color: '#d97757', category: 'ai',
-    inputs: 1, outputs: 1,
-    configFields: [
-      { key: 'apiKey', label: 'Clé API', type: 'password', default: '' },
-      { key: 'model', label: 'Modèle', type: 'text', default: 'claude-3-opus-20240229' },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', default: 'Bonjour' }
-    ],
-    outputFields: [{ key: 'result', label: 'Résultat' }],
-    help: {
-      description: 'Envoie une requête à l\'API Anthropic Claude.',
-      example: 'Prompt: Explique la physique quantique.',
-      tip: 'Claude est excellent pour l\'analyse de très grands textes.'
-    }
-  },
+
   {
     type: 'aiTextAnalyzer', label: 'Analyseur Texte IA', icon: 'Brain', color: '#a78bfa', category: 'ai',
     inputs: 1, outputs: 1,

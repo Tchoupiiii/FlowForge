@@ -433,6 +433,12 @@ INSTRUCTIONS :
             {loading ? <span className="toolbar-status-dot running" /> : <Send size={16} />}
             <span>{loading ? 'Génération en cours...' : 'Générer le Workflow'}</span>
           </button>
+          
+          {loading && (
+            <div style={{ marginTop: '12px', width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: '100%', background: 'var(--accent)', animation: 'progress-indeterminate 1.5s infinite linear', transformOrigin: '0% 50%' }} />
+            </div>
+          )}
         </div>
 
         {error && (
