@@ -1,7 +1,8 @@
 export const demoYoutubeTranscript = {
   id: 'demo-youtube',
-  title: 'Analyse Vidéo YouTube',
-  description: 'Extrait les sous-titres d\'une vidéo YouTube et demande à l\'IA de générer un post Twitter.',
+  name: 'Sous-titres & Post Twitter',
+  description: 'Récupère les sous-titres complets d\'une vidéo YouTube, utilise l\'IA pour rédiger un post promotionnel attractif et l\'envoie sur un canal Slack ou Discord.',
+  tags: ['Réseaux Sociaux', 'YouTube', 'IA', 'Discord'],
   nodes: [
     {
       id: 'trigger-1',
@@ -53,8 +54,8 @@ export const demoYoutubeTranscript = {
     }
   ],
   edges: [
-    { id: 'e1', source: 'trigger-1', target: 'yt-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e2', source: 'yt-1', target: 'ai-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e3', source: 'ai-1', target: 'discord-1', sourceHandle: 'a', targetHandle: 'a' }
+    { id: 'e1', source: 'trigger-1', target: 'yt-1', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
+    { id: 'e2', source: 'yt-1', target: 'ai-1', sourceHandle: 'transcript', targetHandle: 'userPrompt', animated: true, style: { stroke: '#ef4444', strokeWidth: 2 } },
+    { id: 'e3', source: 'ai-1', target: 'discord-1', sourceHandle: 'response', targetHandle: 'content', animated: true, style: { stroke: '#818cf8', strokeWidth: 2 } }
   ]
 }

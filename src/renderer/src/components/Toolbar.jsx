@@ -1,12 +1,11 @@
 import React from 'react'
-import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings, Bell, Download, Upload, Terminal } from 'lucide-react'
+import { Play, Square, Save, FolderOpen, Layout, Trash2, BookOpen, Sparkles, Settings, Bell, Download, Upload, Terminal, RefreshCw } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { useExecution } from '../context/ExecutionContext'
 import { useToast } from './ToastProvider'
-import ThemeToggle from './ThemeToggle'
 
 export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide, onShowSettings, onShowWorkflows, onShowNotifications, hasUnreadNotifications }) {
-  const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas, loadDemoWorkflow } = useWorkflow()
+  const { workflowName, setWorkflowName, nodes, edges, saveWorkflow, clearCanvas, loadDemoWorkflow, reorganizeLayout } = useWorkflow()
   const { isRunning, execute, stop } = useExecution()
   const toast = useToast()
 
@@ -60,6 +59,10 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
           <Save size={18} />
         </button>
 
+        <button className="toolbar-btn" onClick={reorganizeLayout} title="Réorganiser le workflow">
+          <RefreshCw size={18} />
+        </button>
+
         <div className="toolbar-divider" />
 
         <button className="toolbar-btn" onClick={onShowDemos} title="Démos">
@@ -108,8 +111,6 @@ export default function Toolbar({ onShowDemos, onToggleLog, showLog, onShowGuide
             }} />
           )}
         </button>
-        
-        <ThemeToggle />
       </div>
     </div>
   )

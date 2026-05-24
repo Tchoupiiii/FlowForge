@@ -1,7 +1,8 @@
 export const demoTelegramNotion = {
   id: 'demo-telegram-notion',
-  title: 'Telegram -> Notion Task',
-  description: 'Écoutez un bot Telegram, analysez le message avec l\'IA pour extraire la tâche, et ajoutez-la à Notion.',
+  name: 'Bot Telegram vers Notion',
+  description: 'Écoute les messages d\'un Bot Telegram, en extrait la tâche principale via l\'IA, l\'ajoute dans une base de données Notion, puis renvoie une confirmation de création par message Telegram.',
+  tags: ['Telegram', 'Notion', 'IA', 'Productivité'],
   nodes: [
     {
       id: 'trigger-1',
@@ -56,15 +57,16 @@ export const demoTelegramNotion = {
         color: '#38bdf8',
         config: {
           botToken: '',
-          chatId: '{{chatId}}',
-          text: '✅ Tâche ajoutée à Notion : {{response}}'
+          chatId: '{{chatid}}',
+          message: '✅ Tâche ajoutée à Notion : {{response}}'
         }
       }
     }
   ],
   edges: [
-    { id: 'e1', source: 'trigger-1', target: 'ai-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e2', source: 'ai-1', target: 'notion-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e3', source: 'notion-1', target: 'telegram-2', sourceHandle: 'a', targetHandle: 'a' }
+    { id: 'e1', source: 'trigger-1', target: 'ai-1', sourceHandle: 'text', targetHandle: 'userPrompt', animated: true, style: { stroke: '#38bdf8', strokeWidth: 2 } },
+    { id: 'e2', source: 'ai-1', target: 'notion-1', sourceHandle: 'response', targetHandle: 'title', animated: true, style: { stroke: '#818cf8', strokeWidth: 2 } },
+    { id: 'e3', source: 'notion-1', target: 'telegram-2', sourceHandle: 'result', targetHandle: 'message', animated: true, style: { stroke: '#000000', strokeWidth: 2 } },
+    { id: 'e1-4', source: 'trigger-1', target: 'telegram-2', sourceHandle: 'chatid', targetHandle: 'chatId', animated: true, style: { stroke: '#38bdf8', strokeWidth: 2 } }
   ]
 }

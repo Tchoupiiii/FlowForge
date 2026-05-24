@@ -117,8 +117,20 @@ export function WorkflowProvider({ children }) {
     if (params.targetHandle && params.sourceHandle && params.targetHandle !== 'a' && params.sourceHandle !== 'a') {
       setNodes(nds => nds.map(n => {
         if (n.id === params.target) {
+          // Compter les connexions existantes sur le même port de départ
+          const existingSameHandleEdges = edges.filter(e => 
+            e.target === params.target && 
+            e.sourceHandle === params.sourceHandle &&
+            e.source !== params.source
+          )
+          
+          let handleName = params.sourceHandle
+          if (existingSameHandleEdges.length > 0) {
+            handleName = `${params.sourceHandle}_${existingSameHandleEdges.length + 1}`
+          }
+
           const currentVal = n.data.config?.[params.targetHandle] || ''
-          const injection = `{{${params.sourceHandle}}}`
+          const injection = `{{${handleName}}}`
           // Eviter de l'ajouter si déjà présent
           const newVal = String(currentVal).includes(injection) 
             ? currentVal 
@@ -142,7 +154,7 @@ export function WorkflowProvider({ children }) {
       animated: true,
       style: { stroke: 'var(--accent)', strokeWidth: 2 }
     }, eds))
-  }, [setEdges, setNodes])
+  }, [setEdges, setNodes, edges])
 
   const addNode = useCallback((type, position) => {
     const moduleDef = getModuleByType(type)
@@ -431,6 +443,98 @@ export function WorkflowProvider({ children }) {
     setEdges(eds => eds.map(e => ({ ...e, selected: false })).concat(newEdges))
   }, [clipboard, takeSnapshot, setNodes, setEdges])
 
+  const reorganizeLayout = useCallback(() => {
+    if (nodes.length === 0) return
+
+    // Identify all nodes and build adjacency list
+    const nodeMap = {}
+    nodes.forEach(n => {
+      nodeMap[n.id] = {
+        node: n,
+        incoming: [],
+        outgoing: []
+      }
+    })
+
+    edges.forEach(e => {
+      if (nodeMap[e.source] && nodeMap[e.target]) {
+        nodeMap[e.source].outgoing.push(e.target)
+        nodeMap[e.target].incoming.push(e.source)
+      }
+    })
+
+    // Find roots (nodes with no incoming edges)
+    let roots = Object.keys(nodeMap).filter(id => nodeMap[id].incoming.length === 0)
+    if (roots.length === 0 && nodes.length > 0) {
+      roots = [nodes[0].id]
+    }
+
+    // Determine the rank (column) of each node using BFS
+    const ranks = {}
+    const queue = []
+
+    roots.forEach(rId => {
+      ranks[rId] = 0
+      queue.push(rId)
+    })
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()
+      const currentRank = ranks[currentId]
+
+      if (nodeMap[currentId]) {
+        nodeMap[currentId].outgoing.forEach(neighborId => {
+          const nextRank = currentRank + 1
+          if (ranks[neighborId] === undefined || nextRank > ranks[neighborId]) {
+            ranks[neighborId] = nextRank
+            queue.push(neighborId)
+          }
+        })
+      }
+    }
+
+    // Handle any nodes that were not reached (isolated components)
+    nodes.forEach(n => {
+      if (ranks[n.id] === undefined) {
+        ranks[n.id] = 0
+      }
+    })
+
+    // Group nodes by rank
+    const rankGroups = {}
+    Object.keys(ranks).forEach(id => {
+      const r = ranks[id]
+      if (!rankGroups[r]) {
+        rankGroups[r] = []
+      }
+      rankGroups[r].push(id)
+    })
+
+    // Calculate new positions
+    const nodeWidthSpace = 380
+    const nodeHeightSpace = 250
+
+    const updatedNodes = nodes.map(n => {
+      const rank = ranks[n.id] || 0
+      const group = rankGroups[rank] || [n.id]
+      const idx = group.indexOf(n.id)
+
+      const groupHeight = (group.length - 1) * nodeHeightSpace
+      const yPos = 150 + idx * nodeHeightSpace - (groupHeight / 2) + 150
+
+      return {
+        ...n,
+        position: {
+          x: 100 + rank * nodeWidthSpace,
+          y: Math.max(50, yPos)
+        }
+      }
+    })
+
+    takeSnapshot()
+    setNodes(updatedNodes)
+  }, [nodes, edges, setNodes, takeSnapshot])
+
   const value = {
     nodes, setNodes, onNodesChange,
     edges, setEdges, onEdgesChange,
@@ -442,7 +546,7 @@ export function WorkflowProvider({ children }) {
     loadDemoWorkflow, clearCanvas,
     onConnect, addNode, duplicateNode, renameNode,
     updateNodeConfig, updateNodeStatus, resetAllStatus, modulePreferences, reactFlowWrapper,
-    undo, redo, takeSnapshot, copySelection, pasteSelection
+    undo, redo, takeSnapshot, copySelection, pasteSelection, reorganizeLayout
   }
 
   return (

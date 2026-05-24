@@ -646,7 +646,8 @@ export const MODULE_DEFINITIONS = [
       { key: 'response', label: 'Réponse Vocale' },
       { key: 'latencyMs', label: 'Latence (ms)' },
       { key: 'appointmentBooked', label: 'Rendez-vous créé' },
-      { key: 'appointmentDate', label: 'Date du rendez-vous' }
+      { key: 'appointmentDate', label: 'Date du rendez-vous' },
+      { key: 'transcript', label: 'Transcription de l\'appel' }
     ],
     help: {
       description: 'Simule un agent vocal intelligent répondant au téléphone en moins de 500ms.',
@@ -668,7 +669,7 @@ export const MODULE_DEFINITIONS = [
     help: {
       description: 'Génère un fichier audio parlé à partir d\'un texte.',
       example: 'Texte: Votre rendez-vous est confirmé pour demain.',
-      tip: 'Génère une URL audio Google Translate TTS prête à être lue.'
+      tip: 'Générez une URL audio Google Translate TTS prête à être lue.'
     }
   },
   // ──── Map ────
@@ -678,7 +679,8 @@ export const MODULE_DEFINITIONS = [
     configFields: [
       { key: 'query', label: 'Recherche', type: 'text', default: 'boulangerie' },
       { key: 'location', label: 'Ville ou adresse', type: 'text', default: 'Paris' },
-      { key: 'radius', label: 'Rayon (km)', type: 'number', default: 5 }
+      { key: 'radius', label: 'Rayon (km)', type: 'number', default: 5 },
+      { key: 'limit', label: 'Limite de résultats (0 = max)', type: 'number', default: 10 }
     ],
     outputFields: [{ key: 'result', label: 'Résultat' }],
     help: {

@@ -215,33 +215,6 @@ export default function ConfigPanel({ node, onShowHelp, onClose }) {
             </div>
           </details>
         )}
-
-        <details className="config-variables-section" style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--glass-border)' }}>
-          <summary style={{ fontSize: '11.5px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px', cursor: 'pointer', userSelect: 'none' }}>Variables Dynamiques</summary>
-          <div style={{ marginTop: '10px' }}>
-            <p style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '8px', lineHeight: '1.5' }}>
-              Vous pouvez injecter les données des nœuds précédents (parents) dans n'importe quel champ de texte en utilisant les doubles accolades <code style={{background: 'var(--bg-surface-2)', padding: '2px 4px', borderRadius: '4px'}}>{"{{variable}}"}</code>.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-2)', padding: '6px 10px', borderRadius: '4px' }}>
-                <code style={{ fontSize: '11.5px', color: 'var(--accent)' }}>{"{{price}}"}</code>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Bourse (Finance)</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-2)', padding: '6px 10px', borderRadius: '4px' }}>
-                <code style={{ fontSize: '11.5px', color: 'var(--accent)' }}>{"{{text}}"}</code>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Lire un Fichier / Extraction web</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-2)', padding: '6px 10px', borderRadius: '4px' }}>
-                <code style={{ fontSize: '11.5px', color: 'var(--accent)' }}>{"{{content}}"}</code>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Requête HTTP</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-2)', padding: '6px 10px', borderRadius: '4px' }}>
-                <code style={{ fontSize: '11.5px', color: 'var(--accent)' }}>{"{{message}}"}</code>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Ollama / OpenAI</span>
-              </div>
-            </div>
-          </div>
-        </details>
       </div>
     </div>
   )

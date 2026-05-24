@@ -73,11 +73,13 @@ async function callOpenAI(config, params) {
 
   const data = await response.json()
   const choice = data.choices?.[0]
+  const content = choice?.message?.content || ''
 
   return {
     provider: 'openai',
     model: params.model,
-    response: choice?.message?.content || '',
+    response: content,
+    result: content,
     finishReason: choice?.finish_reason || 'unknown',
     usage: data.usage || {},
     timestamp: Date.now()
@@ -110,11 +112,13 @@ async function callOllama(config, params) {
   }
 
   const data = await response.json()
+  const content = data.response || ''
 
   return {
     provider: 'ollama',
     model: params.model,
-    response: data.response || '',
+    response: content,
+    result: content,
     done: data.done,
     totalDuration: data.total_duration,
     evalCount: data.eval_count,

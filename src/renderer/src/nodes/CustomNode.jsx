@@ -55,6 +55,10 @@ function CustomNode({ data, selected }) {
       configSummary = data.config.url
     } else if (data.type === 'aiAgent' && data.config.userPrompt) {
       configSummary = data.config.userPrompt.substring(0, 40) + '...'
+    } else if (data.type === 'phoneAgent' && data.config.userQuery) {
+      configSummary = `Appelant: "${data.config.userQuery.substring(0, 35)}..."`
+    } else if (data.type === 'googleCalendar' && data.config.summary) {
+      configSummary = `RDV: "${data.config.summary}" (${data.config.date || 'Dyn'})`
     } else if (data.type === 'mapSearch' && data.config.query) {
       configSummary = `${data.config.query} — ${data.config.location || ''}`
     } else if (data.type === 'email' && data.config.to) {
@@ -89,8 +93,13 @@ function CustomNode({ data, selected }) {
     )
   }
 
+  const isPhoneAgent = data.type === 'phoneAgent'
+  const customStyle = isPhoneAgent 
+    ? { minWidth: '380px', maxWidth: '420px', minHeight: '260px', paddingBottom: '20px' } 
+    : {}
+
   return (
-    <div className={`custom-node ${statusClass} ${selected ? 'selected' : ''}`}>
+    <div className={`custom-node ${statusClass} ${selected ? 'selected' : ''}`} style={customStyle}>
       {/* Target (Input) Handles */}
       {inputsCount > 0 && (
         <div className="custom-handles-target">

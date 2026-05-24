@@ -46,6 +46,7 @@ export default {
       analysisType,
       text: textStr.substring(0, 500),
       analysis,
+      result: analysis.summary || analysis.sentiment || response || '',
       provider,
       model,
       timestamp: Date.now()

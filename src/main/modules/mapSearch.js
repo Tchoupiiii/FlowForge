@@ -8,7 +8,8 @@ export async function execute(config, inputData) {
   try {
     const query = config.query || inputData?.query || 'boulangerie'
     const location = config.location || inputData?.location || 'Paris'
-    const radius = (config.radius || 5) * 1000 // Convert km to meters
+    const radiusKm = config.radius !== undefined ? parseFloat(config.radius) : 5
+    const limitValue = config.limit !== undefined ? parseInt(config.limit, 10) : 10
 
     // Step 1: Geocode the location to get coordinates
     const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`
@@ -38,8 +39,23 @@ export async function execute(config, inputData) {
     const lat = parseFloat(geoData[0].lat)
     const lon = parseFloat(geoData[0].lon)
 
-    // Step 2: Search for places using Nominatim
-    const searchUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ' ' + location)}&format=json&limit=20&addressdetails=1&extratags=1`
+    // Step 2: Calculate bounding box coordinates around center
+    // 1 degree latitude ~ 111.32 km
+    // 1 degree longitude ~ 111.32 * cos(lat) km
+    const deltaLat = radiusKm / 111.32
+    const cosLat = Math.cos(lat * Math.PI / 180)
+    const deltaLon = radiusKm / (111.32 * (Math.abs(cosLat) > 0.01 ? cosLat : 0.01))
+
+    const left = lon - deltaLon
+    const right = lon + deltaLon
+    const top = lat + deltaLat
+    const bottom = lat - deltaLat
+
+    // Use Nominatim search limit (max 50 to avoid OSM rate limits)
+    const osmLimit = limitValue === 0 ? 50 : Math.min(50, limitValue)
+
+    // Step 3: Search for POIs bounded within the viewbox
+    const searchUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&viewbox=${left},${top},${right},${bottom}&bounded=1&format=json&limit=${osmLimit}&addressdetails=1&extratags=1`
     const searchResponse = await fetch(searchUrl, {
       headers: { 'User-Agent': 'FlowForge/1.0 (workflow-automation)' }
     })
@@ -74,19 +90,26 @@ export async function execute(config, inputData) {
       }
     })
 
-    // Filter by rough radius (bounding box approximation)
+    // Filter by precise radius in meters
+    const radiusMeters = radiusKm * 1000
     const filteredPlaces = places.filter(p => {
       const dLat = (p.lat - lat) * 111320
       const dLon = (p.lon - lon) * 111320 * Math.cos(lat * Math.PI / 180)
       const distance = Math.sqrt(dLat * dLat + dLon * dLon)
       p.distanceMeters = Math.round(distance)
-      return distance <= radius
+      return distance <= radiusMeters
     })
 
     filteredPlaces.sort((a, b) => a.distanceMeters - b.distanceMeters)
 
-    const resultSummary = filteredPlaces.length > 0 
-      ? filteredPlaces.map((p, i) => `${i+1}. ${p.name} (${p.street || ''}, ${p.city || ''}) - à ${p.distanceMeters}m`).join('\n')
+    // Crop to limitValue if greater than 0
+    let finalPlaces = filteredPlaces
+    if (limitValue > 0) {
+      finalPlaces = filteredPlaces.slice(0, limitValue)
+    }
+
+    const resultSummary = finalPlaces.length > 0 
+      ? finalPlaces.map((p, i) => `${i+1}. ${p.name} (${p.street || ''}, ${p.city || ''}) - à ${p.distanceMeters}m`).join('\n')
       : 'Aucun lieu trouvé.'
 
     return {
@@ -94,9 +117,9 @@ export async function execute(config, inputData) {
       query,
       location,
       center: { lat, lon },
-      radius: config.radius || 5,
-      places: filteredPlaces,
-      count: filteredPlaces.length,
+      radius: radiusKm,
+      places: finalPlaces,
+      count: finalPlaces.length,
       totalFound: searchData.length,
       result: resultSummary
     }

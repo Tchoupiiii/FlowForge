@@ -1,7 +1,8 @@
 export const demoCryptoDiscord = {
   id: 'demo-crypto-discord',
-  title: 'Alerte Prix Crypto',
-  description: 'Vérifie le prix du Bitcoin toutes les heures et envoie une alerte Discord s\'il dépasse un certain seuil.',
+  name: 'Alerte Bitcoin Discord',
+  description: 'Vérifie automatiquement le cours du Bitcoin toutes les heures. Si le prix dépasse le seuil défini de 60 000€, envoie immédiatement une alerte formatée sur Discord.',
+  tags: ['Bourse', 'Crypto', 'Condition', 'Discord'],
   nodes: [
     {
       id: 'cron-1',
@@ -39,7 +40,7 @@ export const demoCryptoDiscord = {
         type: 'condition',
         color: '#fb923c',
         config: {
-          field: 'price',
+          field: '{{price}}',
           operator: '>',
           value: '60000'
         }
@@ -62,8 +63,8 @@ export const demoCryptoDiscord = {
     }
   ],
   edges: [
-    { id: 'e1', source: 'cron-1', target: 'crypto-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e2', source: 'crypto-1', target: 'condition-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e3', source: 'condition-1', target: 'discord-1', sourceHandle: 'a', targetHandle: 'a' }
+    { id: 'e1', source: 'cron-1', target: 'crypto-1', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f59e0b', strokeWidth: 2 } },
+    { id: 'e2', source: 'crypto-1', target: 'condition-1', sourceHandle: 'price', targetHandle: 'field', animated: true, style: { stroke: '#f59e0b', strokeWidth: 2 } },
+    { id: 'e3', source: 'condition-1', target: 'discord-1', sourceHandle: 'true', targetHandle: 'content', animated: true, style: { stroke: '#fb923c', strokeWidth: 2 } }
   ]
 }

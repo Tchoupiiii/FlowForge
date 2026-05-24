@@ -1,7 +1,8 @@
 export const demoImageGenerator = {
   id: 'demo-image',
-  title: 'Générateur d\'Images IA',
-  description: 'Génère une image via DALL-E à partir d\'une idée et l\'envoie en notification.',
+  name: 'Générateur d\'images Discord',
+  description: 'Génère automatiquement une description optimisée pour DALL-E 3 avec un Agent IA, puis produit l\'illustration correspondante et envoie une alerte avec l\'URL de l\'image.',
+  tags: ['IA', 'DALL-E', 'Génération Image', 'Discord'],
   nodes: [
     {
       id: 'trigger-1',
@@ -50,14 +51,14 @@ export const demoImageGenerator = {
         color: '#f87171',
         config: {
           title: 'Image Prête',
-          message: 'Votre image a été générée : {{url}}'
+          body: 'Votre image a été générée : {{url}}'
         }
       }
     }
   ],
   edges: [
-    { id: 'e1', source: 'trigger-1', target: 'ai-prompt', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e2', source: 'ai-prompt', target: 'image-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e3', source: 'image-1', target: 'notify-1', sourceHandle: 'a', targetHandle: 'a' }
+    { id: 'e1', source: 'trigger-1', target: 'ai-prompt', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
+    { id: 'e2', source: 'ai-prompt', target: 'image-1', sourceHandle: 'response', targetHandle: 'prompt', animated: true, style: { stroke: '#818cf8', strokeWidth: 2 } },
+    { id: 'e3', source: 'image-1', target: 'notify-1', sourceHandle: 'url', targetHandle: 'body', animated: true, style: { stroke: '#d946ef', strokeWidth: 2 } }
   ]
 }

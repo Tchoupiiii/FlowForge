@@ -1,13 +1,13 @@
 export const demoPhoneAgent = {
   id: 'demo-phone-agent',
   name: 'Agent Téléphonique & TTS',
-  description: 'Simule un appel téléphonique entrant, gère la réservation en direct sur l\'agenda en moins de 500ms, et convertit la réponse en synthèse vocale.',
-  tags: ['Téléphonie', 'IA', 'TTS', 'Agenda'],
+  description: 'Simule un appel téléphonique entrant, planifie un rendez-vous sur Google Calendar en direct, et convertit la réponse en synthèse vocale (TTS).',
+  tags: ['Téléphonie', 'IA', 'Agenda', 'Google Calendar'],
   nodes: [
     {
       id: 'n1',
       type: 'customNode',
-      position: { x: 100, y: 220 },
+      position: { x: 50, y: 200 },
       data: {
         type: 'triggerManual',
         label: 'Appel Téléphonique (Déclencheur)',
@@ -18,13 +18,13 @@ export const demoPhoneAgent = {
     {
       id: 'n2',
       type: 'customNode',
-      position: { x: 420, y: 220 },
+      position: { x: 350, y: 200 },
       data: {
         type: 'phoneAgent',
         label: 'Agent Vocal IA',
         color: '#10b981',
         config: {
-          userQuery: "Bonjour, je voudrais prendre rendez-vous pour mardi s'il vous plait.",
+          userQuery: "Bonjour, je voudrais prendre rendez-vous pour mardi s'il vous plaît.",
           businessDescription: "FlowForge Inc. propose des solutions d'automatisation sans code de niveau entreprise.",
           businessProducts: "FlowForge Pro à 49€/mois, FlowForge Enterprise sur devis.",
           calendarCheck: "Oui"
@@ -34,35 +34,50 @@ export const demoPhoneAgent = {
     {
       id: 'n3',
       type: 'customNode',
-      position: { x: 740, y: 120 },
+      position: { x: 740, y: 80 },
       data: {
         type: 'tts',
         label: 'Synthèse Vocale (TTS)',
         color: '#a78bfa',
         config: {
-          text: "{{input.response}}",
+          text: "{{response}}",
           language: "fr"
+        }
+      }
+    },
+    {
+      id: 'n5',
+      type: 'customNode',
+      position: { x: 740, y: 320 },
+      data: {
+        type: 'googleCalendar',
+        label: 'Google Calendar (Planning)',
+        color: '#4285F4',
+        config: {
+          summary: "RDV Appelant FlowForge",
+          date: "{{appointmentDate}}"
         }
       }
     },
     {
       id: 'n4',
       type: 'customNode',
-      position: { x: 740, y: 320 },
+      position: { x: 1100, y: 320 },
       data: {
         type: 'notification',
-        label: 'Alerte Notification',
+        label: 'Alerte Confirmation',
         color: '#f87171',
         config: {
-          title: "Rendez-vous Téléphonique",
-          body: "Création RDV: {{input.appointmentBooked}} le {{input.appointmentDate}} (Latence: {{input.latencyMs}}ms)"
+          title: "Événement Google Calendar créé",
+          body: "{{result}} (Latence: {{latencyMs}}ms)"
         }
       }
     }
   ],
   edges: [
     { id: 'e1-2', source: 'n1', target: 'n2', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
-    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } },
-    { id: 'e2-4', source: 'n2', target: 'n4', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } }
+    { id: 'e2-3', source: 'n2', target: 'n3', sourceHandle: 'response', targetHandle: 'text', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } },
+    { id: 'e2-5', source: 'n2', target: 'n5', sourceHandle: 'appointmentDate', targetHandle: 'date', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } },
+    { id: 'e5-4', source: 'n5', target: 'n4', sourceHandle: 'result', targetHandle: 'body', animated: true, style: { stroke: '#4285F4', strokeWidth: 2 } }
   ]
 }

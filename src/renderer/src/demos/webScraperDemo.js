@@ -1,7 +1,8 @@
 export const demoWebScraper = {
   id: 'demo-webscraper',
-  title: 'Résumé d\'Article Web',
-  description: 'Extrait le contenu d\'une page web et demande à l\'IA de la résumer en 3 points.',
+  name: 'Scraper Web & Résumé',
+  description: 'Extrait le contenu textuel brut d\'un article Wikipédia, le transmet à un modèle d\'IA pour en rédiger une synthèse en 3 points, et affiche le résultat.',
+  tags: ['Scraping', 'Web', 'IA', 'Résumé'],
   nodes: [
     {
       id: 'trigger-1',
@@ -46,14 +47,14 @@ export const demoWebScraper = {
         color: '#f87171',
         config: {
           title: 'Résumé : {{title}}',
-          message: '{{response}}'
+          body: '{{response}}'
         }
       }
     }
   ],
   edges: [
-    { id: 'e1', source: 'trigger-1', target: 'scraper-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e2', source: 'scraper-1', target: 'ai-1', sourceHandle: 'a', targetHandle: 'a' },
-    { id: 'e3', source: 'ai-1', target: 'notify-1', sourceHandle: 'a', targetHandle: 'a' }
+    { id: 'e1', source: 'trigger-1', target: 'scraper-1', sourceHandle: 'a', targetHandle: 'a', animated: true, style: { stroke: '#f43f5e', strokeWidth: 2 } },
+    { id: 'e2', source: 'scraper-1', target: 'ai-1', sourceHandle: 'content', targetHandle: 'userPrompt', animated: true, style: { stroke: '#10b981', strokeWidth: 2 } },
+    { id: 'e3', source: 'ai-1', target: 'notify-1', sourceHandle: 'response', targetHandle: 'body', animated: true, style: { stroke: '#818cf8', strokeWidth: 2 } }
   ]
 }
