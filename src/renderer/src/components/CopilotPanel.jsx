@@ -121,11 +121,12 @@ Un workflow est un objet JSON de cette forme :
 Voici la liste des modules disponibles (TYPE_DU_MODULE) :
 ${MODULE_DEFINITIONS.map(m => `- ${m.type} : ${m.label} (${m.help.description}). Pour "sourceHandle" et "targetHandle" utilise "a" (générique) ou une clé spécifique. Entrées spécifiques: ${m.configFields?.map(f => f.key).join(', ') || 'aucune'}. Sorties spécifiques: ${m.type === 'condition' ? 'true, false' : (m.outputFields?.map(f => f.key).join(', ') || 'aucune')}`).join('\n')}
 
-INSTRUCTIONS :
+INSTRUCTIONS STRICTES :
 1. Si l'utilisateur te pose une question générale, réponds lui en texte clair et naturel (sans JSON).
-2. Si l'utilisateur te demande explicitement de générer, ajouter ou modifier le workflow, retourne STRICTEMENT un objet JSON représentant le workflow (SANS texte autour).
-3. Si un module essentiel manque pour réaliser ce qu'il demande, retourne STRICTEMENT le JSON : { "impossible": true }
-4. Si l'utilisateur demande de récupérer des informations, des actualités ou des infos macro-économiques, UTILISE LE MODULE "rssParser" avec une URL pertinente (ex: https://news.google.com/rss/search?q=macro+economy+usd) ou "httpRequest" au lieu de dire que c'est impossible.
+2. Si l'utilisateur te demande explicitement de générer ou modifier le workflow, retourne STRICTEMENT un objet JSON valide représentant le workflow, SANS AUCUN texte avant ou après. N'utilise pas de markdown \`\`\`json.
+3. Pour chaque nœud dans ton JSON, tu DOIS ABSOLUMENT renseigner l'objet "data.config" avec les valeurs appropriées pour ce module. Par exemple, pour "httpRequest", remplis "url" et "method". Pour "telegramSend", remplis "message" et "chatId".
+4. Ne laisse jamais un "data.config" vide ou avec des valeurs par défaut inutiles si l'utilisateur a donné des informations.
+5. Si un module essentiel manque pour réaliser ce qu'il demande, retourne STRICTEMENT le JSON : { "impossible": true }
 `
 
     const systemPrompt = `${basePrompt}\n\n[CONTEXTE] Voici le workflow actuellement sur le Canvas (s'il est vide, tu peux l'ignorer) :\n${currentWorkflowJson}\n\nSi l'utilisateur demande une modification, applique-la sur ce workflow. S'il demande une création, crée un nouveau workflow de zéro.`
@@ -200,6 +201,10 @@ INSTRUCTIONS :
           try { workflow = JSON.parse(match[0]) } catch(e) {}
         } else if (responseText.includes('"impossible": true')) {
           workflow = { impossible: true }
+        }
+        
+        if (!workflow) {
+          throw new Error("Le modèle IA (surtout s'il est petit comme 1.8b) n'a pas réussi à générer un code JSON valide. Réessayez ou utilisez un modèle plus puissant (8b minimum ou OpenAI).")
         }
       }
 

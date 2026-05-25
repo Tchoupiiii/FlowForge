@@ -27,7 +27,7 @@ export const MODULE_DEFINITIONS = [
   },
   {
     type: 'timerCron', label: 'Timer / Cron', icon: 'Clock', color: '#f59e0b', category: 'trigger',
-    inputs: 0, outputs: 1,
+    inputs: 1, outputs: 1,
     configFields: [
       { key: 'repetition', label: 'Répétition', type: 'select', options: ['interval', 'every_minute', 'hourly', 'daily'], default: 'interval' },
       { key: 'intervalValue', label: 'Valeur d\'intervalle', type: 'number', default: 30, showIf: (c) => c.repetition === 'interval' },
